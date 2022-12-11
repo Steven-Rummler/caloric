@@ -9,7 +9,8 @@ const slice = createSlice({
         ...[...Array(15)].map(() => ({
             entryType: 'food',
             date: dayjs().subtract(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
-            number: 10 * _.round(10 + 40 * Math.random())
+            number: 10 * _.round(10 + 40 * Math.random()),
+            ...(Math.random() > 0.5 && { label: 'Eggs' })
         })),
         ...[...Array(5)].map(() => ({
             entryType: 'active',

@@ -21,7 +21,7 @@ export default function HistoryScreen() {
     return (<View style={{ flex: 1 }}>
         <EntryTypePicker entryType={entryType} setEntryType={setEntryType} />
         {entryType !== 'active' && <DateSlider {...{ decrementDate, date, incrementDate }} />}
-        <FlatList data={entries}
+        <FlatList data={entries.filter(entry => entry.entryType === entryType)}
             renderItem={({ item }) => <EntryListItem item={item} />}
             keyExtractor={item => item.date}
         />
