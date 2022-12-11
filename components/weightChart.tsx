@@ -1,18 +1,15 @@
 import { useSelector } from "react-redux";
-//import { getEntries } from "../store";
+import { getEntries } from "../store";
 import { View, Text } from "react-native";
 import { VictoryChart, VictoryLine, VictoryTheme } from "victory-native";
 import dayjs from "dayjs";
 
 export default function WeightChart() {
-    //const entries = useSelector(getEntries);
-    const weightEntries = [
-        { date: dayjs(), number: '1' }
-    ]
-    //entries.filter(e => e.entryType === 'weight');
+    const entries = useSelector(getEntries);
+    const weightEntries = entries.filter(e => e.entryType === 'weight');
     const weightData = weightEntries.map(e => ({
         x: dayjs(e.date).toDate(),
-        y: Number.parseFloat(e.number)
+        y: e.number
     }));
 
     return <View>{weightEntries.length === 0 ? <Text>No Data</Text> :

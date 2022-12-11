@@ -23,9 +23,6 @@ const slice = createSlice({
         }))
     ] as entryList,
     reducers: {
-        // updateData: (state, action) => {
-        //     state = action.payload;
-        // },
         addEntry: (state: entryList, action: { type: string; payload: entry }) => {
             state.push(action.payload);
         },
@@ -35,9 +32,9 @@ const slice = createSlice({
     },
 });
 
-const { /*updateData,*/ addEntry, removeEntry } = slice.actions;
+const { addEntry, removeEntry } = slice.actions;
 
-function getEntries(state: entryList): entryList { return state; };
+function getEntries(state: { data: entryList }): entryList { return state.data; };
 
 const reducer = combineReducers({
     data: slice.reducer
@@ -47,4 +44,4 @@ const store = configureStore({
     reducer
 });
 
-export { store, /*updateData, */addEntry, removeEntry, getEntries };
+export { store, addEntry, removeEntry, getEntries };

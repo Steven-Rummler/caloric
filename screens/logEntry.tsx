@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, Pressable, TextInput, StyleSheet, Dimensions, KeyboardAvoidingView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addEntry, getEntries } from '../store';
-//import EntryTypePicker from '../components/entryTypePicker';
+import EntryTypePicker from '../components/entryTypePicker';
 import { entryTypeUnit, entryTypeLabel, displayDate } from '../pure/entryTypes';
 import { Props } from '../navigationTypes';
 import dayjs, { Dayjs } from 'dayjs';
 import { entry, entryList, entryType } from '../types';
-import EntryTypePicker from '../components/entryTypePicker';
 
 export default function LogEntryScreen({ navigation, route }: Props) {
     const dispatch = useDispatch();
