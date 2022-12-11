@@ -2,76 +2,80 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, Pressable, TextInput, StyleSheet, Dimensions, KeyboardAvoidingView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-//import { addEntry, getEntries } from '../store';
+import { addEntry, getEntries } from '../store';
 //import EntryTypePicker from '../components/entryTypePicker';
-//import { entryTypeUnit, entryTypeLabel, displayDate } from '../pure/entryTypes';
+import { entryTypeUnit, entryTypeLabel, displayDate } from '../pure/entryTypes';
 import { Props } from '../navigationTypes';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import { entry, entryList, entryType } from '../types';
+import EntryTypePicker from '../components/entryTypePicker';
 
 export default function LogEntryScreen({ navigation, route }: Props) {
     const dispatch = useDispatch();
-    //const entries = useSelector(getEntries); // eslint-disable-line
-    const [entryType, setEntryType] = useState('food');
-    const [date, setDate] = useState(dayjs());
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showTimePicker, setShowTimePicker] = useState(false);
-    const [number, setNumber] = useState(null);
-    const [label, setLabel] = useState(null);
+    const entries = useSelector<entryList>(getEntries); // eslint-disable-line
+    const [entryType, setEntryType] = useState<entryType>('food');
+    const [date, setDate] = useState<Dayjs>(dayjs());
+    const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+    const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
+    const [number, setNumber] = useState<string>();
+    const [label, setLabel] = useState<string>();
 
-    // const onDateChange = (event, newDate) => {
-    //     setShowDatePicker(false);
-    //     if (entryType === 'active') setDate(dayjs(newDate));
-    //     else setShowTimePicker(true);
-    // }
+    const onDateChange = (event: any, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
+        setShowDatePicker(false);
+        if (entryType === 'active') setDate(dayjs(newDate));
+        else setShowTimePicker(true);
+    }
 
-    // const onTimeChange = (event, newDate) => {
-    //     setShowTimePicker(false);
-    //     setDate(dayjs(newDate));
-    // }
+    const onTimeChange = (event: any, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
+        setShowTimePicker(false);
+        setDate(dayjs(newDate));
+    }
 
     const showDatepicker = () => {
         setShowDatePicker(true);
     };
 
-    // const submit = (e) => {
-    //     navigation.pop();
-    //     navigation.navigate('History');
-    //     dispatch(addEntry({ entryType, date, number, ...(entryType === 'food' && { label }) }))
-    // }
+    const submit = () => {
+        if (number === undefined) return;
+        const newEntry: entry = { entryType, date: date.toJSON(), number: parseInt(number), ...(entryType === 'food' && label !== null && { label }) };
+        navigation.pop();
+        navigation.navigate('History');
+        dispatch(addEntry(newEntry))
+    }
 
     return (
         <KeyboardAvoidingView>
-            {/* <EntryTypePicker entryType={entryType} setEntryType={setEntryType} /> */}
+            <EntryTypePicker entryType={entryType} setEntryType={setEntryType} />
             <View style={styles.toggleButtonSection}>
                 <Pressable style={styles.toggleButton} onPress={showDatepicker}>
-                    {/* <Text style={styles.toggleButtonText}>{displayDate(date, entryType).replace(/,\s/g, '\n')}</Text> */}
+                    <Text style={styles.toggleButtonText}>{displayDate(date, entryType).replace(/,\s/g, '\n')}</Text>
                 </Pressable>
-                {/* <TextInput autoFocus keyboardType='numeric' value={number} style={styles.toggleButton}
+                <TextInput autoFocus keyboardType='numeric' value={number} style={styles.toggleButton}
                     placeholder={entryTypeUnit(entryType)} onChangeText={setNumber} />
                 {entryType === 'food' ? <TextInput style={styles.toggleButton} value={label}
                     placeholder='Label' onChangeText={setLabel} /> :
                     entryType === 'active' ? <Text style={styles.toggleButton}>Current Active Calories{'\n'}500</Text> :
-                        <Text style={styles.toggleButton}>Info for Weight?</Text>} */}
+                        <Text style={styles.toggleButton}>Info for Weight?</Text>}
             </View>
             <View style={styles.actionButtonSection}>
-                {/* <Pressable disabled={!number} onPress={submit} style={number ? styles.actionButton : styles.actionButtonDisabled}>
+                <Pressable disabled={number === undefined} onPress={submit} style={number === undefined ? styles.actionButtonDisabled : styles.actionButton}>
                     <Text style={{ textAlign: 'center' }}>Submit{'\n' + entryTypeLabel(entryType)}</Text>
-                </Pressable> */}
+                </Pressable>
             </View>
-            {/* {showDatePicker && (
+            {showDatePicker && (
                 <DateTimePicker
                     value={date.toDate()}
                     mode='date'
                     onChange={onDateChange}
                 />
-            )} */}
-            {/* {showTimePicker && (
+            )}
+            {showTimePicker && (
                 <DateTimePicker
                     value={date.toDate()}
                     mode='time'
                     onChange={onTimeChange}
                 />
-            )} */}
+            )}
         </KeyboardAvoidingView>
     );
 }

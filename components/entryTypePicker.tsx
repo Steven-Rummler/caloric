@@ -1,24 +1,28 @@
-import { View, Pressable, StyleSheet, Dimensions, Text } from "react-native";
-//import { entryTypeLabel, entryTypes } from "../pure/entryTypes";
+import { View, Pressable, StyleSheet, Dimensions, Text, GestureResponderEvent } from "react-native";
+import { entryTypeLabel, entryTypes } from "../pure/entryTypes";
+import { entryType } from "../types";
 
-export default function EntryTypePicker(/*props*/) {
-    //const { entryType, setEntryType } = props;
+type props = {
+    entryType: entryType;
+    setEntryType: React.Dispatch<React.SetStateAction<entryType>>;
+}
 
-    // const onEntryTypeChange = (event, newType) => {
-    //     setEntryType(newType);
-    // }
+export default function EntryTypePicker({ entryType, setEntryType }: props) {
+    const onEntryTypeChange = (event: GestureResponderEvent, newType: entryType) => {
+        setEntryType(newType);
+    }
 
     const onButtonStyle = { ...styles.toggleButton, backgroundColor: 'lightgreen' }
     const offButtonStyle = { ...styles.toggleButton, backgroundColor: 'lightgray' }
 
-    return <View style={styles.toggleButtonSection}><Text>Entry type Picker</Text>
-        {/* {entryTypes.map(type =>
+    return <View style={styles.toggleButtonSection}>
+        {entryTypes.map(type =>
             <Pressable
                 key={type}
                 style={type === entryType ? onButtonStyle : offButtonStyle}
                 onPress={e => onEntryTypeChange(e, type)}>
                 <Text style={styles.toggleButtonText}>{entryTypeLabel(type)}</Text>
-            </Pressable>)} */}
+            </Pressable>)}
     </View>
 }
 
