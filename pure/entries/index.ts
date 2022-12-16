@@ -9,11 +9,11 @@ function getEntriesForDate(entries: entryList, date: dayjs.Dayjs): entryList {
 }
 function getMinDate(entries: entryList): dayjs.Dayjs {
     if (entries.length === 0) return dayjs();
-    return entries.reduce<dayjs.Dayjs>((min: dayjs.Dayjs, next: entry) => dayjs(next.date).isBefore(min) ? dayjs(next.date) : min, dayjs(entries[0].date));
+    return dayjs(Math.min(...entries.map(entry => dayjs(entry.date).valueOf())));
 }
 function getMaxDate(entries: entryList): dayjs.Dayjs {
     if (entries.length === 0) return dayjs();
-    return entries.reduce<dayjs.Dayjs>((max: dayjs.Dayjs, next: entry) => dayjs(next.date).isAfter(max) ? dayjs(next.date) : max, dayjs(entries[0].date));
+    return dayjs(Math.max(...entries.map(entry => dayjs(entry.date).valueOf())));
 }
 
 export { getEntriesForType, getEntriesForDate, getMinDate, getMaxDate };

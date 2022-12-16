@@ -11,7 +11,6 @@ import { entry, entryList, entryType } from '../types';
 
 export default function LogEntryScreen({ navigation, route }: Props) {
     const dispatch = useDispatch();
-    const entries = useSelector<entryList>(getEntries); // eslint-disable-line
     const [entryType, setEntryType] = useState<entryType>('food');
     const [date, setDate] = useState<Dayjs>(dayjs());
     const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
