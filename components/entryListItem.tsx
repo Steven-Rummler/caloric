@@ -71,7 +71,7 @@ export default function EntryTypePicker({ item }: { item: entry }) {
     <View style={styles.item}>
       <View>
         <Text>
-          {label && `${label}: `}
+          {label !== undefined && `${label}: `}
           {number} {entryTypeUnit(entryType)}
         </Text>
         <Text>{displayDate(dayjs(date), entryType)}</Text>

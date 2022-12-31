@@ -54,7 +54,7 @@ export default function LogEntryScreen({ navigation }: Props) {
       entryType,
       date: date.toJSON(),
       number: parseInt(number),
-      ...(entryType === 'food' && label !== null && { label }),
+      ...(entryType === 'food' && label !== undefined && { label }),
     };
     navigation.pop();
     navigation.navigate('History');

@@ -10,10 +10,10 @@ import { entryTypeLabel, entryTypes } from '../pure/entryTypes';
 
 import { entryType } from '../types';
 
-type props = {
+interface props {
   entryType: entryType;
   setEntryType: React.Dispatch<React.SetStateAction<entryType>>;
-};
+}
 
 export default function EntryTypePicker({ entryType, setEntryType }: props) {
   const onEntryTypeChange = (

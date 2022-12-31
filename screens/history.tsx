@@ -57,13 +57,13 @@ export default function HistoryScreen() {
   );
 }
 
-type DateSliderProps = {
+interface DateSliderProps {
   currentlyOnMinDate: boolean;
   decrementDate: () => void;
   date: dayjs.Dayjs;
   incrementDate: () => void;
   currentlyOnMaxDate: boolean;
-};
+}
 
 function DateSlider({
   currentlyOnMinDate,
