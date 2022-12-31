@@ -1,7 +1,7 @@
 import { Text, View, Pressable, Dimensions, StyleSheet } from 'react-native';
 import { Props } from '../navigationTypes';
 
-export default function HomeScreen({ navigation, route }: Props) {
+export default function HomeScreen({ navigation }: Props) {
     const logEntry = () => navigation.navigate('LogEntry');
     const history = () => navigation.navigate('History');
     const stats = () => navigation.navigate('Stats');

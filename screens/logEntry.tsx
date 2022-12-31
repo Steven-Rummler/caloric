@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { View, Text, Pressable, TextInput, StyleSheet, Dimensions, KeyboardAvoidingView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { addEntry, getEntries } from '../store';
+import { addEntry } from '../store';
 import EntryTypePicker from '../components/entryTypePicker';
 import { entryTypeUnit, entryTypeLabel, displayDate } from '../pure/entryTypes';
 import { Props } from '../navigationTypes';
 import dayjs, { Dayjs } from 'dayjs';
-import { entry, entryList, entryType } from '../types';
+import { entry, entryType } from '../types';
 
-export default function LogEntryScreen({ navigation, route }: Props) {
+export default function LogEntryScreen({ navigation }: Props) {
     const dispatch = useDispatch();
     const [entryType, setEntryType] = useState<entryType>('food');
     const [date, setDate] = useState<Dayjs>(dayjs());
@@ -18,16 +18,16 @@ export default function LogEntryScreen({ navigation, route }: Props) {
     const [number, setNumber] = useState<string>();
     const [label, setLabel] = useState<string>();
 
-    const onDateChange = (event: any, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
+    const onDateChange = (event: unknown, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
         setShowDatePicker(false);
         if (entryType === 'active') setDate(dayjs(newDate));
         else setShowTimePicker(true);
-    }
+    };
 
-    const onTimeChange = (event: any, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
+    const onTimeChange = (event: unknown, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
         setShowTimePicker(false);
         setDate(dayjs(newDate));
-    }
+    };
 
     const showDatepicker = () => {
         setShowDatePicker(true);
@@ -38,8 +38,8 @@ export default function LogEntryScreen({ navigation, route }: Props) {
         const newEntry: entry = { entryType, date: date.toJSON(), number: parseInt(number), ...(entryType === 'food' && label !== null && { label }) };
         navigation.pop();
         navigation.navigate('History');
-        dispatch(addEntry(newEntry))
-    }
+        dispatch(addEntry(newEntry));
+    };
 
     return (
         <KeyboardAvoidingView>

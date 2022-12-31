@@ -1,4 +1,4 @@
-import { entry, entryList, entryType } from "../../types";
+import { entryList, entryType } from '../../types';
 import dayjs from 'dayjs';
 
 function getEntriesForType(entries: entryList, entryType: entryType): entryList {

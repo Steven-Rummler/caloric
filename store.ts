@@ -1,7 +1,7 @@
-import { configureStore, combineReducers, createSlice } from "@reduxjs/toolkit";
+import { configureStore, combineReducers, createSlice } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
 import dayjs from 'dayjs';
-import { entry, entryList } from "./types";
+import { entry, entryList } from './types';
 
 const slice = createSlice({
     name: 'data',
@@ -35,7 +35,7 @@ const slice = createSlice({
 
 const { addEntry, removeEntry } = slice.actions;
 
-function getEntries(state: { data: entryList }): entryList { return state.data; };
+function getEntries(state: { data: entryList }): entryList { return state.data; }
 
 const reducer = combineReducers({
     data: slice.reducer
