@@ -1,6 +1,6 @@
-import { View, Pressable, StyleSheet, Dimensions, Text, GestureResponderEvent } from "react-native";
-import { entryTypeLabel, entryTypes } from "../pure/entryTypes";
-import { entryType } from "../types";
+import { View, Pressable, StyleSheet, Dimensions, Text, GestureResponderEvent } from 'react-native';
+import { entryTypeLabel, entryTypes } from '../pure/entryTypes';
+import { entryType } from '../types';
 
 type props = {
     entryType: entryType;
@@ -10,10 +10,10 @@ type props = {
 export default function EntryTypePicker({ entryType, setEntryType }: props) {
     const onEntryTypeChange = (event: GestureResponderEvent, newType: entryType) => {
         setEntryType(newType);
-    }
+    };
 
-    const onButtonStyle = { ...styles.toggleButton, backgroundColor: 'lightgreen' }
-    const offButtonStyle = { ...styles.toggleButton, backgroundColor: 'lightgray' }
+    const onButtonStyle = { ...styles.toggleButton, backgroundColor: 'lightgreen' };
+    const offButtonStyle = { ...styles.toggleButton, backgroundColor: 'lightgray' };
 
     return <View style={styles.toggleButtonSection}>
         {entryTypes.map(type =>
@@ -23,7 +23,7 @@ export default function EntryTypePicker({ entryType, setEntryType }: props) {
                 onPress={e => onEntryTypeChange(e, type)}>
                 <Text style={styles.toggleButtonText}>{entryTypeLabel(type)}</Text>
             </Pressable>)}
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create({
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         textAlignVertical: 'center'
     }
-})
+});

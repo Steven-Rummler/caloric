@@ -1,8 +1,8 @@
-import { useSelector } from "react-redux";
-import { getEntries } from "../store";
-import { View, Text } from "react-native";
-import { VictoryChart, VictoryLine, VictoryTheme } from "victory-native";
-import dayjs from "dayjs";
+import { useSelector } from 'react-redux';
+import { getEntries } from '../store';
+import { View, Text } from 'react-native';
+import { VictoryChart, VictoryLine, VictoryTheme } from 'victory-native';
+import dayjs from 'dayjs';
 
 export default function WeightChart() {
     const entries = useSelector(getEntries);
@@ -16,12 +16,12 @@ export default function WeightChart() {
         <VictoryChart theme={VictoryTheme.material}>
             <VictoryLine
                 style={{
-                    data: { stroke: "#c43a31" },
-                    parent: { border: "1px solid #ccc" }
+                    data: { stroke: '#c43a31' },
+                    parent: { border: '1px solid #ccc' }
                 }}
                 data={weightData}
             />
         </VictoryChart>
     }
-    </View >
+    </View>;
 }

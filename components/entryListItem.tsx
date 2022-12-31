@@ -1,12 +1,12 @@
-import { View, Text, Pressable, Alert, Modal, TextInput, StyleSheet, Dimensions } from "react-native";
-import { Edit, Trash2 } from "react-native-feather";
-import { addEntry, removeEntry } from "../store";
-import { useDispatch } from "react-redux";
-import { entryTypeUnit, displayDate } from "../pure/entryTypes";
-import { useState } from "react";
-import dayjs from "dayjs";
+import { View, Text, Pressable, Alert, Modal, TextInput, StyleSheet, Dimensions } from 'react-native';
+import { Edit, Trash2 } from 'react-native-feather';
+import { addEntry, removeEntry } from '../store';
+import { useDispatch } from 'react-redux';
+import { entryTypeUnit, displayDate } from '../pure/entryTypes';
+import { useState } from 'react';
+import dayjs from 'dayjs';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { entry } from "../types";
+import { entry } from '../types';
 
 export default function EntryTypePicker({ item }: { item: entry }) {
     const { entryType, label, number, date } = item;
@@ -18,16 +18,16 @@ export default function EntryTypePicker({ item }: { item: entry }) {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
 
-    const onDateChange = (event: any, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
+    const onDateChange = (event: unknown, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
         setShowDatePicker(false);
         if (entryType === 'active') setEditDate(dayjs(newDate));
         else setShowTimePicker(true);
-    }
+    };
 
-    const onTimeChange = (event: any, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
+    const onTimeChange = (event: unknown, newDate: string | number | dayjs.Dayjs | Date | null | undefined) => {
         setShowTimePicker(false);
         setEditDate(dayjs(newDate));
-    }
+    };
 
     const showDatepicker = () => {
         setShowDatePicker(true);
@@ -35,17 +35,17 @@ export default function EntryTypePicker({ item }: { item: entry }) {
 
     const onDelete = (entry: entry) => {
         return Alert.alert(
-            "Delete Entry?",
-            "Entry will be gone forever (a long time)",
+            'Delete Entry?',
+            'Entry will be gone forever (a long time)',
             [
                 {
-                    text: "Delete",
+                    text: 'Delete',
                     onPress: () => {
                         dispatch(removeEntry(entry));
                     },
                 },
                 {
-                    text: "Cancel",
+                    text: 'Cancel',
                 },
             ]
         );
@@ -57,11 +57,11 @@ export default function EntryTypePicker({ item }: { item: entry }) {
             <Text>{displayDate(dayjs(date), entryType)}</Text>
         </View>
         <View>
-            <Pressable onPress={e => setEditVisible(true)}><Edit color='black' /></Pressable>
-            <Pressable onPress={e => onDelete(item)}><Trash2 color='black' /></Pressable>
+            <Pressable onPress={() => setEditVisible(true)}><Edit color='black' /></Pressable>
+            <Pressable onPress={() => onDelete(item)}><Trash2 color='black' /></Pressable>
         </View>
         <Modal
-            animationType="slide"
+            animationType='slide'
             transparent={true}
             visible={editVisible}
             onRequestClose={() => setEditVisible(!editVisible)}
@@ -109,7 +109,7 @@ export default function EntryTypePicker({ item }: { item: entry }) {
                 onChange={onTimeChange}
             />
         )}
-    </View>
+    </View>;
 }
 
 const styles = StyleSheet.create({
@@ -124,17 +124,17 @@ const styles = StyleSheet.create({
     // Modal
     centeredView: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
         marginTop: 22
     },
     modalView: {
         margin: 20,
-        backgroundColor: "white",
+        backgroundColor: 'white',
         borderRadius: 20,
         padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
+        alignItems: 'center',
+        shadowColor: '#000',
         shadowOffset: {
             width: 0,
             height: 2
@@ -149,19 +149,19 @@ const styles = StyleSheet.create({
         elevation: 2
     },
     buttonOpen: {
-        backgroundColor: "#F194FF",
+        backgroundColor: '#F194FF',
     },
     buttonClose: {
-        backgroundColor: "#2196F3",
+        backgroundColor: '#2196F3',
     },
     textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center"
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center'
     },
     modalText: {
         marginBottom: 15,
-        textAlign: "center"
+        textAlign: 'center'
     },
     toggleButton: {
         height: Dimensions.get('window').height * .15,

@@ -12,16 +12,16 @@ import StatsScreen from './screens/stats';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
-  return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="LogEntry" component={LogEntryScreen} />
-          <Stack.Screen name="History" component={HistoryScreen} />
-          <Stack.Screen name="Stats" component={StatsScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Provider>
-  );
+    return (
+        <Provider store={store}>
+            <NavigationContainer>
+                <Stack.Navigator>
+                    <Stack.Screen name="Home" component={HomeScreen} />
+                    <Stack.Screen name="LogEntry" component={LogEntryScreen} />
+                    <Stack.Screen name="History" component={HistoryScreen} />
+                    <Stack.Screen name="Stats" component={StatsScreen} />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </Provider>
+    );
 }
