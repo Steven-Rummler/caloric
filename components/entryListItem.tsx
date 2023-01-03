@@ -19,21 +19,23 @@ import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 
 export default function EntryTypePicker({ item }: { item: entry }) {
-  const { entryType, label, number, date } = item;
+  const { entryType, label, number, timestamp } = item;
   const dispatch = useDispatch();
   const [editVisible, setEditVisible] = useState(false);
   const [editLabel, setEditLabel] = useState<string | undefined>(label);
   const [editNumber, setEditNumber] = useState<string>(number.toString());
-  const [editDate, setEditDate] = useState<dayjs.Dayjs>(dayjs(date));
+  const [editTimestamp, setEditTimestamp] = useState<dayjs.Dayjs>(
+    dayjs(timestamp)
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const onDateChange = (
     event: unknown,
-    newDate: string | number | dayjs.Dayjs | Date | null | undefined
+    newTimestamp: string | number | dayjs.Dayjs | Date | null | undefined
   ) => {
     setShowDatePicker(false);
-    if (entryType === 'active') setEditDate(dayjs(newDate));
+    if (entryType === 'active') setEditTimestamp(dayjs(newTimestamp));
     else setShowTimePicker(true);
   };
 
@@ -42,7 +44,7 @@ export default function EntryTypePicker({ item }: { item: entry }) {
     newDate: string | number | dayjs.Dayjs | Date | null | undefined
   ) => {
     setShowTimePicker(false);
-    setEditDate(dayjs(newDate));
+    setEditTimestamp(dayjs(newDate));
   };
 
   const showDatepicker = () => {
@@ -74,7 +76,7 @@ export default function EntryTypePicker({ item }: { item: entry }) {
           {label !== undefined && `${label}: `}
           {number} {entryTypeUnit(entryType)}
         </Text>
-        <Text>{displayDate(dayjs(date), entryType)}</Text>
+        <Text>{displayDate(dayjs(timestamp), entryType)}</Text>
       </View>
       <View>
         <Pressable onPress={() => setEditVisible(true)}>
@@ -107,7 +109,7 @@ export default function EntryTypePicker({ item }: { item: entry }) {
             />
             <Text>{entryTypeUnit(entryType)}</Text>
             <Pressable onPress={showDatepicker}>
-              <Text>{displayDate(editDate, entryType)}</Text>
+              <Text>{displayDate(editTimestamp, entryType)}</Text>
             </Pressable>
             <View style={{ flexDirection: 'row' }}>
               <Pressable
@@ -122,7 +124,7 @@ export default function EntryTypePicker({ item }: { item: entry }) {
                   dispatch(
                     addEntry({
                       entryType,
-                      date: editDate.toJSON(),
+                      timestamp: editTimestamp.toJSON(),
                       number: Number.parseInt(editNumber),
                       ...(entryType === 'food' && {
                         label: editLabel,
@@ -141,14 +143,14 @@ export default function EntryTypePicker({ item }: { item: entry }) {
       </Modal>
       {showDatePicker && (
         <DateTimePicker
-          value={editDate.toDate()}
+          value={editTimestamp.toDate()}
           mode="date"
           onChange={onDateChange}
         />
       )}
       {showTimePicker && (
         <DateTimePicker
-          value={editDate.toDate()}
+          value={editTimestamp.toDate()}
           mode="time"
           onChange={onTimeChange}
         />

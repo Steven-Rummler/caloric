@@ -4,14 +4,14 @@ import { entry, entryList } from './types';
 import _ from 'lodash';
 import dayjs from 'dayjs';
 
-const arrayOfFifteen = Array(15);
+const arrayOfFifteen = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 const slice = createSlice({
   name: 'data',
   initialState: [
     ...arrayOfFifteen.map(() => ({
       entryType: 'food',
-      date: dayjs()
+      timestamp: dayjs()
         .subtract(10 * 24 * 60 * Math.random(), 'minute')
         .toJSON(),
       number: 10 * _.round(10 + 40 * Math.random()),
@@ -19,14 +19,14 @@ const slice = createSlice({
     })),
     ...arrayOfFifteen.map(() => ({
       entryType: 'active',
-      date: dayjs()
+      timestamp: dayjs()
         .subtract(10 * 24 * 60 * Math.random(), 'minute')
         .toJSON(),
-      number: 10 * _.round(100 * Math.random()),
+      number: 5 * _.round(100 * Math.random()),
     })),
     ...arrayOfFifteen.map(() => ({
       entryType: 'weight',
-      date: dayjs()
+      timestamp: dayjs()
         .subtract(10 * 24 * 60 * Math.random(), 'minute')
         .toJSON(),
       number: _.round(150 + 5 * Math.random(), 1),

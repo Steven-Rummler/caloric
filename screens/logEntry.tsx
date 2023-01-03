@@ -21,7 +21,7 @@ import { useState } from 'react';
 export default function LogEntryScreen({ navigation }: Props) {
   const dispatch = useDispatch();
   const [entryType, setEntryType] = useState<entryType>('food');
-  const [date, setDate] = useState<Dayjs>(dayjs());
+  const [timestamp, setTimestamp] = useState<Dayjs>(dayjs());
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
   const [number, setNumber] = useState<string>();
@@ -29,19 +29,19 @@ export default function LogEntryScreen({ navigation }: Props) {
 
   const onDateChange = (
     event: unknown,
-    newDate: string | number | dayjs.Dayjs | Date | null | undefined
+    newTimestamp: string | number | dayjs.Dayjs | Date | null | undefined
   ) => {
     setShowDatePicker(false);
-    if (entryType === 'active') setDate(dayjs(newDate));
+    if (entryType === 'active') setTimestamp(dayjs(newTimestamp));
     else setShowTimePicker(true);
   };
 
   const onTimeChange = (
     event: unknown,
-    newDate: string | number | dayjs.Dayjs | Date | null | undefined
+    newTimestamp: string | number | dayjs.Dayjs | Date | null | undefined
   ) => {
     setShowTimePicker(false);
-    setDate(dayjs(newDate));
+    setTimestamp(dayjs(newTimestamp));
   };
 
   const showDatepicker = () => {
@@ -52,7 +52,7 @@ export default function LogEntryScreen({ navigation }: Props) {
     if (number === undefined) return;
     const newEntry: entry = {
       entryType,
-      date: date.toJSON(),
+      timestamp: timestamp.toJSON(),
       number: parseInt(number),
       ...(entryType === 'food' && label !== undefined && { label }),
     };
@@ -67,7 +67,7 @@ export default function LogEntryScreen({ navigation }: Props) {
       <View style={styles.toggleButtonSection}>
         <Pressable style={styles.toggleButton} onPress={showDatepicker}>
           <Text style={styles.toggleButtonText}>
-            {displayDate(date, entryType).replace(/,\s/g, '\n')}
+            {displayDate(timestamp, entryType).replace(/,\s/g, '\n')}
           </Text>
         </Pressable>
         <TextInput
@@ -110,14 +110,14 @@ export default function LogEntryScreen({ navigation }: Props) {
       </View>
       {showDatePicker && (
         <DateTimePicker
-          value={date.toDate()}
+          value={timestamp.toDate()}
           mode="date"
           onChange={onDateChange}
         />
       )}
       {showTimePicker && (
         <DateTimePicker
-          value={date.toDate()}
+          value={timestamp.toDate()}
           mode="time"
           onChange={onTimeChange}
         />

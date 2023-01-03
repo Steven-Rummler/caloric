@@ -2,7 +2,7 @@ export type entryType = 'food' | 'active' | 'weight';
 
 export interface entry {
   entryType: entryType;
-  date: string;
+  timestamp: string;
   number: number;
   label?: string;
 }

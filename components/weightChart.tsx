@@ -3,15 +3,24 @@ import { VictoryChart, VictoryLine, VictoryTheme } from 'victory-native';
 
 import dayjs from 'dayjs';
 import { getEntries } from '../store';
+import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function WeightChart() {
   const entries = useSelector(getEntries);
-  const weightEntries = entries.filter((e) => e.entryType === 'weight');
-  const weightData = weightEntries.map((e) => ({
-    x: dayjs(e.date).toDate(),
-    y: e.number,
-  }));
+  const weightEntries = useMemo(
+    () => entries.filter((e) => e.entryType === 'weight'),
+    [entries]
+  );
+
+  const weightData = useMemo(
+    () =>
+      weightEntries.map((e) => ({
+        x: dayjs(e.timestamp).toDate(),
+        y: e.number,
+      })),
+    [weightEntries]
+  );
 
   return (
     <View>

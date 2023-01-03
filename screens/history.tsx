@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'react-native-feather';
 import { Dimensions, FlatList, Pressable, Text, View } from 'react-native';
-import { getMaxDate, getMinDate } from '../pure/entries';
+import { getFirstDay, getLastDay } from '../pure/entries';
 
 import EntryListItem from '../components/entryListItem';
 import EntryTypePicker from '../components/entryTypePicker';
@@ -15,24 +15,24 @@ import { useState } from 'react';
 export default function HistoryScreen() {
   const entries = useSelector(getEntries);
   const [entryType, setEntryType] = useState<entryType>('food');
-  const [date, setDate] = useState<dayjs.Dayjs>(dayjs());
+  const [timestamp, setTimestamp] = useState<dayjs.Dayjs>(dayjs());
 
   const entriesForType = entries.filter(
     (entry) => entry.entryType === entryType
   );
-  const minDateForType = getMinDate(entriesForType);
-  const maxDateForType = getMaxDate(entriesForType);
-  if (date.isBefore(minDateForType, 'day')) setDate(minDateForType);
-  if (date.isAfter(maxDateForType, 'day')) setDate(maxDateForType);
+  const firstDayForType = getFirstDay(entriesForType);
+  const lastDayForType = getLastDay(entriesForType);
+  if (timestamp.isBefore(firstDayForType, 'day')) setTimestamp(firstDayForType);
+  if (timestamp.isAfter(lastDayForType, 'day')) setTimestamp(lastDayForType);
 
-  const currentlyOnMinDate = date.isSame(minDateForType, 'day');
-  const currentlyOnMaxDate = date.isSame(maxDateForType, 'day');
+  const currentlyOnFirstDay = timestamp.isSame(firstDayForType, 'day');
+  const currentlyOnLastDay = timestamp.isSame(lastDayForType, 'day');
   const entriesToDisplay = entriesForType.filter((entry) =>
-    dayjs(entry.date).isSame(date, 'day')
+    dayjs(entry.timestamp).isSame(timestamp, 'day')
   );
 
-  const decrementDate = () => setDate(date.subtract(1, 'day'));
-  const incrementDate = () => setDate(date.add(1, 'day'));
+  const decrementDate = () => setTimestamp(timestamp.subtract(1, 'day'));
+  const incrementDate = () => setTimestamp(timestamp.add(1, 'day'));
 
   return (
     <View style={{ flex: 1 }}>
@@ -40,37 +40,37 @@ export default function HistoryScreen() {
       {entryType !== 'active' && (
         <DateSlider
           {...{
-            currentlyOnMinDate,
+            currentlyOnFirstDay,
             decrementDate,
-            date,
+            timestamp,
             incrementDate,
-            currentlyOnMaxDate,
+            currentlyOnLastDay,
           }}
         />
       )}
       <FlatList
         data={entriesToDisplay}
         renderItem={({ item }) => <EntryListItem item={item} />}
-        keyExtractor={(item) => item.date}
+        keyExtractor={(item) => item.timestamp}
       />
     </View>
   );
 }
 
 interface DateSliderProps {
-  currentlyOnMinDate: boolean;
+  currentlyOnFirstDay: boolean;
   decrementDate: () => void;
-  date: dayjs.Dayjs;
+  timestamp: dayjs.Dayjs;
   incrementDate: () => void;
-  currentlyOnMaxDate: boolean;
+  currentlyOnLastDay: boolean;
 }
 
 function DateSlider({
-  currentlyOnMinDate,
+  currentlyOnFirstDay,
   decrementDate,
-  date,
+  timestamp,
   incrementDate,
-  currentlyOnMaxDate,
+  currentlyOnLastDay,
 }: DateSliderProps) {
   return (
     <View
@@ -83,13 +83,13 @@ function DateSlider({
     >
       <DateArrow
         Icon={ChevronLeft}
-        active={currentlyOnMinDate}
+        active={currentlyOnFirstDay}
         action={decrementDate}
       />
-      <DateDisplay {...{ date }} />
+      <DateDisplay {...{ timestamp }} />
       <DateArrow
         Icon={ChevronRight}
-        active={currentlyOnMaxDate}
+        active={currentlyOnLastDay}
         action={incrementDate}
       />
     </View>
@@ -119,7 +119,7 @@ function DateArrow({
   );
 }
 
-function DateDisplay({ date }: { date: dayjs.Dayjs }) {
+function DateDisplay({ timestamp }: { timestamp: dayjs.Dayjs }) {
   return (
     <Pressable
       style={{
@@ -128,7 +128,7 @@ function DateDisplay({ date }: { date: dayjs.Dayjs }) {
         justifyContent: 'center',
       }}
     >
-      <Text>{displayDate(date, 'active')}</Text>
+      <Text>{displayDate(timestamp, 'active')}</Text>
     </Pressable>
   );
 }
