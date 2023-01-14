@@ -49,6 +49,40 @@ function getCaloriesAtTimestamp(
 
   return foodCalories - activeCalories;
 }
+function calculatePassiveCalories(entries: entryList) {
+  const weightSeries = entries
+    .filter((entry) => entry.entryType === 'weight')
+    .map((entry) => ({
+      x: dayjs(entry.timestamp).valueOf(),
+      y: entry.number,
+    }));
+  const calorieSeries = entries
+    .filter((entry) => entry.entryType !== 'weight')
+    .map((entry) => ({
+      x: dayjs(entry.timestamp).valueOf(),
+      y: entry.number,
+    }));
+
+  const weightLine = slopeForLine(weightSeries);
+  const calorieLine = slopeForLine(calorieSeries);
+
+  return weightLine.slope - calorieLine.slope;
+}
+function slopeForLine(series: { x: number; y: number }[]): {
+  slope: number;
+  intercept: number;
+} {
+  const count = series.length;
+  const xSum = series.reduce((total, next) => total + next.x, 0);
+  const ySum = series.reduce((total, next) => total + next.y, 0);
+  const xxSum = series.reduce((total, next) => total + next.x * next.x, 0);
+  const xySum = series.reduce((total, next) => total + next.x * next.y, 0);
+
+  const slope = (count * xySum - xSum * ySum) / (count * xxSum - xSum * xSum);
+  const intercept = ySum / count - (slope * xSum) / count;
+
+  return { slope, intercept };
+}
 
 export {
   getEntriesForType,
@@ -56,4 +90,5 @@ export {
   getFirstDay,
   getLastDay,
   getCaloriesAtTimestamp,
+  calculatePassiveCalories,
 };
