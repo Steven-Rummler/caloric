@@ -21,7 +21,7 @@ export default function CaloriesChart() {
     const days = [firstDay];
 
     while (days[days.length - 1] <= lastDay)
-      days.push(days[days.length - 1].add(1, 'day'));
+      days.push(days[days.length - 1].add(1, 'hour'));
 
     return days.map((day) => ({
       x: day.toDate(),
