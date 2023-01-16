@@ -5,35 +5,77 @@ import {
   foodCaloriesAtTimestamp,
   getFirstDay,
   getLastDay,
-  passiveCaloriesAtTimestamp,
 } from '../pure/entries';
+import { getEntries, getPassiveCalories } from '../store';
 
 import { View } from 'react-native';
-import dayjs from 'dayjs';
-import { entryList } from '../types';
-import { getEntries } from '../store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 export default function CaloriesChart() {
   const entries = useSelector(getEntries);
+  const passiveCalories = useSelector(getPassiveCalories);
 
-  const total = useMemo(
-    () => calorieData(entries, caloriesAtTimestamp),
-    [entries]
-  );
-  const food = useMemo(
-    () => calorieData(entries, foodCaloriesAtTimestamp),
-    [entries]
-  );
-  const active = useMemo(
-    () => calorieData(entries, activeCaloriesAtTimestamp),
-    [entries]
-  );
-  const passive = useMemo(
-    () => calorieData(entries, passiveCaloriesAtTimestamp),
-    [entries]
-  );
+  const total = useMemo(() => {
+    if (entries.length === 0) return [];
+
+    const firstDay = getFirstDay(entries);
+    const lastDay = getLastDay(entries);
+    const days = [firstDay];
+
+    while (days[days.length - 1] <= lastDay)
+      days.push(days[days.length - 1].add(1, 'hour'));
+
+    return days.map((day) => ({
+      x: day.toDate(),
+      y: caloriesAtTimestamp(entries, day, passiveCalories),
+    }));
+  }, [entries]);
+  const food = useMemo(() => {
+    if (entries.length === 0) return [];
+
+    const firstDay = getFirstDay(entries);
+    const lastDay = getLastDay(entries);
+    const days = [firstDay];
+
+    while (days[days.length - 1] <= lastDay)
+      days.push(days[days.length - 1].add(1, 'hour'));
+
+    return days.map((day) => ({
+      x: day.toDate(),
+      y: foodCaloriesAtTimestamp(entries, day),
+    }));
+  }, [entries]);
+  const active = useMemo(() => {
+    if (entries.length === 0) return [];
+
+    const firstDay = getFirstDay(entries);
+    const lastDay = getLastDay(entries);
+    const days = [firstDay];
+
+    while (days[days.length - 1] <= lastDay)
+      days.push(days[days.length - 1].add(1, 'hour'));
+
+    return days.map((day) => ({
+      x: day.toDate(),
+      y: activeCaloriesAtTimestamp(entries, day),
+    }));
+  }, [entries]);
+  const passive = useMemo(() => {
+    if (entries.length === 0) return [];
+
+    const firstDay = getFirstDay(entries);
+    const lastDay = getLastDay(entries);
+    const days = [firstDay];
+
+    while (days[days.length - 1] <= lastDay)
+      days.push(days[days.length - 1].add(1, 'hour'));
+
+    return days.map((day) => ({
+      x: day.toDate(),
+      y: passiveCalories * (day.valueOf() - firstDay.valueOf()),
+    }));
+  }, [entries]);
   const lines = [total, food, active, passive];
 
   return (
@@ -43,7 +85,7 @@ export default function CaloriesChart() {
           <VictoryLine
             key={index}
             style={{
-              data: { stroke: '#c43a31' },
+              data: { stroke: ['purple', 'red', 'green', 'blue'][index] },
               parent: { border: '1px solid #ccc' },
             }}
             data={line}
@@ -52,26 +94,4 @@ export default function CaloriesChart() {
       </VictoryChart>
     </View>
   );
-}
-
-function calorieData(
-  entries: entryList,
-  caloriesAtTimestampFunction: (
-    entries: entryList,
-    timestamp: dayjs.Dayjs
-  ) => number
-) {
-  if (entries.length === 0) return [];
-
-  const firstDay = getFirstDay(entries);
-  const lastDay = getLastDay(entries);
-  const days = [firstDay];
-
-  while (days[days.length - 1] <= lastDay)
-    days.push(days[days.length - 1].add(1, 'hour'));
-
-  return days.map((day) => ({
-    x: day.toDate(),
-    y: caloriesAtTimestampFunction(entries, day),
-  }));
 }
