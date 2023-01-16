@@ -1,9 +1,31 @@
-import { combineReducers, configureStore, createSlice } from '@reduxjs/toolkit';
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+  persistReducer,
+  persistStore,
+} from 'redux-persist';
+import {
+  combineReducers,
+  configureStore,
+  createSlice,
+  getDefaultMiddleware,
+} from '@reduxjs/toolkit';
 import { entry, entryList } from './types';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import _ from 'lodash';
 import { calculateDailyPassiveCalories } from './pure/entries';
 import dayjs from 'dayjs';
+
+const persistConfig = {
+  key: 'root',
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  storage: AsyncStorage,
+};
 
 const arrayOfFifteen = Array(100)
   .fill(0)
@@ -80,8 +102,27 @@ const reducer = combineReducers({
   data: slice.reducer,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+const persistedReducer = persistReducer(persistConfig, reducer);
+
 const store = configureStore({
-  reducer,
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  reducer: persistedReducer,
+  middleware: getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+    },
+  }),
 });
 
-export { store, addEntry, removeEntry, getEntries, getPassiveCalories };
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+const persistor = persistStore(store);
+
+export {
+  store,
+  persistor,
+  addEntry,
+  removeEntry,
+  getEntries,
+  getPassiveCalories,
+};
