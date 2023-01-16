@@ -29,21 +29,24 @@ function caloriesAtTimestamp(
   timestamp: dayjs.Dayjs,
   dailyPassiveCalories: number
 ): number {
-  // console.log(
-  //   foodCaloriesAtTimestamp(entries, timestamp),
-  //   activeCaloriesAtTimestamp(entries, timestamp),
-  //   timestamp.format(),
-  //   getFirstDay(entries).format(),
-  //   timestamp.diff(getFirstDay(entries), 'days') / (1000 * 60 * 60 * 24),
-  //   dailyPassiveCalories * timestamp.diff(getFirstDay(entries) / (1000 * 60 * 60 * 24),
-  //   foodCaloriesAtTimestamp(entries, timestamp) +
+  //   console.log(`On ${timestamp.format('MMM d')}, ${timestamp.diff(
+  //     getFirstDay(entries),
+  //     'days'
+  //   )} after tracking started,
+  // I'd consumed ${foodCaloriesAtTimestamp(entries, timestamp)} food calories,
+  // actively burned ${activeCaloriesAtTimestamp(entries, timestamp)} calories,
+  // and passively burned ${
+  //     dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
+  //   }
+  // for a total calorie difference of ${
+  //     foodCaloriesAtTimestamp(entries, timestamp) +
   //     activeCaloriesAtTimestamp(entries, timestamp) +
-  //     dailyPassiveCalories * timestamp.diff(getFirstDay(entries)) / (1000 * 60 * 60 * 24)
-  // );
+  //     dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
+  //   }`);
   return (
     foodCaloriesAtTimestamp(entries, timestamp) +
     activeCaloriesAtTimestamp(entries, timestamp) +
-    dailyPassiveCalories * timestamp.diff(getFirstDay(entries), 'days')
+    dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
   );
 }
 function foodCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
@@ -117,6 +120,9 @@ function slopeForLine(series: { x: number; y: number }[]): {
 
   return { slope, intercept };
 }
+function dayDiff(start: dayjs.Dayjs, end: dayjs.Dayjs) {
+  return (end.valueOf() - start.valueOf()) / 1000 / 60 / 60 / 24;
+}
 export {
   getEntriesForType,
   getEntriesForDay,
@@ -126,4 +132,5 @@ export {
   foodCaloriesAtTimestamp,
   activeCaloriesAtTimestamp,
   calculateDailyPassiveCalories,
+  dayDiff,
 };

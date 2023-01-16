@@ -2,6 +2,7 @@ import { VictoryChart, VictoryLine, VictoryTheme } from 'victory-native';
 import {
   activeCaloriesAtTimestamp,
   caloriesAtTimestamp,
+  dayDiff,
   foodCaloriesAtTimestamp,
   getFirstDay,
   getLastDay,
@@ -73,7 +74,7 @@ export default function CaloriesChart() {
 
     return days.map((day) => ({
       x: day.toDate(),
-      y: passiveCalories * (day.valueOf() - firstDay.valueOf()),
+      y: passiveCalories * dayDiff(firstDay, day),
     }));
   }, [entries]);
   const lines = [total, food, active, passive];
