@@ -23,38 +23,49 @@ function getLastDay(entries: entryList): dayjs.Dayjs {
     Math.max(...entries.map((entry) => dayjs(entry.timestamp).valueOf()))
   );
 }
-function getCaloriesAtTimestamp(
+function caloriesAtTimestamp(
   entries: entryList,
   timestamp: dayjs.Dayjs
 ): number {
+  return (
+    foodCaloriesAtTimestamp(entries, timestamp) -
+    activeCaloriesAtTimestamp(entries, timestamp) -
+    passiveCaloriesAtTimestamp(entries, timestamp)
+  );
+}
+function foodCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
   const entriesBeforeTimestamp = entries.filter((entry) =>
     dayjs(entry.timestamp).isBefore(timestamp)
   );
-
   const foodEntriesBeforeTimestamp = entriesBeforeTimestamp.filter(
     (entry) => entry.entryType === 'food'
   );
-  const foodCalories = foodEntriesBeforeTimestamp.reduce(
+  return foodEntriesBeforeTimestamp.reduce(
     (total, next) => total + next.number,
     0
   );
-
+}
+function activeCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
+  const entriesBeforeTimestamp = entries.filter((entry) =>
+    dayjs(entry.timestamp).isBefore(timestamp)
+  );
   const activeEntriesBeforeTimestamp = entriesBeforeTimestamp.filter(
     (entry) => entry.entryType === 'active'
   );
-  const activeCalories = activeEntriesBeforeTimestamp.reduce(
+  return activeEntriesBeforeTimestamp.reduce(
     (total, next) => total + next.number,
     0
   );
-
-  return foodCalories - activeCalories;
 }
-function calculatePassiveCalories(entries: entryList) {
+function passiveCaloriesAtTimestamp(
+  entries: entryList,
+  timestamp: dayjs.Dayjs
+) {
   const weightSeries = entries
     .filter((entry) => entry.entryType === 'weight')
     .map((entry) => ({
       x: dayjs(entry.timestamp).valueOf(),
-      y: entry.number,
+      y: 3500 * entry.number,
     }));
   const calorieSeries = entries
     .filter((entry) => entry.entryType !== 'weight')
@@ -65,8 +76,14 @@ function calculatePassiveCalories(entries: entryList) {
 
   const weightLine = slopeForLine(weightSeries);
   const calorieLine = slopeForLine(calorieSeries);
+  const x = timestamp.valueOf();
+  const passiveCalories =
+    (weightLine.slope - calorieLine.slope) * x +
+    (weightLine.intercept - calorieLine.intercept);
 
-  return weightLine.slope - calorieLine.slope;
+  // console.log(passiveCalories);
+
+  return passiveCalories;
 }
 function slopeForLine(series: { x: number; y: number }[]): {
   slope: number;
@@ -89,6 +106,8 @@ export {
   getEntriesForDay,
   getFirstDay,
   getLastDay,
-  getCaloriesAtTimestamp,
-  calculatePassiveCalories,
+  caloriesAtTimestamp,
+  foodCaloriesAtTimestamp,
+  activeCaloriesAtTimestamp,
+  passiveCaloriesAtTimestamp,
 };

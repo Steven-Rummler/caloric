@@ -1,11 +1,16 @@
-import { Text, View } from 'react-native';
 import { VictoryChart, VictoryLine, VictoryTheme } from 'victory-native';
 import {
-  getCaloriesAtTimestamp,
+  activeCaloriesAtTimestamp,
+  caloriesAtTimestamp,
+  foodCaloriesAtTimestamp,
   getFirstDay,
   getLastDay,
+  passiveCaloriesAtTimestamp,
 } from '../pure/entries';
 
+import { View } from 'react-native';
+import dayjs from 'dayjs';
+import { entryList } from '../types';
 import { getEntries } from '../store';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,37 +18,60 @@ import { useSelector } from 'react-redux';
 export default function CaloriesChart() {
   const entries = useSelector(getEntries);
 
-  const caloriesData = useMemo(() => {
-    if (entries.length === 0) return [];
-
-    const firstDay = getFirstDay(entries);
-    const lastDay = getLastDay(entries);
-    const days = [firstDay];
-
-    while (days[days.length - 1] <= lastDay)
-      days.push(days[days.length - 1].add(1, 'hour'));
-
-    return days.map((day) => ({
-      x: day.toDate(),
-      y: getCaloriesAtTimestamp(entries, day),
-    }));
-  }, [entries]);
+  const total = useMemo(
+    () => calorieData(entries, caloriesAtTimestamp),
+    [entries]
+  );
+  const food = useMemo(
+    () => calorieData(entries, foodCaloriesAtTimestamp),
+    [entries]
+  );
+  const active = useMemo(
+    () => calorieData(entries, activeCaloriesAtTimestamp),
+    [entries]
+  );
+  const passive = useMemo(
+    () => calorieData(entries, passiveCaloriesAtTimestamp),
+    [entries]
+  );
+  const lines = [total, food, active, passive];
 
   return (
     <View>
-      {caloriesData.length === 0 ? (
-        <Text>No Data</Text>
-      ) : (
-        <VictoryChart theme={VictoryTheme.material}>
+      <VictoryChart theme={VictoryTheme.material}>
+        {lines.map((line, index) => (
           <VictoryLine
+            key={index}
             style={{
               data: { stroke: '#c43a31' },
               parent: { border: '1px solid #ccc' },
             }}
-            data={caloriesData}
+            data={line}
           />
-        </VictoryChart>
-      )}
+        ))}
+      </VictoryChart>
     </View>
   );
+}
+
+function calorieData(
+  entries: entryList,
+  caloriesAtTimestampFunction: (
+    entries: entryList,
+    timestamp: dayjs.Dayjs
+  ) => number
+) {
+  if (entries.length === 0) return [];
+
+  const firstDay = getFirstDay(entries);
+  const lastDay = getLastDay(entries);
+  const days = [firstDay];
+
+  while (days[days.length - 1] <= lastDay)
+    days.push(days[days.length - 1].add(1, 'hour'));
+
+  return days.map((day) => ({
+    x: day.toDate(),
+    y: caloriesAtTimestampFunction(entries, day),
+  }));
 }
