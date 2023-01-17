@@ -1,8 +1,15 @@
+import * as FileSystem from 'expo-file-system';
+
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Props } from '../navigationTypes';
+import { entryList } from '../types';
+import { getEntries } from '../store';
+import { useSelector } from 'react-redux';
 
 export default function HomeScreen({ navigation }: Props) {
+  const entries = useSelector(getEntries);
+
   const logEntry = () => navigation.navigate('LogEntry');
   const history = () => navigation.navigate('History');
   const stats = () => navigation.navigate('Stats');
@@ -30,6 +37,14 @@ export default function HomeScreen({ navigation }: Props) {
         </Pressable>
         <Pressable onPress={stats} style={styles.footerButton}>
           <Text>Stats</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            exportData(entries).catch((error) => console.log(error));
+          }}
+          style={styles.footerButton}
+        >
+          <Text>Export</Text>
         </Pressable>
       </View>
     </View>
@@ -80,3 +95,35 @@ const styles = StyleSheet.create({
   },
   footerButton: {},
 });
+
+async function exportData(entries: entryList) {
+  try {
+    const header = ['entryType', 'timestamp', 'number', 'label'];
+    const rows = entries.map((entry) => [
+      entry.entryType,
+      entry.timestamp,
+      entry.number,
+      entry.label,
+    ]);
+
+    const headerString = header.join(',');
+    const rowStrings = rows.map((row) => row.join(','));
+    const csvString = `${headerString}\n${rowStrings.join('\n')}`;
+
+    const permissions =
+      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+    if (!permissions.granted) return;
+
+    const filePath = await FileSystem.StorageAccessFramework.createFileAsync(
+      `${permissions.directoryUri}`,
+      'caloric',
+      'text/csv'
+    );
+
+    await FileSystem.writeAsStringAsync(filePath, csvString, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
