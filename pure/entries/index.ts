@@ -29,20 +29,6 @@ function caloriesAtTimestamp(
   timestamp: dayjs.Dayjs,
   dailyPassiveCalories: number
 ): number {
-  //   console.log(`On ${timestamp.format('MMM d')}, ${timestamp.diff(
-  //     getFirstDay(entries),
-  //     'days'
-  //   )} after tracking started,
-  // I'd consumed ${foodCaloriesAtTimestamp(entries, timestamp)} food calories,
-  // actively burned ${activeCaloriesAtTimestamp(entries, timestamp)} calories,
-  // and passively burned ${
-  //     dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
-  //   }
-  // for a total calorie difference of ${
-  //     foodCaloriesAtTimestamp(entries, timestamp) +
-  //     activeCaloriesAtTimestamp(entries, timestamp) +
-  //     dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
-  //   }`);
   return (
     foodCaloriesAtTimestamp(entries, timestamp) +
     activeCaloriesAtTimestamp(entries, timestamp) +
@@ -84,10 +70,6 @@ function calculateDailyPassiveCalories(entries: entryList) {
   const calorieSeries: { x: number; y: number }[] = [];
   const sortedEntries = _.cloneDeep(entries);
   sortedEntries.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1));
-  console.log(
-    sortedEntries[0].timestamp,
-    sortedEntries[sortedEntries.length - 1].timestamp
-  );
   sortedEntries
     .filter((entry) => entry.entryType !== 'weight')
     .forEach((entry) => {

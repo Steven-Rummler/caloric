@@ -63,7 +63,6 @@ const defaultEntries: entryList = [
 ];
 
 const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
-console.log(defaultPassive);
 
 const slice = createSlice({
   name: 'data',
