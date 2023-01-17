@@ -5,6 +5,7 @@ import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Props } from '../navigationTypes';
 import { entryList } from '../types';
 import { getEntries } from '../store';
+import { jsonToCSV } from 'react-native-csv';
 import { useSelector } from 'react-redux';
 
 export default function HomeScreen({ navigation }: Props) {
@@ -98,17 +99,14 @@ const styles = StyleSheet.create({
 
 async function exportData(entries: entryList) {
   try {
-    const header = ['entryType', 'timestamp', 'number', 'label'];
-    const rows = entries.map((entry) => [
-      entry.entryType,
-      entry.timestamp,
-      entry.number,
-      entry.label,
-    ]);
-
-    const headerString = header.join(',');
-    const rowStrings = rows.map((row) => row.join(','));
-    const csvString = `${headerString}\n${rowStrings.join('\n')}`;
+    const csvString = jsonToCSV(
+      JSON.stringify(
+        entries.map((entry) => {
+          if (entry.label !== undefined) return entry;
+          return { ...entry, label: '' };
+        })
+      )
+    );
 
     const permissions =
       await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();

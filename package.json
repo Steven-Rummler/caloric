@@ -15,18 +15,19 @@
     "@react-navigation/native-stack": "^6.9.5",
     "@reduxjs/toolkit": "^1.9.1",
     "expo": "~47.0.8",
+    "expo-file-system": "~15.1.1",
     "expo-status-bar": "~1.4.2",
     "lodash": "^4.17.21",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
+    "react-native-csv": "^0.2.0",
     "react-native-feather": "^1.1.2",
     "react-native-svg": "13.4.0",
     "react-redux": "^8.0.5",
     "redux-persist": "^6.0.0",
     "redux-toolkit": "^1.1.2",
-    "victory-native": "^36.6.8",
-    "expo-file-system": "~15.1.1"
+    "victory-native": "^36.6.8"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
