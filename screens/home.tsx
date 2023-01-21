@@ -1,7 +1,12 @@
 import * as FileSystem from 'expo-file-system';
 
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
-import { clearEntries, getEntries, useDefaultEntries } from '../store';
+import {
+  addEntries,
+  clearEntries,
+  getEntries,
+  useDefaultEntries,
+} from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Props } from '../navigationTypes';
@@ -83,6 +88,21 @@ export default function HomeScreen({ navigation }: Props) {
           style={styles.footerButton}
         >
           <Text>Export</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            console.log('Import');
+            importData()
+              .then((newEntries) => {
+                console.log('Imported');
+                dispatch(clearEntries());
+                dispatch(addEntries(newEntries));
+              })
+              .catch((error) => console.log(error));
+          }}
+          style={styles.footerButton}
+        >
+          <Text>Import</Text>
         </Pressable>
         <Pressable
           onPress={() => {
@@ -177,4 +197,9 @@ async function exportData(entries: entryList) {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function importData() {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return [];
 }

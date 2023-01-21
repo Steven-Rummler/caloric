@@ -75,6 +75,10 @@ const slice = createSlice({
       state.entries.push(action.payload);
       state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
+    addEntries: (state, action: { type: string; payload: entryList }) => {
+      state.entries.push(...action.payload);
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+    },
     removeEntry: (state, action: { type: string; payload: entry }) => {
       const filteredEntries = state.entries.filter(
         (entry) => !_.isEqual(entry, action.payload)
@@ -93,7 +97,7 @@ const slice = createSlice({
   },
 });
 
-const { addEntry, removeEntry, clearEntries, useDefaultEntries } =
+const { addEntry, addEntries, removeEntry, clearEntries, useDefaultEntries } =
   slice.actions;
 
 function getEntries(state: { data: { entries: entryList } }): entryList {
@@ -130,6 +134,7 @@ export {
   store,
   persistor,
   addEntry,
+  addEntries,
   removeEntry,
   clearEntries,
   useDefaultEntries,
