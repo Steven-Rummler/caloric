@@ -1,3 +1,4 @@
+import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -7,12 +8,12 @@ import {
   getEntries,
   useDefaultEntries,
 } from '../store';
+import { entry, entryList } from '../types';
+import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Props } from '../navigationTypes';
 import dayjs from 'dayjs';
-import { entryList } from '../types';
-import { jsonToCSV } from 'react-native-csv';
 import { useMemo } from 'react';
 
 export default function HomeScreen({ navigation }: Props) {
@@ -91,10 +92,9 @@ export default function HomeScreen({ navigation }: Props) {
         </Pressable>
         <Pressable
           onPress={() => {
-            console.log('Import');
             importData()
               .then((newEntries) => {
-                console.log('Imported');
+                if (newEntries.length === 0) return;
                 dispatch(clearEntries());
                 dispatch(addEntries(newEntries));
               })
@@ -200,6 +200,35 @@ async function exportData(entries: entryList) {
 }
 
 async function importData() {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  const importFile = await DocumentPicker.getDocumentAsync({
+    copyToCacheDirectory: true,
+    type: ['text/csv', 'text/comma-separated-values'],
+  });
+  if (importFile.type !== 'success') return [];
+  const fileString = await FileSystem.readAsStringAsync(importFile.uri, {
+    encoding: FileSystem.EncodingType.UTF8,
+  });
+  const fileData = readString(fileString);
+  if (Array.isArray(fileData.data)) {
+    const dataRows = fileData.data.slice(1);
+    const entries = dataRows.map((row) => {
+      if (!Array.isArray(row)) return null;
+      if (typeof row[0] !== 'string') return null;
+      if (typeof row[1] !== 'string') return null;
+      if (typeof row[2] !== 'string') return null;
+      if (typeof row[3] !== 'string') return null;
+      const entry = {
+        entryType: row[0],
+        timestamp: row[1],
+        number: Number.parseFloat(row[2]),
+        ...(row[3] === '' ? {} : { label: row[3] }),
+      };
+      return entry;
+    });
+    const validEntries: entryList = entries.filter(
+      (entry): entry is entry => entry !== null
+    );
+    return validEntries;
+  }
   return [];
 }
