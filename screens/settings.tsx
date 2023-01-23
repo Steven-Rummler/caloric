@@ -1,5 +1,5 @@
-import { Switch, Text, View } from 'react-native';
-import { getSettings, updateSetting } from '../store';
+import { Pressable, Switch, Text, View } from 'react-native';
+import { getSettings, resetSettings, updateSetting } from '../store';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function SettingsScreen() {
@@ -18,6 +18,13 @@ export default function SettingsScreen() {
           );
         }}
       />
+      <Pressable
+        onPress={() => {
+          dispatch(resetSettings());
+        }}
+      >
+        <Text>Reset Settings</Text>
+      </Pressable>
     </View>
   );
 }

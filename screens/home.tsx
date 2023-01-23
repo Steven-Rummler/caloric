@@ -121,14 +121,6 @@ export default function HomeScreen({ navigation }: Props) {
         >
           <Text>Default</Text>
         </Pressable>
-        <Pressable
-          onPress={() => {
-            dispatch(resetSettings());
-          }}
-          style={styles.footerButton}
-        >
-          <Text>Reset Settings</Text>
-        </Pressable>
       </View>
     </View>
   );
