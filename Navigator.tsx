@@ -1,5 +1,4 @@
 import { Props, RootStackParamList } from './navigationTypes';
-import { useNavigation, useRoute } from '@react-navigation/native';
 
 import HistoryScreen from './screens/history';
 import HomeScreen from './screens/home';
