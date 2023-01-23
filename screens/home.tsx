@@ -6,6 +6,7 @@ import {
   addEntries,
   clearEntries,
   getEntries,
+  resetSettings,
   useDefaultEntries,
 } from '../store';
 import { entry, entryList } from '../types';
@@ -119,6 +120,14 @@ export default function HomeScreen({ navigation }: Props) {
           style={styles.footerButton}
         >
           <Text>Default</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            dispatch(resetSettings());
+          }}
+          style={styles.footerButton}
+        >
+          <Text>Reset Settings</Text>
         </Pressable>
       </View>
     </View>

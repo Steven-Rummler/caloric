@@ -14,7 +14,7 @@ import {
   createSlice,
   getDefaultMiddleware,
 } from '@reduxjs/toolkit';
-import { entry, entryList } from './types';
+import { entry, entryList, settings } from './types';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import _ from 'lodash';
@@ -64,11 +64,16 @@ const defaultEntries: entryList = [
 
 const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
+const defaultSettings: settings = {
+  trackActiveCalories: false,
+};
+
 const slice = createSlice({
   name: 'data',
   initialState: {
     passiveCalories: defaultPassive,
     entries: defaultEntries,
+    settings: defaultSettings,
   },
   reducers: {
     addEntry: (state, action: { type: string; payload: entry }) => {
@@ -94,11 +99,31 @@ const slice = createSlice({
       state.entries = defaultEntries;
       state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
+    updateSetting: (
+      state,
+      action: {
+        type: string;
+        payload: Partial<settings>;
+      }
+    ) => {
+      for (const [key, value] of Object.entries(action.payload))
+        state.settings[key as keyof typeof state.settings] = value;
+    },
+    resetSettings: (state) => {
+      state.settings = defaultSettings;
+    },
   },
 });
 
-const { addEntry, addEntries, removeEntry, clearEntries, useDefaultEntries } =
-  slice.actions;
+const {
+  addEntry,
+  addEntries,
+  removeEntry,
+  clearEntries,
+  useDefaultEntries,
+  updateSetting,
+  resetSettings,
+} = slice.actions;
 
 function getEntries(state: { data: { entries: entryList } }): entryList {
   return state.data.entries;
@@ -108,6 +133,10 @@ function getPassiveCalories(state: {
   data: { passiveCalories: number };
 }): number {
   return state.data.passiveCalories;
+}
+
+function getSettings(state: { data: { settings: settings } }) {
+  return state.data.settings;
 }
 
 const reducer = combineReducers({
@@ -138,6 +167,9 @@ export {
   removeEntry,
   clearEntries,
   useDefaultEntries,
+  updateSetting,
+  resetSettings,
   getEntries,
   getPassiveCalories,
+  getSettings,
 };

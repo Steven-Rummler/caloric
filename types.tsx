@@ -8,3 +8,7 @@ export interface entry {
 }
 
 export type entryList = entry[];
+
+export interface settings {
+  trackActiveCalories: boolean;
+}

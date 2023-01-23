@@ -6,9 +6,10 @@ export type RootStackParamList = {
   LogEntry: undefined;
   History: undefined;
   Stats: undefined;
+  Settings: undefined;
 };
 
 export type Props = NativeStackScreenProps<
   RootStackParamList,
-  'Home' | 'LogEntry' | 'History' | 'Stats'
+  'Home' | 'LogEntry' | 'History' | 'Stats' | 'Settings'
 >;
