@@ -17,6 +17,7 @@ export default function Navigator() {
       screenOptions={({ navigation, route }: Props) => {
         if (route.name === 'Settings') return {};
         return {
+          headerShadowVisible: false,
           headerRight: () => (
             <SettingsButton navigation={navigation} route={route} />
           ),

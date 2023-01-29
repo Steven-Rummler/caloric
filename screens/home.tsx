@@ -45,28 +45,30 @@ export default function HomeScreen({ navigation }: Props) {
   }, [entries]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <TitleSection>
         <Title>Caloric</Title>
       </TitleSection>
-      <Info>
-        <Text>Total Active Calories: {totalActiveCalories}</Text>
-      </Info>
-      <Info>
-        <Text>Average Food Calories: {averageFoodCalories}</Text>
-      </Info>
-      <Info>
-        <Text>Last Weight: {lastWeight}</Text>
-      </Info>
-      <ActionButton onPress={logEntry}>
-        <Text adjustsFontSizeToFit>Log</Text>
-      </ActionButton>
+      <InfoSection>
+        <Info>Total Active Calories: {totalActiveCalories}</Info>
+      </InfoSection>
+      <InfoSection>
+        <Info>Average Food Calories: {averageFoodCalories}</Info>
+      </InfoSection>
+      <InfoSection>
+        <Info>Last Weight: {lastWeight}</Info>
+      </InfoSection>
+      <ActionSection>
+        <ActionButton onPress={logEntry}>
+          <Action>Log</Action>
+        </ActionButton>
+      </ActionSection>
       <OptionsSection>
         <OptionButton onPress={history}>
-          <Text adjustsFontSizeToFit>History</Text>
+          <Text>History</Text>
         </OptionButton>
         <OptionButton onPress={stats}>
-          <Text adjustsFontSizeToFit>Stats</Text>
+          <Text>Stats</Text>
         </OptionButton>
       </OptionsSection>
     </View>
@@ -76,31 +78,37 @@ const TitleSection = styled.View`
   flex: 2 1 0;
   align-items: center;
   justify-content: center;
-  border: 1px solid red;
+  //border: 1px solid red;
 `;
 const Title = styled.Text`
   font-size: 50px;
 `;
-const Info = styled.View`
+const InfoSection = styled.View`
   flex: 0.5 1 0;
   align-items: center;
   justify-content: center;
-  border: 1px solid blue;
+`;
+const Info = styled.Text``;
+const ActionSection = styled.View`
+  flex: 5 1 0;
+  padding: 10px 10px 5px 10px;
 `;
 const ActionButton = styled.Pressable`
-  flex: 5 1 0;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  border: 1px solid green;
+  border: 1px solid lightgrey;
 `;
+const Action = styled.Text``;
 const OptionsSection = styled.View`
   flex: 1.5 1 0;
   flex-direction: row;
-  border: 1px solid purple;
+  padding: 5px 10px 10px 0px;
 `;
 const OptionButton = styled.Pressable`
-  flex-grow: 1;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  border: 1px solid orange;
+  border: 1px solid lightgrey;
+  margin-left: 10px;
 `;
