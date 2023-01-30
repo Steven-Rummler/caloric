@@ -1,14 +1,20 @@
 import { persistor, store } from './store';
+import { setCustomText, setCustomTextInput } from 'react-native-global-props';
 
 import { NavigationContainer } from '@react-navigation/native';
 import Navigator from './Navigator';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
-import { setCustomText } from 'react-native-global-props';
 
 export default function App() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   setCustomText({
+    style: {
+      fontSize: 16,
+    },
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  setCustomTextInput({
     style: {
       fontSize: 16,
     },

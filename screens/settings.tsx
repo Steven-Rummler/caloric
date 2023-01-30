@@ -16,10 +16,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
+import { Props } from '../navigationTypes';
 import { Text } from 'react-native';
 import styled from 'styled-components/native';
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }: Props) {
   const dispatch = useDispatch();
   const settings = useSelector(getSettings);
   const entries = useSelector(getEntries);
@@ -51,7 +52,9 @@ export default function SettingsScreen() {
       </TitleSection>
       <OptionButton
         onPress={() => {
-          exportData(entries).catch((error) => console.log(error));
+          exportData(entries)
+            .then(() => navigation.goBack())
+            .catch((error) => console.log(error));
         }}
         style={{}}
       >
@@ -64,6 +67,7 @@ export default function SettingsScreen() {
               if (newEntries.length === 0) return;
               dispatch(clearEntries());
               dispatch(addEntries(newEntries));
+              navigation.goBack();
             })
             .catch((error) => console.log(error));
         }}
@@ -74,6 +78,7 @@ export default function SettingsScreen() {
       <OptionButton
         onPress={() => {
           dispatch(clearEntries());
+          navigation.goBack();
         }}
         style={{}}
       >
@@ -82,6 +87,7 @@ export default function SettingsScreen() {
       <OptionButton
         onPress={() => {
           dispatch(useDefaultEntries());
+          navigation.goBack();
         }}
         style={{}}
       >
@@ -92,7 +98,7 @@ export default function SettingsScreen() {
 }
 
 const TitleSection = styled.View`
-  flex: 1;
+  flex: 0.667;
   align-items: center;
   justify-content: center;
 `;

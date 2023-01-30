@@ -1,31 +1,29 @@
-import {
-  Dimensions,
-  KeyboardAvoidingView,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { addEntry, getSettings } from '../store';
 import dayjs, { Dayjs } from 'dayjs';
-import { displayDate, entryTypeLabel, entryTypeUnit } from '../pure/entryTypes';
+import { displayDate, entryTypeUnit } from '../pure/entryTypes';
 import { entry, entryType } from '../types';
+import { useDispatch, useSelector } from 'react-redux';
 
+import ActionButton from '../components/ActionButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import EntryTypePicker from '../components/entryTypePicker';
+import { OptionButton } from '../components/OptionButton';
 import { Props } from '../navigationTypes';
-import { addEntry } from '../store';
-import { useDispatch } from 'react-redux';
+import _ from 'lodash';
+import styled from 'styled-components/native';
 import { useState } from 'react';
 
 export default function LogEntryScreen({ navigation }: Props) {
+  const settings = useSelector(getSettings);
+  const { trackActiveCalories } = settings;
+
   const dispatch = useDispatch();
   const [entryType, setEntryType] = useState<entryType>('food');
   const [timestamp, setTimestamp] = useState<Dayjs>(dayjs());
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
   const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
   const [number, setNumber] = useState<string>();
-  const [label, setLabel] = useState<string>();
+  // const [label, setLabel] = useState<string>();
 
   const onDateChange = (
     event: unknown,
@@ -54,7 +52,7 @@ export default function LogEntryScreen({ navigation }: Props) {
       entryType,
       timestamp: timestamp.toJSON(),
       number: parseInt(number),
-      ...(entryType === 'food' && label !== undefined && { label }),
+      // ...(entryType === 'food' && label !== undefined && { label }),
     };
     navigation.pop();
     navigation.navigate('History');
@@ -62,51 +60,59 @@ export default function LogEntryScreen({ navigation }: Props) {
   };
 
   return (
-    <KeyboardAvoidingView>
-      <EntryTypePicker entryType={entryType} setEntryType={setEntryType} />
-      <View style={styles.toggleButtonSection}>
-        <Pressable style={styles.toggleButton} onPress={showDatepicker}>
+    <Page>
+      <OptionsSection>
+        <OptionButton onPress={() => setEntryType('food')}>
+          <Text style={entryType === 'food' ? {} : { color: 'lightgrey' }}>
+            Food
+          </Text>
+        </OptionButton>
+        {trackActiveCalories && (
+          <OptionButton onPress={() => setEntryType('active')}>
+            <Text style={entryType === 'active' ? {} : { color: 'lightgrey' }}>
+              Active
+            </Text>
+          </OptionButton>
+        )}
+        <OptionButton onPress={() => setEntryType('weight')}>
+          <Text style={entryType === 'weight' ? {} : { color: 'lightgrey' }}>
+            Weight
+          </Text>
+        </OptionButton>
+      </OptionsSection>
+      <OptionsSection>
+        <OptionButton onPress={showDatepicker}>
           <Text style={styles.toggleButtonText}>
             {displayDate(timestamp, entryType).replace(/,\s/g, '\n')}
           </Text>
-        </Pressable>
-        <TextInput
+        </OptionButton>
+        <OptionTextInput
           autoFocus
           keyboardType="numeric"
           value={number}
-          style={styles.toggleButton}
           placeholder={entryTypeUnit(entryType)}
+          textAlign="center"
           onChangeText={setNumber}
+          multiline={true}
+          numberOfLines={1}
         />
-        {entryType === 'food' ? (
-          <TextInput
-            style={styles.toggleButton}
-            value={label}
-            placeholder="Label"
-            onChangeText={setLabel}
-          />
-        ) : entryType === 'active' ? (
-          <Text style={styles.toggleButton}>
-            Current Active Calories{'\n'}500
-          </Text>
-        ) : (
-          <Text style={styles.toggleButton}>Info for Weight?</Text>
-        )}
-      </View>
-      <View style={styles.actionButtonSection}>
-        <Pressable
-          disabled={number === undefined}
+      </OptionsSection>
+      <View style={{ padding: 20, flexGrow: 1 }}>
+        <ActionButton
+          disabled={[undefined, '', '0'].includes(number)}
           onPress={submit}
-          style={
-            number === undefined
-              ? styles.actionButtonDisabled
-              : styles.actionButton
-          }
         >
-          <Text style={{ textAlign: 'center' }}>
-            Submit{`\n${entryTypeLabel(entryType)}`}
+          <Text
+            style={{
+              textAlign: 'center',
+              color: [undefined, '', '0'].includes(number)
+                ? 'lightgrey'
+                : 'black',
+            }}
+          >
+            {`Log ${_.upperFirst(entryType)}`}
           </Text>
-        </Pressable>
+        </ActionButton>
       </View>
       {showDatePicker && (
         <DateTimePicker
@@ -122,9 +128,27 @@ export default function LogEntryScreen({ navigation }: Props) {
           onChange={onTimeChange}
         />
       )}
-    </KeyboardAvoidingView>
+    </Page>
   );
 }
+
+const Page = styled.KeyboardAvoidingView`
+  flex: 1;
+  background-color: white;
+  padding-top: 90px;
+`;
+const OptionsSection = styled.View`
+  flex: 1 1 0;
+  max-height: 133px;
+  flex-direction: row;
+  padding: 0px 10px 0px 10px;
+`;
+const OptionTextInput = styled.TextInput`
+  flex: 1;
+  text-align: center;
+  border: 1px solid lightgrey;
+  margin: 10px;
+`;
 
 const styles = StyleSheet.create({
   toggleButtonSection: {

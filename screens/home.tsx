@@ -1,3 +1,4 @@
+import ActionButton from '../components/ActionButton';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
@@ -61,7 +62,7 @@ export default function HomeScreen({ navigation }: Props) {
       </InfoSection>
       <ActionSection>
         <ActionButton onPress={logEntry}>
-          <Action>Log</Action>
+          <Text>Log</Text>
         </ActionButton>
       </ActionSection>
       <OptionsSection>
@@ -93,13 +94,6 @@ const ActionSection = styled.View`
   flex: 5 1 0;
   padding: 20px 20px 10px 20px;
 `;
-const ActionButton = styled.Pressable`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid lightgrey;
-`;
-const Action = styled.Text``;
 const OptionsSection = styled.View`
   flex: 1.667 1 0;
   flex-direction: row;
