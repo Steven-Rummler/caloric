@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import { setCustomText } from 'react-native-global-props';
 
 export default function App() {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   setCustomText({
     style: {
       fontSize: 16,

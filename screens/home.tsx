@@ -81,7 +81,7 @@ const TitleSection = styled.View`
   justify-content: center;
 `;
 const Title = styled.Text`
-  font-size: 54px;
+  font-size: 67.77px;
 `;
 const InfoSection = styled.View`
   flex: 0.667 1 0;

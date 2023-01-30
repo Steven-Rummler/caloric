@@ -97,7 +97,7 @@ const TitleSection = styled.View`
   justify-content: center;
 `;
 const Title = styled.Text`
-  font-size: 24px;
+  font-size: 25.89px;
 `;
 
 async function exportData(entries: entryList) {
