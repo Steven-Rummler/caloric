@@ -1,134 +1,73 @@
-import { ChevronLeft, ChevronRight } from 'react-native-feather';
-import { Dimensions, FlatList, Pressable, Text, View } from 'react-native';
-import { getFirstDay, getLastDay } from '../pure/entries';
+import { FlatList, Text } from 'react-native';
+import { getEntries, getSettings } from '../store';
+import { useMemo, useState } from 'react';
 
 import EntryListItem from '../components/entryListItem';
-import EntryTypePicker from '../components/entryTypePicker';
-import { SvgProps } from 'react-native-svg';
+import { OptionButton } from '../components/OptionButton';
+import Page from '../components/Page';
+import _ from 'lodash';
 import dayjs from 'dayjs';
-import { displayDate } from '../pure/entryTypes';
 import { entryType } from '../types';
-import { getEntries } from '../store';
+import styled from 'styled-components/native';
 import { useSelector } from 'react-redux';
-import { useState } from 'react';
 
 export default function HistoryScreen() {
   const entries = useSelector(getEntries);
-  const [entryType, setEntryType] = useState<entryType>('food');
-  const [timestamp, setTimestamp] = useState<dayjs.Dayjs>(dayjs());
+  const settings = useSelector(getSettings);
+  const { trackActiveCalories } = settings;
+  const [selectedEntryType, setSelectedEntryType] = useState<entryType>('food');
 
-  const entriesForType = entries.filter(
-    (entry) => entry.entryType === entryType
-  );
-  const firstDayForType = getFirstDay(entriesForType);
-  const lastDayForType = getLastDay(entriesForType);
-  if (timestamp.isBefore(firstDayForType, 'day')) setTimestamp(firstDayForType);
-  if (timestamp.isAfter(lastDayForType, 'day')) setTimestamp(lastDayForType);
-
-  const currentlyOnFirstDay = timestamp.isSame(firstDayForType, 'day');
-  const currentlyOnLastDay = timestamp.isSame(lastDayForType, 'day');
-  const entriesToDisplay = entriesForType.filter((entry) =>
-    dayjs(entry.timestamp).isSame(timestamp, 'day')
-  );
-
-  const decrementDate = () => setTimestamp(timestamp.subtract(1, 'day'));
-  const incrementDate = () => setTimestamp(timestamp.add(1, 'day'));
+  const sortedEntries = useMemo(() => {
+    const sortedEntries = _.clone(
+      entries.filter((entry) => entry.entryType === selectedEntryType)
+    );
+    sortedEntries.sort(
+      (a, b) => dayjs(a.timestamp).valueOf() - dayjs(b.timestamp).valueOf()
+    );
+    return sortedEntries;
+  }, [entries, selectedEntryType]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <EntryTypePicker entryType={entryType} setEntryType={setEntryType} />
-      {entryType !== 'active' && (
-        <DateSlider
-          {...{
-            currentlyOnFirstDay,
-            decrementDate,
-            timestamp,
-            incrementDate,
-            currentlyOnLastDay,
-          }}
-        />
-      )}
+    <Page style={{ paddingTop: 90 }}>
+      <OptionsSection>
+        <OptionButton onPress={() => setSelectedEntryType('food')}>
+          <Text
+            style={selectedEntryType === 'food' ? {} : { color: 'lightgrey' }}
+          >
+            Food
+          </Text>
+        </OptionButton>
+        {trackActiveCalories && (
+          <OptionButton onPress={() => setSelectedEntryType('active')}>
+            <Text
+              style={
+                selectedEntryType === 'active' ? {} : { color: 'lightgrey' }
+              }
+            >
+              Active
+            </Text>
+          </OptionButton>
+        )}
+        <OptionButton onPress={() => setSelectedEntryType('weight')}>
+          <Text
+            style={selectedEntryType === 'weight' ? {} : { color: 'lightgrey' }}
+          >
+            Weight
+          </Text>
+        </OptionButton>
+      </OptionsSection>
       <FlatList
-        data={entriesToDisplay}
+        data={sortedEntries}
         renderItem={({ item }) => <EntryListItem item={item} />}
         keyExtractor={(item) => item.timestamp}
       />
-    </View>
+    </Page>
   );
 }
 
-interface DateSliderProps {
-  currentlyOnFirstDay: boolean;
-  decrementDate: () => void;
-  timestamp: dayjs.Dayjs;
-  incrementDate: () => void;
-  currentlyOnLastDay: boolean;
-}
-
-function DateSlider({
-  currentlyOnFirstDay,
-  decrementDate,
-  timestamp,
-  incrementDate,
-  currentlyOnLastDay,
-}: DateSliderProps) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        height: Dimensions.get('window').width * 0.15,
-        width: Dimensions.get('window').width,
-        backgroundColor: 'lightblue',
-      }}
-    >
-      <DateArrow
-        Icon={ChevronLeft}
-        active={currentlyOnFirstDay}
-        action={decrementDate}
-      />
-      <DateDisplay {...{ timestamp }} />
-      <DateArrow
-        Icon={ChevronRight}
-        active={currentlyOnLastDay}
-        action={incrementDate}
-      />
-    </View>
-  );
-}
-
-function DateArrow({
-  Icon,
-  active,
-  action,
-}: {
-  Icon: (props: SvgProps) => JSX.Element;
-  active: boolean;
-  action: () => void;
-}) {
-  return (
-    <Pressable
-      style={{ width: Dimensions.get('window').width * 0.15 }}
-      onPress={action}
-    >
-      <Icon
-        color={active ? 'lightblue' : 'white'}
-        height={Dimensions.get('window').width * 0.15}
-        width={Dimensions.get('window').width * 0.15}
-      />
-    </Pressable>
-  );
-}
-
-function DateDisplay({ timestamp }: { timestamp: dayjs.Dayjs }) {
-  return (
-    <Pressable
-      style={{
-        width: Dimensions.get('window').width * 0.7,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Text>{displayDate(timestamp, 'active')}</Text>
-    </Pressable>
-  );
-}
+const OptionsSection = styled.View`
+  flex: 1 1 0;
+  min-height: 133px;
+  max-height: 133px;
+  flex-direction: row;
+`;

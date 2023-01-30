@@ -1,5 +1,4 @@
 import {
-  Alert,
   Dimensions,
   Modal,
   Pressable,
@@ -8,13 +7,16 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Edit, Trash2 } from 'react-native-feather';
 import { addEntry, removeEntry } from '../store';
-import { displayDate, entryTypeUnit } from '../pure/entryTypes';
+import { displayDate, entryTypeLabel, entryTypeUnit } from '../pure/entryTypes';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+  Edit
+} from 'react-native-feather';
 import dayjs from 'dayjs';
 import { entry } from '../types';
+import styled from 'styled-components/native';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
 
@@ -51,40 +53,37 @@ export default function EntryTypePicker({ item }: { item: entry }) {
     setShowDatePicker(true);
   };
 
-  const onDelete = (entry: entry) => {
-    return Alert.alert(
-      'Delete Entry?',
-      'Entry will be gone forever (a long time)',
-      [
-        {
-          text: 'Delete',
-          onPress: () => {
-            dispatch(removeEntry(entry));
-          },
-        },
-        {
-          text: 'Cancel',
-        },
-      ]
-    );
-  };
+  // const onDelete = (entry: entry) => {
+  //   return Alert.alert(
+  //     'Delete Entry?',
+  //     'Entry will be gone forever (a long time)',
+  //     [
+  //       {
+  //         text: 'Delete',
+  //         onPress: () => {
+  //           dispatch(removeEntry(entry));
+  //         },
+  //       },
+  //       {
+  //         text: 'Cancel',
+  //       },
+  //     ]
+  //   );
+  // };
 
   return (
-    <View style={styles.item}>
+    <ItemBox onPress={() => setEditVisible(true)}>
       <View>
         <Text>
-          {label !== undefined && `${label}: `}
-          {number} {entryTypeUnit(entryType)}
+          {number} {entryTypeLabel(entryType).replace('\n', ' ')}
         </Text>
         <Text>{displayDate(dayjs(timestamp), entryType)}</Text>
       </View>
       <View>
-        <Pressable onPress={() => setEditVisible(true)}>
-          <Edit color="black" />
-        </Pressable>
-        <Pressable onPress={() => onDelete(item)}>
+        <Edit color="black" />
+        {/* <Pressable onPress={() => onDelete(item)}>
           <Trash2 color="black" />
-        </Pressable>
+        </Pressable> */}
       </View>
       <Modal
         animationType="slide"
@@ -155,9 +154,21 @@ export default function EntryTypePicker({ item }: { item: entry }) {
           onChange={onTimeChange}
         />
       )}
-    </View>
+    </ItemBox>
   );
 }
+
+const ItemBox = styled.Pressable`
+  align-items: center;
+  justify-content: center;
+  border: 1px solid lightgrey;
+  margin: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+  margin-vertical: 8px;
+  margin-horizontal: 16px;
+`;
 
 const styles = StyleSheet.create({
   item: {
