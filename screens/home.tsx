@@ -1,7 +1,7 @@
-import { Text, View } from 'react-native';
-
 import { OptionButton } from '../components/OptionButton';
+import Page from '../components/Page';
 import { Props } from '../navigationTypes';
+import { Text } from 'react-native';
 import dayjs from 'dayjs';
 import { getEntries } from '../store';
 import styled from 'styled-components/native';
@@ -46,7 +46,7 @@ export default function HomeScreen({ navigation }: Props) {
   }, [entries]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <Page>
       <TitleSection>
         <Title>Caloric</Title>
       </TitleSection>
@@ -72,20 +72,19 @@ export default function HomeScreen({ navigation }: Props) {
           <Text>Stats</Text>
         </OptionButton>
       </OptionsSection>
-    </View>
+    </Page>
   );
 }
 const TitleSection = styled.View`
   flex: 2 1 0;
   align-items: center;
   justify-content: center;
-  //border: 1px solid red;
 `;
 const Title = styled.Text`
-  font-size: 50px;
+  font-size: 54px;
 `;
 const InfoSection = styled.View`
-  flex: 0.5 1 0;
+  flex: 0.667 1 0;
   align-items: center;
   justify-content: center;
 `;
@@ -102,7 +101,7 @@ const ActionButton = styled.Pressable`
 `;
 const Action = styled.Text``;
 const OptionsSection = styled.View`
-  flex: 1.5 1 0;
+  flex: 1.667 1 0;
   flex-direction: row;
   padding: 0px 10px 20px 10px;
 `;

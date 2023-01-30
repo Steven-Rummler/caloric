@@ -15,6 +15,7 @@ import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { OptionButton } from '../components/OptionButton';
+import Page from '../components/Page';
 import { Text } from 'react-native';
 import styled from 'styled-components/native';
 
@@ -25,7 +26,7 @@ export default function SettingsScreen() {
 
   const { trackActiveCalories } = settings;
   return (
-    <SettingsPage>
+    <Page>
       <TitleSection>
         <Title>Preferences</Title>
       </TitleSection>
@@ -86,22 +87,17 @@ export default function SettingsScreen() {
       >
         <Text>Reset Log to Demo</Text>
       </OptionButton>
-    </SettingsPage>
+    </Page>
   );
 }
 
-const SettingsPage = styled.View`
-  flex: 1;
-  padding: 5px;
-  background-color: white;
-`;
 const TitleSection = styled.View`
   flex: 1;
   align-items: center;
   justify-content: center;
 `;
 const Title = styled.Text`
-  font-size: 20px;
+  font-size: 24px;
 `;
 
 async function exportData(entries: entryList) {
