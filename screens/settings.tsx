@@ -1,7 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 
-import { Pressable, Switch, Text, View } from 'react-native';
 import {
   addEntries,
   clearEntries,
@@ -15,6 +14,10 @@ import { entry, entryList } from '../types';
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { OptionButton } from '../components/OptionButton';
+import { Text } from 'react-native';
+import styled from 'styled-components/native';
+
 export default function SettingsScreen() {
   const dispatch = useDispatch();
   const settings = useSelector(getSettings);
@@ -22,25 +25,38 @@ export default function SettingsScreen() {
 
   const { trackActiveCalories } = settings;
   return (
-    <View>
-      <Text>Track Active Calories</Text>
-      <Switch
-        value={trackActiveCalories}
-        onChange={() => {
+    <SettingsPage>
+      <TitleSection>
+        <Title>Preferences</Title>
+      </TitleSection>
+      <OptionButton
+        onPress={() => {
           dispatch(
             updateSetting({ trackActiveCalories: !trackActiveCalories })
           );
         }}
-      />
-      <Pressable
+      >
+        <Text>Track Active Calories: {trackActiveCalories ? 'Yes' : 'No'}</Text>
+      </OptionButton>
+      <OptionButton
+        onPress={() => {
+          dispatch(resetSettings());
+        }}
+      >
+        <Text>Reset Preferences to Defaults</Text>
+      </OptionButton>
+      <TitleSection>
+        <Title>Manage Log</Title>
+      </TitleSection>
+      <OptionButton
         onPress={() => {
           exportData(entries).catch((error) => console.log(error));
         }}
         style={{}}
       >
-        <Text>Export</Text>
-      </Pressable>
-      <Pressable
+        <Text>Export Log to CSV</Text>
+      </OptionButton>
+      <OptionButton
         onPress={() => {
           importData()
             .then((newEntries) => {
@@ -52,34 +68,41 @@ export default function SettingsScreen() {
         }}
         style={{}}
       >
-        <Text>Import</Text>
-      </Pressable>
-      <Pressable
+        <Text>Import Log from CSV</Text>
+      </OptionButton>
+      <OptionButton
         onPress={() => {
           dispatch(clearEntries());
         }}
         style={{}}
       >
-        <Text>Clear</Text>
-      </Pressable>
-      <Pressable
+        <Text>Clear Log</Text>
+      </OptionButton>
+      <OptionButton
         onPress={() => {
           dispatch(useDefaultEntries());
         }}
         style={{}}
       >
-        <Text>Default</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => {
-          dispatch(resetSettings());
-        }}
-      >
-        <Text>Reset Settings</Text>
-      </Pressable>
-    </View>
+        <Text>Reset Log to Demo</Text>
+      </OptionButton>
+    </SettingsPage>
   );
 }
+
+const SettingsPage = styled.View`
+  flex: 1;
+  padding: 5px;
+  background-color: white;
+`;
+const TitleSection = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+const Title = styled.Text`
+  font-size: 20px;
+`;
 
 async function exportData(entries: entryList) {
   try {

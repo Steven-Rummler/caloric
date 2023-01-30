@@ -15,7 +15,7 @@ export default function Navigator() {
   return (
     <Stack.Navigator
       screenOptions={({ navigation, route }: Props) => {
-        if (route.name === 'Settings') return {};
+        if (route.name === 'Settings') return { headerShadowVisible: false };
         return {
           headerShadowVisible: false,
           headerRight: () => (

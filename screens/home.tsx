@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 
+import { OptionButton } from '../components/OptionButton';
 import { Props } from '../navigationTypes';
 import dayjs from 'dayjs';
 import { getEntries } from '../store';
@@ -91,7 +92,7 @@ const InfoSection = styled.View`
 const Info = styled.Text``;
 const ActionSection = styled.View`
   flex: 5 1 0;
-  padding: 10px 10px 5px 10px;
+  padding: 20px 20px 10px 20px;
 `;
 const ActionButton = styled.Pressable`
   flex: 1;
@@ -103,12 +104,5 @@ const Action = styled.Text``;
 const OptionsSection = styled.View`
   flex: 1.5 1 0;
   flex-direction: row;
-  padding: 5px 10px 10px 0px;
-`;
-const OptionButton = styled.Pressable`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid lightgrey;
-  margin-left: 10px;
+  padding: 0px 10px 20px 10px;
 `;
