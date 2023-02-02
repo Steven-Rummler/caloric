@@ -80,18 +80,18 @@ export default function SettingsScreen({ navigation }: Props) {
           dispatch(clearEntries());
           navigation.goBack();
         }}
-        style={{}}
+        style={{ borderColor: '#ab0000' }}
       >
-        <Text>Clear Log</Text>
+        <Text style={{ color: '#ab0000' }}>Clear Log</Text>
       </OptionButton>
       <OptionButton
         onPress={() => {
           dispatch(useDefaultEntries());
           navigation.goBack();
         }}
-        style={{}}
+        style={{ borderColor: '#ab0000' }}
       >
-        <Text>Reset Log to Demo</Text>
+        <Text style={{ color: '#ab0000' }}>Reset Log to Demo</Text>
       </OptionButton>
     </Page>
   );

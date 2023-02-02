@@ -1,13 +1,14 @@
-import { FlatList, Text } from 'react-native';
+import { FlatList, Modal, Text } from 'react-native';
+import { entry, entryType } from '../types';
 import { getEntries, getSettings } from '../store';
 import { useMemo, useState } from 'react';
 
+import EditEntry from '../components/EditEntry';
 import EntryListItem from '../components/entryListItem';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import _ from 'lodash';
 import dayjs from 'dayjs';
-import { entryType } from '../types';
 import styled from 'styled-components/native';
 import { useSelector } from 'react-redux';
 
@@ -16,6 +17,10 @@ export default function HistoryScreen() {
   const settings = useSelector(getSettings);
   const { trackActiveCalories } = settings;
   const [selectedEntryType, setSelectedEntryType] = useState<entryType>('food');
+  const [selectedEntry, setSelectedEntry] = useState<entry | undefined>(
+    undefined
+  );
+  const [editVisible, setEditVisible] = useState(false);
 
   const sortedEntries = useMemo(() => {
     const sortedEntries = _.clone(
@@ -58,9 +63,22 @@ export default function HistoryScreen() {
       </OptionsSection>
       <FlatList
         data={sortedEntries}
-        renderItem={({ item }) => <EntryListItem item={item} />}
+        renderItem={({ item }) => (
+          <EntryListItem
+            entry={item}
+            setSelectedEntry={setSelectedEntry}
+            setEditVisible={setEditVisible}
+          />
+        )}
         keyExtractor={(item) => item.timestamp}
       />
+      <Modal
+        transparent={true}
+        visible={editVisible}
+        onRequestClose={() => setEditVisible(!editVisible)}
+      >
+        <EditEntry selectedEntry={selectedEntry} setVisible={setEditVisible} />
+      </Modal>
     </Page>
   );
 }
