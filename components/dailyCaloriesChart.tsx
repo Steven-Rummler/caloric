@@ -20,6 +20,10 @@ export default function DailyCaloriesChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
 
+  const netSeries = useMemo(() => {
+    return generateDailyTotalCalorieSeries(entries, passiveCalories);
+  }, [entries]);
+
   const foodSeries = useMemo(() => {
     return generateDailyCalorieSeries(entries, 'food');
   }, [entries]);
@@ -31,18 +35,14 @@ export default function DailyCaloriesChart() {
     }));
   }, [entries]);
 
-  const totalSeries = useMemo(() => {
-    return generateDailyTotalCalorieSeries(entries, passiveCalories);
-  }, [entries]);
-
   const passiveSeries = useMemo(() => {
-    return totalSeries.map(({ x }) => ({ x, y: passiveCalories }));
-  }, [totalSeries]);
+    return netSeries.map(({ x }) => ({ x, y: passiveCalories }));
+  }, [netSeries]);
 
   const lines = [
+    { name: 'Net', data: netSeries, color: 'green' },
     { name: 'Food', data: foodSeries, color: 'purple' },
     { name: 'Active', data: activeSeries, color: 'red' },
-    { name: 'Total', data: totalSeries, color: 'green' },
     { name: 'Passive', data: passiveSeries, color: 'blue' },
   ];
 

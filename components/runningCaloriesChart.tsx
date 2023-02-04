@@ -7,8 +7,6 @@ import {
   VictoryTheme,
 } from 'victory-native';
 import {
-  generateDailyCalorieSeries,
-  generateDailyTotalCalorieSeries,
   generateRunningCalorieSeries,
   generateRunningTotalCalorieSeries,
   passiveCaloriesAtTimestampFromEntries,
@@ -23,6 +21,10 @@ export default function DailyCaloriesChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
 
+  const netSeries = useMemo(() => {
+    return generateRunningTotalCalorieSeries(entries, passiveCalories);
+  }, [entries]);
+
   const foodSeries = useMemo(() => {
     return generateRunningCalorieSeries(entries, 'food');
   }, [entries]);
@@ -34,21 +36,17 @@ export default function DailyCaloriesChart() {
     }));
   }, [entries]);
 
-  const totalSeries = useMemo(() => {
-    return generateRunningTotalCalorieSeries(entries, passiveCalories);
-  }, [entries]);
-
   const passiveSeries = useMemo(() => {
-    return totalSeries.map(({ x }) => ({
+    return netSeries.map(({ x }) => ({
       x,
       y: passiveCaloriesAtTimestampFromEntries(entries, x, passiveCalories),
     }));
-  }, [entries, passiveCalories, totalSeries]);
+  }, [entries, passiveCalories, netSeries]);
 
   const lines = [
+    { name: 'Net', data: netSeries, color: 'green' },
     { name: 'Food', data: foodSeries, color: 'purple' },
     { name: 'Active', data: activeSeries, color: 'red' },
-    { name: 'Total', data: totalSeries, color: 'green' },
     { name: 'Passive', data: passiveSeries, color: 'blue' },
   ];
 
