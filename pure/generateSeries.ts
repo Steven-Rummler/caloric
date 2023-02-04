@@ -65,4 +65,117 @@ function fillInSeriesGapDays(series: series) {
   }
 }
 
-export { generateDailyCalorieSeries, generateDailyTotalCalorieSeries };
+function generateRunningCalorieSeries(
+  entries: entryList,
+  entryType: entryType
+) {
+  if (entries.length === 0) return [];
+  const startDay = entries
+    .reduce(
+      (start, entry) =>
+        dayjs(entry.timestamp).isBefore(start) ? dayjs(entry.timestamp) : start,
+      dayjs(entries[0].timestamp)
+    )
+    .startOf('day');
+  const filteredEntries = entries.filter(
+    (entry) => entry.entryType === entryType
+  );
+  if (filteredEntries.length === 0) return [];
+  filteredEntries.sort((a, b) =>
+    dayjs(a.timestamp).isBefore(dayjs(b.timestamp)) ? -1 : 1
+  );
+
+  let runningTotal = 0;
+  const series = [
+    { x: startDay, y: 0 },
+    ...filteredEntries.map((entry) => {
+      runningTotal += entry.number;
+      return { x: dayjs(entry.timestamp), y: runningTotal };
+    }),
+  ];
+
+  return series;
+}
+
+function generateRunningTotalCalorieSeries(
+  entries: entryList,
+  dailyPassiveCalories: number
+) {
+  if (entries.length === 0) return [];
+  const startDay = entries
+    .reduce(
+      (start, entry) =>
+        dayjs(entry.timestamp).isBefore(start) ? dayjs(entry.timestamp) : start,
+      dayjs(entries[0].timestamp)
+    )
+    .startOf('day');
+  const filteredEntries = entries.filter(
+    (entry) => entry.entryType !== 'weight'
+  );
+  if (filteredEntries.length === 0) return [];
+  filteredEntries.sort((a, b) =>
+    dayjs(a.timestamp).isBefore(dayjs(b.timestamp)) ? -1 : 1
+  );
+
+  let runningTotal = 0;
+  const series = [
+    { x: startDay, y: 0 },
+    ...filteredEntries.map((entry) => {
+      const timestamp = dayjs(entry.timestamp);
+      const number =
+        entry.entryType === 'food' ? entry.number : -1 * entry.number;
+      runningTotal += number;
+      return {
+        x: timestamp,
+        y:
+          runningTotal +
+          passiveCaloriesAtTimestamp(startDay, timestamp, dailyPassiveCalories),
+      };
+    }),
+  ];
+
+  return series;
+}
+
+function passiveCaloriesAtTimestampFromEntries(
+  entries: entryList,
+  timestamp: dayjs.Dayjs,
+  dailyPassiveCalories: number
+) {
+  const startDay = entries
+    .reduce(
+      (start, entry) =>
+        dayjs(entry.timestamp).isBefore(start) ? dayjs(entry.timestamp) : start,
+      dayjs(entries[0].timestamp)
+    )
+    .startOf('day');
+  return (
+    (dailyPassiveCalories * (timestamp.valueOf() - startDay.valueOf())) /
+    1000 /
+    60 /
+    60 /
+    24
+  );
+}
+
+function passiveCaloriesAtTimestamp(
+  startDay: dayjs.Dayjs,
+  timestamp: dayjs.Dayjs,
+  dailyPassiveCalories: number
+) {
+  return (
+    (dailyPassiveCalories * (timestamp.valueOf() - startDay.valueOf())) /
+    1000 /
+    60 /
+    60 /
+    24
+  );
+}
+
+export {
+  generateDailyCalorieSeries,
+  generateDailyTotalCalorieSeries,
+  generateRunningCalorieSeries,
+  generateRunningTotalCalorieSeries,
+  passiveCaloriesAtTimestampFromEntries,
+};

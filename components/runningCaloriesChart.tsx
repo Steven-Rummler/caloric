@@ -1,90 +1,59 @@
+import { Text, View } from 'react-native';
 import {
+  VictoryAxis,
   VictoryChart,
   VictoryLegend,
   VictoryLine,
   VictoryTheme,
 } from 'victory-native';
 import {
-  activeCaloriesAtTimestamp,
-  caloriesAtTimestamp,
-  dayDiff,
-  foodCaloriesAtTimestamp,
-  getFirstDay,
-  getLastDay,
-} from '../pure/entries';
+  generateDailyCalorieSeries,
+  generateDailyTotalCalorieSeries,
+  generateRunningCalorieSeries,
+  generateRunningTotalCalorieSeries,
+  passiveCaloriesAtTimestampFromEntries,
+} from '../pure/generateSeries';
 import { getEntries, getPassiveCalories } from '../store';
 
-import { View } from 'react-native';
+import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-export default function RunningCaloriesChart() {
+export default function DailyCaloriesChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
 
-  const total = useMemo(() => {
-    if (entries.length === 0) return [];
+  const foodSeries = useMemo(() => {
+    return generateRunningCalorieSeries(entries, 'food');
+  }, [entries]);
 
-    const firstDay = getFirstDay(entries);
-    const lastDay = getLastDay(entries);
-    const days = [firstDay];
-
-    while (days[days.length - 1] <= lastDay)
-      days.push(days[days.length - 1].add(1, 'hour'));
-
-    return days.map((day) => ({
-      x: day.toDate(),
-      y: caloriesAtTimestamp(entries, day, passiveCalories),
+  const activeSeries = useMemo(() => {
+    return generateRunningCalorieSeries(entries, 'active').map(({ x, y }) => ({
+      x,
+      y: -1 * y,
     }));
   }, [entries]);
-  const food = useMemo(() => {
-    if (entries.length === 0) return [];
 
-    const firstDay = getFirstDay(entries);
-    const lastDay = getLastDay(entries);
-    const days = [firstDay];
-
-    while (days[days.length - 1] <= lastDay)
-      days.push(days[days.length - 1].add(1, 'hour'));
-
-    return days.map((day) => ({
-      x: day.toDate(),
-      y: foodCaloriesAtTimestamp(entries, day),
-    }));
+  const totalSeries = useMemo(() => {
+    return generateRunningTotalCalorieSeries(entries, passiveCalories);
   }, [entries]);
-  const active = useMemo(() => {
-    if (entries.length === 0) return [];
 
-    const firstDay = getFirstDay(entries);
-    const lastDay = getLastDay(entries);
-    const days = [firstDay];
-
-    while (days[days.length - 1] <= lastDay)
-      days.push(days[days.length - 1].add(1, 'hour'));
-
-    return days.map((day) => ({
-      x: day.toDate(),
-      y: activeCaloriesAtTimestamp(entries, day),
+  const passiveSeries = useMemo(() => {
+    return totalSeries.map(({ x }) => ({
+      x,
+      y: passiveCaloriesAtTimestampFromEntries(entries, x, passiveCalories),
     }));
-  }, [entries]);
-  const passive = useMemo(() => {
-    if (entries.length === 0) return [];
+  }, [entries, passiveCalories, totalSeries]);
 
-    const firstDay = getFirstDay(entries);
-    const lastDay = getLastDay(entries);
-    const days = [firstDay];
+  const lines = [
+    { name: 'Food', data: foodSeries, color: 'purple' },
+    { name: 'Active', data: activeSeries, color: 'red' },
+    { name: 'Total', data: totalSeries, color: 'green' },
+    { name: 'Passive', data: passiveSeries, color: 'blue' },
+  ];
 
-    while (days[days.length - 1] <= lastDay)
-      days.push(days[days.length - 1].add(1, 'hour'));
-
-    return days.map((day) => ({
-      x: day.toDate(),
-      y: passiveCalories * dayDiff(firstDay, day),
-    }));
-  }, [entries]);
-  const lines = [total, food, active, passive];
-  const titles = ['Total', 'Food', 'Active', 'Passive'];
-  const colors = ['purple', 'red', 'green', 'blue'];
+  if (lines.some((line) => !Array.isArray(line.data)))
+    return <Text>Loading</Text>;
 
   return (
     <View style={{ margin: 10 }}>
@@ -93,21 +62,26 @@ export default function RunningCaloriesChart() {
           <VictoryLine
             key={index}
             style={{
-              data: { stroke: colors[index] },
+              data: { stroke: line.color },
               parent: { border: '1px solid #ccc' },
             }}
-            data={line}
+            data={line.data.map(({ x, y }) => ({ x: x.valueOf(), y }))}
           />
         ))}
         <VictoryLegend
           x={70}
           orientation="horizontal"
           gutter={20}
-          data={lines.map((line, index) => ({
-            name: titles[index],
-            symbol: { fill: colors[index] },
+          data={lines.map((line) => ({
+            name: line.name,
+            symbol: { fill: line.color },
           }))}
         />
+        <VictoryAxis
+          style={{ grid: { stroke: 'none' } }}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM DD')}
+        />
+        <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
       </VictoryChart>
     </View>
   );
