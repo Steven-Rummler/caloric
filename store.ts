@@ -31,13 +31,13 @@ const arrayOfFifteen = Array(100)
   .fill(0)
   .map((e, i) => i);
 
+const startDay = dayjs().startOf('day').subtract(10, 'day');
+
 const defaultEntries: entryList = [
   ...arrayOfFifteen.map(
     (): entry => ({
       entryType: 'food',
-      timestamp: dayjs()
-        .subtract(10 * 24 * 60 * Math.random(), 'minute')
-        .toJSON(),
+      timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
       number: _.round(100 + 200 * Math.random()),
       ...(Math.random() > 0.5 && { label: 'Eggs' }),
     })
@@ -45,18 +45,14 @@ const defaultEntries: entryList = [
   ...arrayOfFifteen.map(
     (): entry => ({
       entryType: 'active',
-      timestamp: dayjs()
-        .subtract(10 * 24 * 60 * Math.random(), 'minute')
-        .toJSON(),
+      timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
       number: _.round(25 + 50 * Math.random()),
     })
   ),
   ...arrayOfFifteen.map(
     (): entry => ({
       entryType: 'weight',
-      timestamp: dayjs()
-        .subtract(10 * 24 * 60 * Math.random(), 'minute')
-        .toJSON(),
+      timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
       number: _.round(150 + 2 * Math.random(), 1),
     })
   ),
