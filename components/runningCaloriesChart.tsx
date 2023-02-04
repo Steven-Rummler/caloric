@@ -1,4 +1,9 @@
-import { VictoryChart, VictoryLine, VictoryTheme } from 'victory-native';
+import {
+  VictoryChart,
+  VictoryLegend,
+  VictoryLine,
+  VictoryTheme,
+} from 'victory-native';
 import {
   activeCaloriesAtTimestamp,
   caloriesAtTimestamp,
@@ -13,7 +18,7 @@ import { View } from 'react-native';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-export default function CaloriesChart() {
+export default function RunningCaloriesChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
 
@@ -78,20 +83,31 @@ export default function CaloriesChart() {
     }));
   }, [entries]);
   const lines = [total, food, active, passive];
+  const titles = ['Total', 'Food', 'Active', 'Passive'];
+  const colors = ['purple', 'red', 'green', 'blue'];
 
   return (
-    <View>
+    <View style={{ margin: 10 }}>
       <VictoryChart theme={VictoryTheme.material}>
         {lines.map((line, index) => (
           <VictoryLine
             key={index}
             style={{
-              data: { stroke: ['purple', 'red', 'green', 'blue'][index] },
+              data: { stroke: colors[index] },
               parent: { border: '1px solid #ccc' },
             }}
             data={line}
           />
         ))}
+        <VictoryLegend
+          x={70}
+          orientation="horizontal"
+          gutter={20}
+          data={lines.map((line, index) => ({
+            name: titles[index],
+            symbol: { fill: colors[index] },
+          }))}
+        />
       </VictoryChart>
     </View>
   );
