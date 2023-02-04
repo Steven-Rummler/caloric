@@ -27,14 +27,16 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
-const arrayOfFifteen = Array(100)
-  .fill(0)
-  .map((e, i) => i);
+function sizedArray(size: number) {
+  return Array(size)
+    .fill(0)
+    .map((e, i) => i);
+}
 
 const startDay = dayjs().startOf('day').subtract(10, 'day');
 
 const defaultEntries: entryList = [
-  ...arrayOfFifteen.map(
+  ...sizedArray(80).map(
     (): entry => ({
       entryType: 'food',
       timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
@@ -42,18 +44,20 @@ const defaultEntries: entryList = [
       ...(Math.random() > 0.5 && { label: 'Eggs' }),
     })
   ),
-  ...arrayOfFifteen.map(
+  ...sizedArray(5).map(
     (): entry => ({
       entryType: 'active',
       timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
-      number: _.round(25 + 50 * Math.random()),
+      number: _.round(200 + 600 * Math.random()),
     })
   ),
-  ...arrayOfFifteen.map(
-    (): entry => ({
+  ...sizedArray(10).map(
+    (day): entry => ({
       entryType: 'weight',
-      timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
-      number: _.round(150 + 2 * Math.random(), 1),
+      timestamp: startDay
+        .add(24 * 60 * (day + Math.random()), 'minute')
+        .toJSON(),
+      number: _.round(150 + 1 * Math.random() - 0.1 * day, 1),
     })
   ),
 ];

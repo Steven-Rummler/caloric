@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { displayDate, entryTypeLabel } from '../pure/entryTypes';
+import { displayDate, entryTypeUnit } from '../pure/entryTypes';
 
 import { Edit } from 'react-native-feather';
 import dayjs from 'dayjs';
@@ -26,7 +26,7 @@ export default function EntryTypePicker({
     <ItemBox onPress={openEditEntry}>
       <View>
         <Text>
-          {number} {entryTypeLabel(entryType).replace('\n', ' ')}
+          {number} {entryTypeUnit(entryType).replace('\n', ' ')}
         </Text>
         <Text>{displayDate(dayjs(timestamp), entryType)}</Text>
       </View>
@@ -41,10 +41,8 @@ const ItemBox = styled.Pressable`
   align-items: center;
   justify-content: center;
   border: 1px solid lightgrey;
-  margin: 10px;
+  margin: 5px 10px;
   flex-direction: row;
   justify-content: space-between;
   padding: 20px;
-  margin-vertical: 8px;
-  margin-horizontal: 16px;
 `;

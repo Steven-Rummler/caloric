@@ -55,12 +55,15 @@ export default function DailyCaloriesChart() {
 
   const linesWithData = lines.filter((line) => line.data.length > 0);
 
+  const blank = lines.every((line) => line.data.length === 0);
+
   return (
     <View style={{ margin: 10 }}>
       <VictoryChart theme={VictoryTheme.material}>
         {linesWithData.map((line, index) => (
           <VictoryLine
             key={index}
+            interpolation="cardinal"
             style={{
               data: { stroke: line.color },
               parent: { border: '1px solid #ccc' },
@@ -72,7 +75,7 @@ export default function DailyCaloriesChart() {
           x={70}
           orientation="horizontal"
           gutter={20}
-          data={linesWithData.map((line) => ({
+          data={(blank ? lines : linesWithData).map((line) => ({
             name: line.name,
             symbol: { fill: line.color },
           }))}

@@ -1,14 +1,16 @@
-import { Text, View } from 'react-native';
 import {
+  VictoryAxis,
   VictoryChart,
   VictoryLegend,
   VictoryLine,
   VictoryTheme,
 } from 'victory-native';
-import { caloriesAtTimestamp, getFirstDay, getLastDay } from '../pure/entries';
 import { getEntries, getPassiveCalories } from '../store';
+import { getFirstDay, getLastDay } from '../pure/entries';
 
+import { View } from 'react-native';
 import dayjs from 'dayjs';
+import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -40,10 +42,10 @@ export default function WeightChart() {
     while (days[days.length - 1] <= lastDay)
       days.push(days[days.length - 1].add(1, 'hour'));
 
-    const caloriesSeries = days.map((day) => ({
-      x: day.toDate(),
-      y: caloriesAtTimestamp(entries, day, passiveCalories),
-    }));
+    const caloriesSeries = generateRunningTotalCalorieSeries(
+      entries,
+      passiveCalories
+    );
 
     const averageWeight =
       weightData.reduce((total, next) => total + next.y, 0) / weightData.length;
@@ -61,35 +63,38 @@ export default function WeightChart() {
 
   return (
     <View style={{ margin: 10 }}>
-      {weightEntries.length === 0 ? (
-        <Text>No Data</Text>
-      ) : (
-        <VictoryChart theme={VictoryTheme.material}>
-          <VictoryLine
-            style={{
-              data: { stroke: 'red' },
-              parent: { border: '1px solid #ccc' },
-            }}
-            data={weightData}
-          />
-          <VictoryLine
-            style={{
-              data: { stroke: 'blue' },
-              parent: { border: '1px solid #ccc' },
-            }}
-            data={actualWeight}
-          />
-          <VictoryLegend
-            x={110}
-            orientation="horizontal"
-            gutter={20}
-            data={[
-              { name: 'Recorded', symbol: { fill: 'red' } },
-              { name: 'Calculated', symbol: { fill: 'blue' } },
-            ]}
-          />
-        </VictoryChart>
-      )}
+      <VictoryChart theme={VictoryTheme.material}>
+        <VictoryLine
+          interpolation="cardinal"
+          style={{
+            data: { stroke: 'red' },
+            parent: { border: '1px solid #ccc' },
+          }}
+          data={weightData}
+        />
+        <VictoryLine
+          interpolation="cardinal"
+          style={{
+            data: { stroke: 'blue' },
+            parent: { border: '1px solid #ccc' },
+          }}
+          data={actualWeight}
+        />
+        <VictoryLegend
+          x={110}
+          orientation="horizontal"
+          gutter={20}
+          data={[
+            { name: 'Recorded', symbol: { fill: 'red' } },
+            { name: 'Calculated', symbol: { fill: 'blue' } },
+          ]}
+        />
+        <VictoryAxis
+          style={{ grid: { stroke: 'none' } }}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM DD')}
+        />
+        <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
+      </VictoryChart>
     </View>
   );
 }
