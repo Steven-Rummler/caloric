@@ -74,18 +74,30 @@ const slice = createSlice({
   reducers: {
     addEntry: (state, action: { type: string; payload: entry }) => {
       state.entries.push(action.payload);
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+      state.passiveCalories = calculateDailyPassiveCalories(
+        state.settings.trackActiveCalories
+          ? state.entries
+          : state.entries.filter((entry) => entry.entryType !== 'active')
+      );
     },
     addEntries: (state, action: { type: string; payload: entryList }) => {
       state.entries.push(...action.payload);
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+      state.passiveCalories = calculateDailyPassiveCalories(
+        state.settings.trackActiveCalories
+          ? state.entries
+          : state.entries.filter((entry) => entry.entryType !== 'active')
+      );
     },
     removeEntry: (state, action: { type: string; payload: entry }) => {
       const filteredEntries = state.entries.filter(
         (entry) => !_.isEqual(entry, action.payload)
       );
       state.entries = filteredEntries;
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+      state.passiveCalories = calculateDailyPassiveCalories(
+        state.settings.trackActiveCalories
+          ? state.entries
+          : state.entries.filter((entry) => entry.entryType !== 'active')
+      );
     },
     clearEntries: (state) => {
       state.entries = [];
@@ -93,7 +105,11 @@ const slice = createSlice({
     },
     useDefaultEntries: (state) => {
       state.entries = defaultEntries;
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+      state.passiveCalories = calculateDailyPassiveCalories(
+        state.settings.trackActiveCalories
+          ? state.entries
+          : state.entries.filter((entry) => entry.entryType !== 'active')
+      );
     },
     updateSetting: (
       state,
@@ -104,9 +120,19 @@ const slice = createSlice({
     ) => {
       for (const [key, value] of Object.entries(action.payload))
         state.settings[key as keyof typeof state.settings] = value;
+      state.passiveCalories = calculateDailyPassiveCalories(
+        state.settings.trackActiveCalories
+          ? state.entries
+          : state.entries.filter((entry) => entry.entryType !== 'active')
+      );
     },
     resetSettings: (state) => {
       state.settings = defaultSettings;
+      state.passiveCalories = calculateDailyPassiveCalories(
+        state.settings.trackActiveCalories
+          ? state.entries
+          : state.entries.filter((entry) => entry.entryType !== 'active')
+      );
     },
   },
 });
@@ -121,8 +147,12 @@ const {
   resetSettings,
 } = slice.actions;
 
-function getEntries(state: { data: { entries: entryList } }): entryList {
-  return state.data.entries;
+function getEntries(state: {
+  data: { entries: entryList; settings: settings };
+}): entryList {
+  return state.data.settings.trackActiveCalories
+    ? state.data.entries
+    : state.data.entries.filter((entry) => entry.entryType !== 'active');
 }
 
 function getPassiveCalories(state: {

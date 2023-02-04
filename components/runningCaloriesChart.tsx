@@ -53,10 +53,12 @@ export default function DailyCaloriesChart() {
   if (lines.some((line) => !Array.isArray(line.data)))
     return <Text>Loading</Text>;
 
+  const linesWithData = lines.filter((line) => line.data.length > 0);
+
   return (
     <View style={{ margin: 10 }}>
       <VictoryChart theme={VictoryTheme.material}>
-        {lines.map((line, index) => (
+        {linesWithData.map((line, index) => (
           <VictoryLine
             key={index}
             style={{
@@ -70,7 +72,7 @@ export default function DailyCaloriesChart() {
           x={70}
           orientation="horizontal"
           gutter={20}
-          data={lines.map((line) => ({
+          data={linesWithData.map((line) => ({
             name: line.name,
             symbol: { fill: line.color },
           }))}
