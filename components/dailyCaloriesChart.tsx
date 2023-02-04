@@ -1,5 +1,6 @@
 import { Text, View } from 'react-native';
 import {
+  VictoryAxis,
   VictoryChart,
   VictoryLegend,
   VictoryLine,
@@ -24,7 +25,10 @@ export default function DailyCaloriesChart() {
   }, [entries]);
 
   const activeSeries = useMemo(() => {
-    return generateDailyCalorieSeries(entries, 'active');
+    return generateDailyCalorieSeries(entries, 'active').map(({ x, y }) => ({
+      x,
+      y: -1 * y,
+    }));
   }, [entries]);
 
   const totalSeries = useMemo(() => {
@@ -55,7 +59,7 @@ export default function DailyCaloriesChart() {
               data: { stroke: line.color },
               parent: { border: '1px solid #ccc' },
             }}
-            data={line.data.map(({ x, y }) => ({ x: dayjs(x), y }))}
+            data={line.data.map(({ x, y }) => ({ x: dayjs(x).valueOf(), y }))}
           />
         ))}
         <VictoryLegend
@@ -67,6 +71,11 @@ export default function DailyCaloriesChart() {
             symbol: { fill: line.color },
           }))}
         />
+        <VictoryAxis
+          style={{ grid: { stroke: 'none' } }}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM DD')}
+        />
+        <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
       </VictoryChart>
     </View>
   );
