@@ -1,5 +1,7 @@
 export type entryType = 'food' | 'active' | 'weight';
 
+export type series = { x: string; y: number }[];
+
 export interface entry {
   entryType: entryType;
   timestamp: string;

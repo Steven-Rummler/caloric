@@ -1,5 +1,5 @@
 import { Dayjs } from 'dayjs';
-import { entryType } from '../../types';
+import { entryType } from '../types';
 
 const entryTypes: entryType[] = ['food', 'active', 'weight'];
 
