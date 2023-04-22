@@ -37,7 +37,8 @@
         {
           "iCloudContainerEnvironment": "Production"
         }
-      ]
+      ],
+      "sentry-expo"
     ],
     "extra": {
       "eas": {
