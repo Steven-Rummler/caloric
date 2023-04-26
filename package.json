@@ -21,7 +21,7 @@
     "lodash": "^4.17.21",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-native": "0.71.6",
+    "react-native": "0.71.7",
     "react-native-csv": "^0.2.0",
     "react-native-feather": "^1.1.2",
     "react-native-global-props": "^1.1.5",
