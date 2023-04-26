@@ -27,7 +27,7 @@ export default function HistoryScreen() {
       entries.filter((entry) => entry.entryType === selectedEntryType)
     );
     sortedEntries.sort(
-      (a, b) => dayjs(a.timestamp).valueOf() - dayjs(b.timestamp).valueOf()
+      (a, b) => dayjs(b.timestamp).valueOf() - dayjs(a.timestamp).valueOf()
     );
     return sortedEntries;
   }, [entries, selectedEntryType]);
