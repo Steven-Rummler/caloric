@@ -1,4 +1,4 @@
-import { Alert, Dimensions, Pressable, Text, View } from 'react-native';
+import { Alert, Dimensions, Text, View } from 'react-native';
 import { addEntry, removeEntry } from '../store';
 import { displayDate, entryTypeUnit } from '../pure/entryTypes';
 
@@ -74,7 +74,7 @@ export default function EditEntry({
       addEntry({
         entryType,
         timestamp: timestamp.toJSON(),
-        number: Number.parseInt(number),
+        number: Number.parseFloat(number),
       })
     );
     dispatch(removeEntry(selectedEntry));
