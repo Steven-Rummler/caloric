@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/68603faa-f028-4a0e-9fd5-96b85f926366"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -28,7 +29,10 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.stevenrummler.caloric",
-      "versionCode": 2
+      "versionCode": 3,
+      "runtimeVersion": {
+        "policy": "sdkVersion"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
