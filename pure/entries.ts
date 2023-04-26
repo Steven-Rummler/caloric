@@ -60,6 +60,9 @@ function activeCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
   );
 }
 function calculateDailyPassiveCalories(entries: entryList) {
+  if (entries.filter((entry) => entry.entryType === 'weight').length < 2)
+    return -1500;
+
   const weightSeries = entries
     .filter((entry) => entry.entryType === 'weight')
     .map((entry) => ({
@@ -92,6 +95,9 @@ function slopeForLine(series: { x: number; y: number }[]): {
   intercept: number;
 } {
   const count = series.length;
+
+  if (count < 2) return { slope: 0, intercept: 0 };
+
   const xSum = series.reduce((total, next) => total + next.x, 0);
   const ySum = series.reduce((total, next) => total + next.y, 0);
   const xxSum = series.reduce((total, next) => total + next.x * next.x, 0);
