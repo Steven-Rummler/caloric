@@ -51,7 +51,7 @@ export default function LogEntryScreen({ navigation }: Props) {
     const newEntry: entry = {
       entryType,
       timestamp: timestamp.toJSON(),
-      number: parseInt(number),
+      number: parseFloat(number),
       // ...(entryType === 'food' && label !== undefined && { label }),
     };
     navigation.pop();
