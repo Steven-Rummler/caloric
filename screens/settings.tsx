@@ -106,7 +106,7 @@ const Title = styled.Text`
   font-size: 25.89px;
 `;
 
-async function exportData(entries: entryList) {
+async function exportData(entries: entry[]) {
   try {
     const csvString = jsonToCSV(
       JSON.stringify(
@@ -161,7 +161,7 @@ async function importData() {
       };
       return entry;
     });
-    const validEntries: entryList = entries.filter(
+    const validEntries: entry[] = entries.filter(
       (entry): entry is entry => entry !== null
     );
     return validEntries;

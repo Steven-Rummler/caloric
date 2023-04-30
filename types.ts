@@ -1,6 +1,9 @@
+import { Dayjs } from 'dayjs';
+
 export type entryType = 'food' | 'active' | 'weight';
 
-export type series = { x: string; y: number }[];
+export type timeSeries = { x: Dayjs; y: number }[];
+export type daySeries = { x: string; y: number }[];
 
 export interface entry {
   entryType: entryType;
@@ -8,8 +11,6 @@ export interface entry {
   number: number;
   label?: string;
 }
-
-export type entryList = entry[];
 
 export interface settings {
   trackActiveCalories: boolean;

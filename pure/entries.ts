@@ -3,29 +3,26 @@ import { entryList, entryType } from '../types';
 import _ from 'lodash';
 import dayjs from 'dayjs';
 
-function getEntriesForType(
-  entries: entryList,
-  entryType: entryType
-): entryList {
+function getEntriesForType(entries: entry[], entryType: entryType): entry[] {
   return entries.filter((entry) => entry.entryType === entryType);
 }
-function getEntriesForDay(entries: entryList, date: dayjs.Dayjs): entryList {
+function getEntriesForDay(entries: entry[], date: dayjs.Dayjs): entry[] {
   return entries.filter((entry) => date.isSame(entry.timestamp, 'day'));
 }
-function getFirstDay(entries: entryList): dayjs.Dayjs {
+function getFirstDay(entries: entry[]): dayjs.Dayjs {
   if (entries.length === 0) return dayjs();
   return dayjs(
     Math.min(...entries.map((entry) => dayjs(entry.timestamp).valueOf()))
   );
 }
-function getLastDay(entries: entryList): dayjs.Dayjs {
+function getLastDay(entries: entry[]): dayjs.Dayjs {
   if (entries.length === 0) return dayjs();
   return dayjs(
     Math.max(...entries.map((entry) => dayjs(entry.timestamp).valueOf()))
   );
 }
 function caloriesAtTimestamp(
-  entries: entryList,
+  entries: entry[],
   timestamp: dayjs.Dayjs,
   dailyPassiveCalories: number
 ): number {
@@ -35,7 +32,7 @@ function caloriesAtTimestamp(
     dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
   );
 }
-function foodCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
+function foodCaloriesAtTimestamp(entries: entry[], timestamp: dayjs.Dayjs) {
   const entriesBeforeTimestamp = entries.filter((entry) =>
     dayjs(entry.timestamp).isBefore(timestamp)
   );
@@ -47,7 +44,7 @@ function foodCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
     0
   );
 }
-function activeCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
+function activeCaloriesAtTimestamp(entries: entry[], timestamp: dayjs.Dayjs) {
   const entriesBeforeTimestamp = entries.filter((entry) =>
     dayjs(entry.timestamp).isBefore(timestamp)
   );
@@ -59,7 +56,7 @@ function activeCaloriesAtTimestamp(entries: entryList, timestamp: dayjs.Dayjs) {
     0
   );
 }
-function calculateDailyPassiveCalories(entries: entryList) {
+function calculateDailyPassiveCalories(entries: entry[]) {
   if (entries.filter((entry) => entry.entryType === 'weight').length < 2)
     return -1500;
 

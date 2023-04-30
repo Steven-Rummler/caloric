@@ -43,12 +43,15 @@ export default function DailyCaloriesChart() {
     }));
   }, [entries, passiveCalories, netSeries]);
 
-  const lines = [
-    { name: 'Net', data: netSeries, color: 'green' },
-    { name: 'Food', data: foodSeries, color: 'purple' },
-    { name: 'Active', data: activeSeries, color: 'red' },
-    { name: 'Passive', data: passiveSeries, color: 'blue' },
-  ];
+  const lines = [];
+  if (netSeries.length > 1)
+    lines.push({ name: 'Net', data: netSeries, color: 'green' });
+  if (foodSeries.length > 1)
+    lines.push({ name: 'Food', data: foodSeries, color: 'purple' });
+  if (activeSeries.length > 1)
+    lines.push({ name: 'Active', data: activeSeries, color: 'red' });
+  if (passiveSeries.length > 1)
+    lines.push({ name: 'Passive', data: passiveSeries, color: 'blue' });
 
   if (lines.some((line) => !Array.isArray(line.data)))
     return <Text>Loading</Text>;

@@ -18,6 +18,12 @@ export default function WeightChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
 
+  if (
+    entries.length < 2 ||
+    entries.filter((entry) => entry.entryType === 'weight').length < 2
+  )
+    return;
+
   const weightEntries = useMemo(
     () => entries.filter((e) => e.entryType === 'weight'),
     [entries]
@@ -64,22 +70,26 @@ export default function WeightChart() {
   return (
     <View style={{ margin: 10 }}>
       <VictoryChart theme={VictoryTheme.material}>
-        <VictoryLine
-          interpolation="cardinal"
-          style={{
-            data: { stroke: 'red' },
-            parent: { border: '1px solid #ccc' },
-          }}
-          data={weightData}
-        />
-        <VictoryLine
-          interpolation="cardinal"
-          style={{
-            data: { stroke: 'blue' },
-            parent: { border: '1px solid #ccc' },
-          }}
-          data={actualWeight}
-        />
+        {weightData.length > 1 && (
+          <VictoryLine
+            interpolation="cardinal"
+            style={{
+              data: { stroke: 'red' },
+              parent: { border: '1px solid #ccc' },
+            }}
+            data={weightData}
+          />
+        )}
+        {actualWeight.length > 1 && (
+          <VictoryLine
+            interpolation="cardinal"
+            style={{
+              data: { stroke: 'blue' },
+              parent: { border: '1px solid #ccc' },
+            }}
+            data={actualWeight}
+          />
+        )}
         <VictoryLegend
           x={110}
           orientation="horizontal"

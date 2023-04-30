@@ -40,13 +40,13 @@ export default function DailyCaloriesChart() {
   }, [netSeries]);
 
   const lines = [];
-  if (netSeries.length > 0)
+  if (netSeries.length > 1)
     lines.push({ name: 'Net', data: netSeries, color: 'green' });
-  if (foodSeries.length > 0)
+  if (foodSeries.length > 1)
     lines.push({ name: 'Food', data: foodSeries, color: 'purple' });
-  if (activeSeries.length > 0)
+  if (activeSeries.length > 1)
     lines.push({ name: 'Active', data: activeSeries, color: 'red' });
-  if (passiveSeries.length > 0)
+  if (passiveSeries.length > 1)
     lines.push({ name: 'Passive', data: passiveSeries, color: 'blue' });
 
   if (lines.some((line) => !Array.isArray(line.data)))

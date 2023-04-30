@@ -35,7 +35,7 @@ function sizedArray(size: number) {
 
 const startDay = dayjs().startOf('day').subtract(10, 'day');
 
-const defaultEntries: entryList = [
+const defaultEntries: entry[] = [
   ...sizedArray(80).map(
     (): entry => ({
       entryType: 'food',
@@ -84,7 +84,7 @@ const slice = createSlice({
           : state.entries.filter((entry) => entry.entryType !== 'active')
       );
     },
-    addEntries: (state, action: { type: string; payload: entryList }) => {
+    addEntries: (state, action: { type: string; payload: entry[] }) => {
       state.entries.push(...action.payload);
       state.passiveCalories = calculateDailyPassiveCalories(
         state.settings.trackActiveCalories
@@ -152,8 +152,8 @@ const {
 } = slice.actions;
 
 function getEntries(state: {
-  data: { entries: entryList; settings: settings };
-}): entryList {
+  data: { entries: entry[]; settings: settings };
+}): entry[] {
   return state.data.settings.trackActiveCalories
     ? state.data.entries
     : state.data.entries.filter((entry) => entry.entryType !== 'active');
