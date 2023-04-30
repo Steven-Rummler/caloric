@@ -55,7 +55,6 @@ export default function LogEntryScreen({ navigation }: Props) {
       // ...(entryType === 'food' && label !== undefined && { label }),
     };
     navigation.pop();
-    navigation.navigate('History');
     dispatch(addEntry(newEntry));
   };
 
