@@ -1,13 +1,12 @@
 import { Alert, Dimensions, Text, View } from 'react-native';
 import { addEntry, removeEntry } from '../store';
-import { displayDate, entryTypeUnit } from '../pure/entryTypes';
 
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { DatePicker } from './DatePicker';
 import { OptionButton } from './OptionButton';
 import { Trash2 } from 'react-native-feather';
 import _ from 'lodash';
-import dayjs from 'dayjs';
 import { entry } from '../types';
+import { entryTypeUnit } from '../pure/entryTypes';
 import styled from 'styled-components/native';
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
@@ -16,47 +15,14 @@ export default function EditEntry({
   selectedEntry,
   setVisible,
 }: {
-  selectedEntry: entry | undefined;
+  selectedEntry: entry;
   setVisible: (visible: boolean) => void;
 }) {
   const dispatch = useDispatch();
 
-  const entryType = selectedEntry?.entryType ?? 'food';
-  const [number, setNumber] = useState<string | undefined>();
-  const [timestamp, setTimestamp] = useState<dayjs.Dayjs | undefined>();
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-
-  const blank = number === undefined && timestamp === undefined;
-  if (selectedEntry !== undefined && blank) {
-    setNumber(selectedEntry.number.toString());
-    setTimestamp(dayjs(selectedEntry.timestamp));
-  }
-
-  if (selectedEntry === undefined) return null;
-  if (number === undefined) return null;
-  if (timestamp === undefined) return null;
-
-  const onDateChange = (
-    event: unknown,
-    newTimestamp: string | number | dayjs.Dayjs | Date | null | undefined
-  ) => {
-    setShowDatePicker(false);
-    if (entryType === 'active') setTimestamp(dayjs(newTimestamp));
-    else setShowTimePicker(true);
-  };
-
-  const onTimeChange = (
-    event: unknown,
-    newDate: string | number | dayjs.Dayjs | Date | null | undefined
-  ) => {
-    setShowTimePicker(false);
-    setTimestamp(dayjs(newDate));
-  };
-
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };
+  const entryType = selectedEntry.entryType;
+  const [number, setNumber] = useState<string>(`${selectedEntry.number}`);
+  const [timestamp, setTimestamp] = useState<string>(selectedEntry.timestamp);
 
   const onDelete = (entry: entry) =>
     Alert.alert('Delete Entry?', 'Entry will be gone forever (a long time)', [
@@ -73,7 +39,7 @@ export default function EditEntry({
     dispatch(
       addEntry({
         entryType,
-        timestamp: timestamp.toJSON(),
+        timestamp,
         number: Number.parseFloat(number),
       })
     );
@@ -95,9 +61,7 @@ export default function EditEntry({
         </Text>
       </View>
       <OptionsSection>
-        <OptionButton onPress={showDatepicker}>
-          <Text>{displayDate(timestamp, entryType).replace(/,\s/g, '\n')}</Text>
-        </OptionButton>
+        <DatePicker {...{ timestamp, setTimestamp }} />
         <OptionTextInput
           autoFocus
           keyboardType="numeric"
@@ -124,20 +88,6 @@ export default function EditEntry({
         <Trash2 color="#ab0000" />
         <Text style={{ color: '#ab0000' }}>Delete Entry</Text>
       </OptionButton>
-      {showDatePicker && (
-        <DateTimePicker
-          value={timestamp.toDate()}
-          mode="date"
-          onChange={onDateChange}
-        />
-      )}
-      {showTimePicker && (
-        <DateTimePicker
-          value={timestamp.toDate()}
-          mode="time"
-          onChange={onTimeChange}
-        />
-      )}
     </ModalArea>
   );
 }

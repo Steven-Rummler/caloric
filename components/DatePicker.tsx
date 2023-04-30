@@ -18,18 +18,24 @@ export function DatePicker(props: {
     dayjs(timestamp).format('YYYY-MM-DD')
   );
 
-  const onDateChange = useCallback((newDate: Date) => {
-    setDate(dayjs(newDate).format('YYYY-MM-DD'));
+  const onDateChange = useCallback((newDate: Date | undefined) => {
     setShowDatePicker(false);
-    setShowTimePicker(true);
+    if (newDate !== undefined) {
+      setDate(dayjs(newDate).format('YYYY-MM-DD'));
+      setShowTimePicker(true);
+    }
   }, []);
 
-  const onTimeChange = useCallback((newTime: Date) => {
-    setShowTimePicker(false);
-    setTimestamp(
-      dayAndTimeToTimestamp(date, dayjs(newTime).format('HH:mm:ss'))
-    );
-  }, []);
+  const onTimeChange = useCallback(
+    (newTime: Date | undefined) => {
+      setShowTimePicker(false);
+      if (newTime !== undefined)
+        setTimestamp(
+          dayAndTimeToTimestamp(date, dayjs(newTime).format('HH:mm:ss'))
+        );
+    },
+    [date]
+  );
 
   return (
     <>
@@ -43,7 +49,7 @@ export function DatePicker(props: {
           value={new Date(timestamp)}
           mode="date"
           onChange={(_, newDate) => {
-            if (newDate !== undefined) onDateChange(newDate);
+            onDateChange(newDate);
           }}
         />
       )}
@@ -52,7 +58,7 @@ export function DatePicker(props: {
           value={new Date(timestamp)}
           mode="time"
           onChange={(_, newTime) => {
-            if (newTime !== undefined) onTimeChange(newTime);
+            onTimeChange(newTime);
           }}
         />
       )}
