@@ -1,6 +1,7 @@
+import { Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 
-const OptionButton = styled.Pressable`
+export const OptionButton = styled.Pressable`
   flex: 1;
   align-items: center;
   justify-content: center;
@@ -8,4 +9,7 @@ const OptionButton = styled.Pressable`
   margin: 10px;
 `;
 
-export { OptionButton };
+export const OptionText = styled.Text`
+  height: ${Dimensions.get('window').height * 0.15}px;
+  text-align: center;
+`;
