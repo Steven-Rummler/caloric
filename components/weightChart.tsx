@@ -72,7 +72,6 @@ export default function WeightChart() {
       <VictoryChart theme={VictoryTheme.material}>
         {weightData.length > 1 && (
           <VictoryLine
-            interpolation="cardinal"
             style={{
               data: { stroke: 'red' },
               parent: { border: '1px solid #ccc' },
@@ -82,7 +81,6 @@ export default function WeightChart() {
         )}
         {actualWeight.length > 1 && (
           <VictoryLine
-            interpolation="cardinal"
             style={{
               data: { stroke: 'blue' },
               parent: { border: '1px solid #ccc' },

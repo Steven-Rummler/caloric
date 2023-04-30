@@ -66,7 +66,6 @@ export default function DailyCaloriesChart() {
         {linesWithData.map((line, index) => (
           <VictoryLine
             key={index}
-            interpolation="cardinal"
             style={{
               data: { stroke: line.color },
               parent: { border: '1px solid #ccc' },
