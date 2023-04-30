@@ -1,4 +1,4 @@
-import { entryList, entryType } from '../types';
+import { entry, entryType } from '../types';
 
 import _ from 'lodash';
 import dayjs from 'dayjs';

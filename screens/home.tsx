@@ -5,6 +5,7 @@ import { Props } from '../navigationTypes';
 import { Text } from 'react-native';
 import dayjs from 'dayjs';
 import { getEntries } from '../store';
+import { getLastDay } from '../pure/entries';
 import styled from 'styled-components/native';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
@@ -16,12 +17,18 @@ export default function HomeScreen({ navigation }: Props) {
   const history = () => navigation.navigate('History');
   const stats = () => navigation.navigate('Stats');
 
-  const totalActiveCalories = useMemo(() => {
-    const activeEntries = entries.filter(
-      (entry) => entry.entryType === 'active'
+  const recentFoodCalories = useMemo(() => {
+    const foodEntries = entries.filter((entry) => entry.entryType === 'food');
+    if (foodEntries.length === 0) return 0;
+    const lastDay = getLastDay(foodEntries);
+    const recentFoodEntries = foodEntries.filter((entry) =>
+      dayjs(entry.timestamp).isSame(lastDay, 'day')
     );
-    if (activeEntries.length === 0) return 0;
-    return activeEntries.reduce((total, next) => total + next.number, 0);
+    const recentFoodCalories = recentFoodEntries.reduce(
+      (total, next) => total + next.number,
+      0
+    );
+    return Math.round(recentFoodCalories);
   }, [entries]);
   const averageFoodCalories = useMemo(() => {
     const foodEntries = entries.filter((entry) => entry.entryType === 'food');
@@ -52,7 +59,7 @@ export default function HomeScreen({ navigation }: Props) {
         <Title>Caloric</Title>
       </TitleSection>
       <InfoSection>
-        <Info>Total Active Calories: {totalActiveCalories}</Info>
+        <Info>Food Calories Today: {recentFoodCalories}</Info>
       </InfoSection>
       <InfoSection>
         <Info>Average Food Calories: {averageFoodCalories}</Info>
