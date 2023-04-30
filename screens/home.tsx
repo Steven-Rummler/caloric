@@ -1,10 +1,11 @@
+import { getEntries, getPassiveCalories } from '../store';
+
 import ActionButton from '../components/ActionButton';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
 import { Text } from 'react-native';
 import dayjs from 'dayjs';
-import { getEntries } from '../store';
 import { getLastDay } from '../pure/entries';
 import styled from 'styled-components/native';
 import { useMemo } from 'react';
@@ -12,6 +13,7 @@ import { useSelector } from 'react-redux';
 
 export default function HomeScreen({ navigation }: Props) {
   const entries = useSelector(getEntries);
+  const passiveCalories = useSelector(getPassiveCalories);
 
   const logEntry = () => navigation.navigate('LogEntry');
   const history = () => navigation.navigate('History');
@@ -45,13 +47,6 @@ export default function HomeScreen({ navigation }: Props) {
     });
     return Math.round(totalFoodCalories / days.length);
   }, [entries]);
-  const lastWeight = useMemo(() => {
-    const weightEntries = entries.filter(
-      (entry) => entry.entryType === 'weight'
-    );
-    if (weightEntries.length === 0) return 0;
-    return weightEntries[weightEntries.length - 1].number;
-  }, [entries]);
 
   return (
     <Page>
@@ -65,7 +60,9 @@ export default function HomeScreen({ navigation }: Props) {
         <Info>Average Food Calories: {averageFoodCalories}</Info>
       </InfoSection>
       <InfoSection>
-        <Info>Last Weight: {lastWeight}</Info>
+        <Info>
+          Equilibrium Food Calories: {Math.round(-1 * passiveCalories)}
+        </Info>
       </InfoSection>
       <ActionSection>
         <ActionButton onPress={logEntry}>

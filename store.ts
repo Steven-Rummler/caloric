@@ -14,7 +14,7 @@ import {
   createSlice,
   getDefaultMiddleware,
 } from '@reduxjs/toolkit';
-import { entry, entryList, settings } from './types';
+import { entry, settings } from './types';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import _ from 'lodash';
