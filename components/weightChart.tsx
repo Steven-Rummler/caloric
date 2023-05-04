@@ -6,11 +6,11 @@ import {
   VictoryTheme,
 } from 'victory-native';
 import { getEntries, getPassiveCalories } from '../store';
-import { getFirstDay, getLastDay } from '../pure/entries';
 
 import { View } from 'react-native';
 import dayjs from 'dayjs';
 import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
+import { getFirstDay } from '../pure/entries';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -42,10 +42,9 @@ export default function WeightChart() {
     if (entries.length === 0) return [];
 
     const firstDay = getFirstDay(entries);
-    const lastDay = getLastDay(entries);
     const days = [firstDay];
 
-    while (days[days.length - 1] <= lastDay)
+    while (days[days.length - 1] <= dayjs())
       days.push(days[days.length - 1].add(1, 'hour'));
 
     const caloriesSeries = generateRunningTotalCalorieSeries(

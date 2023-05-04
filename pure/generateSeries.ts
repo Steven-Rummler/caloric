@@ -23,6 +23,8 @@ function generateDailyCalorieSeries(
         y: number,
       });
   });
+  if (!series.some((point) => point.x === dayjs().format('YYYY-MM-DD')))
+    series.push({ x: dayjs().format('YYYY-MM-DD'), y: 0 });
   series.sort((a, b) => (a.x > b.x ? 1 : -1));
 
   fillInSeriesGapDays(series);
@@ -54,7 +56,7 @@ function fillInSeriesGapDays(series: daySeries) {
     day = day.add(1, 'day')
   ) {
     const dayString = day.format('YYYY-MM-DD');
-    if (!series.some((point) => point.x !== dayString))
+    if (!series.some((point) => point.x === dayString))
       series.push({
         x: dayString,
         y: 0,
@@ -89,6 +91,7 @@ function generateRunningCalorieSeries(
       runningTotal += entry.number;
       return { x: dayjs(entry.timestamp), y: runningTotal };
     }),
+    { x: dayjs(), y: runningTotal },
   ];
 
   return series;
@@ -128,6 +131,12 @@ function generateRunningTotalCalorieSeries(
           passiveCaloriesAtTimestamp(startDay, timestamp, dailyPassiveCalories),
       };
     }),
+    {
+      x: dayjs(),
+      y:
+        runningTotal +
+        passiveCaloriesAtTimestamp(startDay, dayjs(), dailyPassiveCalories),
+    },
   ];
 
   return series;
