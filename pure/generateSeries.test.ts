@@ -18,11 +18,6 @@ const foodEntry: entry = {
   timestamp: dayjs().toJSON(),
   number: 100,
 };
-const activeEntry: entry = {
-  entryType: 'active',
-  timestamp: dayjs().toJSON(),
-  number: 100,
-};
 const weightEntry: entry = {
   entryType: 'weight',
   timestamp: dayjs().toJSON(),
@@ -59,9 +54,6 @@ it('should give empty series from no entries', () => {
 
 it('should give correct results for single entry list', () => {
   expect(generateDailyCalorieSeries([foodEntry], 'food')).toEqual([
-    { x: dayjs().format('YYYY-MM-DD'), y: 100 },
-  ]);
-  expect(generateDailyCalorieSeries([activeEntry], 'active')).toEqual([
     { x: dayjs().format('YYYY-MM-DD'), y: 100 },
   ]);
   expect(generateDailyCalorieSeries([weightEntry], 'weight')).toEqual([

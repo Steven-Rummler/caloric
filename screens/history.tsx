@@ -14,8 +14,6 @@ import { useSelector } from 'react-redux';
 
 export default function HistoryScreen() {
   const entries = useSelector(getEntries);
-  const settings = useSelector(getSettings);
-  const { trackActiveCalories } = settings;
   const [selectedEntryType, setSelectedEntryType] = useState<entryType>('food');
   const [selectedEntry, setSelectedEntry] = useState<entry | undefined>(
     undefined
@@ -42,17 +40,6 @@ export default function HistoryScreen() {
             Food
           </Text>
         </OptionButton>
-        {trackActiveCalories && (
-          <OptionButton onPress={() => setSelectedEntryType('active')}>
-            <Text
-              style={
-                selectedEntryType === 'active' ? {} : { color: 'lightgrey' }
-              }
-            >
-              Active
-            </Text>
-          </OptionButton>
-        )}
         <OptionButton onPress={() => setSelectedEntryType('weight')}>
           <Text
             style={selectedEntryType === 'weight' ? {} : { color: 'lightgrey' }}
@@ -77,7 +64,12 @@ export default function HistoryScreen() {
         visible={editVisible}
         onRequestClose={() => setEditVisible(!editVisible)}
       >
-        <EditEntry selectedEntry={selectedEntry} setVisible={setEditVisible} />
+        {selectedEntry !== undefined && (
+          <EditEntry
+            selectedEntry={selectedEntry}
+            setVisible={setEditVisible}
+          />
+        )}
       </Modal>
     </Page>
   );

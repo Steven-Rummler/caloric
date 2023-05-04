@@ -1,11 +1,10 @@
 import { Dayjs } from 'dayjs';
 import { entryType } from '../types';
 
-const entryTypes: entryType[] = ['food', 'active', 'weight'];
+const entryTypes: entryType[] = ['food', 'weight'];
 
-const entryTypeUnits = {
+const entryTypeUnits: Record<entryType, string> = {
   food: 'Calories',
-  active: 'Calories',
   weight: 'Pounds',
 };
 
@@ -13,9 +12,8 @@ function entryTypeUnit(entryType: entryType): string {
   return entryTypeUnits[entryType];
 }
 
-const entryTypeLabels = {
+const entryTypeLabels: Record<entryType, string> = {
   food: 'Food\nCalories',
-  active: 'Active\nCalories',
   weight: 'Weight',
 };
 
@@ -23,9 +21,8 @@ function entryTypeLabel(entryType: entryType): string {
   return entryTypeLabels[entryType];
 }
 
-const entryTypeDateFormats = {
+const entryTypeDateFormats: Record<entryType, string> = {
   food: 'dddd, MMMM D, h:mm a',
-  active: 'dddd, MMMM D',
   weight: 'dddd, MMMM D, h:mm a',
 };
 

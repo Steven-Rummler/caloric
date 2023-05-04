@@ -35,17 +35,11 @@ function generateDailyTotalCalorieSeries(
   passiveCalories: number
 ): daySeries {
   const foodSeries = generateDailyCalorieSeries(entries, 'food');
-  const activeSeries = generateDailyCalorieSeries(entries, 'active');
   const series: daySeries = [];
   for (const foodPoint of foodSeries) {
     const existingPoint = series.find((point) => point.x === foodPoint.x);
     if (existingPoint) existingPoint.y += foodPoint.y;
     else series.push({ x: foodPoint.x, y: foodPoint.y });
-  }
-  for (const activePoint of activeSeries) {
-    const existingPoint = series.find((point) => point.x === activePoint.x);
-    if (existingPoint) existingPoint.y -= activePoint.y;
-    else series.push({ x: activePoint.x, y: -1 * activePoint.y });
   }
   for (const point of series) point.y += passiveCalories;
   series.sort((a, b) => (a.x > b.x ? 1 : -1));
@@ -125,8 +119,7 @@ function generateRunningTotalCalorieSeries(
     { x: startDay, y: 0 },
     ...filteredEntries.map((entry) => {
       const timestamp = dayjs(entry.timestamp);
-      const number =
-        entry.entryType === 'food' ? entry.number : -1 * entry.number;
+      const number = entry.number;
       runningTotal += number;
       return {
         x: timestamp,

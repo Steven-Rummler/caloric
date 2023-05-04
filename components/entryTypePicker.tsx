@@ -9,8 +9,6 @@ import {
 import { entryTypeLabel, entryTypes } from '../pure/entryTypes';
 
 import { entryType } from '../types';
-import { getSettings } from '../store';
-import { useSelector } from 'react-redux';
 
 interface props {
   entryType: entryType;
@@ -18,8 +16,6 @@ interface props {
 }
 
 export default function EntryTypePicker({ entryType, setEntryType }: props) {
-  const settings = useSelector(getSettings);
-
   const onEntryTypeChange = (
     event: GestureResponderEvent,
     newType: entryType
@@ -36,13 +32,9 @@ export default function EntryTypePicker({ entryType, setEntryType }: props) {
     backgroundColor: 'lightgray',
   };
 
-  const availableEntryTypes = settings.trackActiveCalories
-    ? entryTypes
-    : entryTypes.filter((entryType) => entryType !== 'active');
-
   return (
     <View style={styles.toggleButtonSection}>
-      {availableEntryTypes.map((type) => (
+      {entryTypes.map((type) => (
         <Pressable
           key={type}
           style={type === entryType ? onButtonStyle : offButtonStyle}

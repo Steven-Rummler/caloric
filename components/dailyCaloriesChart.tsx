@@ -28,13 +28,6 @@ export default function DailyCaloriesChart() {
     return generateDailyCalorieSeries(entries, 'food');
   }, [entries]);
 
-  const activeSeries = useMemo(() => {
-    return generateDailyCalorieSeries(entries, 'active').map(({ x, y }) => ({
-      x,
-      y: -1 * y,
-    }));
-  }, [entries]);
-
   const passiveSeries = useMemo(() => {
     return netSeries.map(({ x }) => ({ x, y: passiveCalories }));
   }, [netSeries]);
@@ -44,8 +37,6 @@ export default function DailyCaloriesChart() {
     lines.push({ name: 'Net', data: netSeries, color: 'green' });
   if (foodSeries.length > 1)
     lines.push({ name: 'Food', data: foodSeries, color: 'purple' });
-  if (activeSeries.length > 1)
-    lines.push({ name: 'Active', data: activeSeries, color: 'red' });
   if (passiveSeries.length > 1)
     lines.push({ name: 'Passive', data: passiveSeries, color: 'blue' });
 

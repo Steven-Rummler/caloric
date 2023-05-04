@@ -41,14 +41,6 @@ const defaultEntries: entry[] = [
       entryType: 'food',
       timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
       number: _.round(100 + 200 * Math.random()),
-      ...(Math.random() > 0.5 && { label: 'Eggs' }),
-    })
-  ),
-  ...sizedArray(5).map(
-    (): entry => ({
-      entryType: 'active',
-      timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
-      number: _.round(200 + 600 * Math.random()),
     })
   ),
   ...sizedArray(10).map(
@@ -64,9 +56,7 @@ const defaultEntries: entry[] = [
 
 const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
-const defaultSettings: settings = {
-  trackActiveCalories: false,
-};
+const defaultSettings: settings = {};
 
 const slice = createSlice({
   name: 'data',
@@ -78,30 +68,18 @@ const slice = createSlice({
   reducers: {
     addEntry: (state, action: { type: string; payload: entry }) => {
       state.entries.push(action.payload);
-      state.passiveCalories = calculateDailyPassiveCalories(
-        state.settings.trackActiveCalories
-          ? state.entries
-          : state.entries.filter((entry) => entry.entryType !== 'active')
-      );
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     addEntries: (state, action: { type: string; payload: entry[] }) => {
       state.entries.push(...action.payload);
-      state.passiveCalories = calculateDailyPassiveCalories(
-        state.settings.trackActiveCalories
-          ? state.entries
-          : state.entries.filter((entry) => entry.entryType !== 'active')
-      );
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     removeEntry: (state, action: { type: string; payload: entry }) => {
       const filteredEntries = state.entries.filter(
         (entry) => !_.isEqual(entry, action.payload)
       );
       state.entries = filteredEntries;
-      state.passiveCalories = calculateDailyPassiveCalories(
-        state.settings.trackActiveCalories
-          ? state.entries
-          : state.entries.filter((entry) => entry.entryType !== 'active')
-      );
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     clearEntries: (state) => {
       state.entries = [];
@@ -109,34 +87,22 @@ const slice = createSlice({
     },
     useDefaultEntries: (state) => {
       state.entries = defaultEntries;
-      state.passiveCalories = calculateDailyPassiveCalories(
-        state.settings.trackActiveCalories
-          ? state.entries
-          : state.entries.filter((entry) => entry.entryType !== 'active')
-      );
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     updateSetting: (
       state,
       action: {
         type: string;
-        payload: Partial<settings>;
+        payload: settings;
       }
     ) => {
       for (const [key, value] of Object.entries(action.payload))
-        state.settings[key as keyof typeof state.settings] = value;
-      state.passiveCalories = calculateDailyPassiveCalories(
-        state.settings.trackActiveCalories
-          ? state.entries
-          : state.entries.filter((entry) => entry.entryType !== 'active')
-      );
+        state.settings[key] = value;
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     resetSettings: (state) => {
       state.settings = defaultSettings;
-      state.passiveCalories = calculateDailyPassiveCalories(
-        state.settings.trackActiveCalories
-          ? state.entries
-          : state.entries.filter((entry) => entry.entryType !== 'active')
-      );
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
   },
 });
@@ -154,9 +120,7 @@ const {
 function getEntries(state: {
   data: { entries: entry[]; settings: settings };
 }): entry[] {
-  return state.data.settings.trackActiveCalories
-    ? state.data.entries
-    : state.data.entries.filter((entry) => entry.entryType !== 'active');
+  return state.data.entries;
 }
 
 function getPassiveCalories(state: {

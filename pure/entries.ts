@@ -28,7 +28,6 @@ function caloriesAtTimestamp(
 ): number {
   return (
     foodCaloriesAtTimestamp(entries, timestamp) +
-    activeCaloriesAtTimestamp(entries, timestamp) +
     dailyPassiveCalories * dayDiff(getFirstDay(entries), timestamp)
   );
 }
@@ -41,18 +40,6 @@ function foodCaloriesAtTimestamp(entries: entry[], timestamp: dayjs.Dayjs) {
   );
   return foodEntriesBeforeTimestamp.reduce(
     (total, next) => total + next.number,
-    0
-  );
-}
-function activeCaloriesAtTimestamp(entries: entry[], timestamp: dayjs.Dayjs) {
-  const entriesBeforeTimestamp = entries.filter((entry) =>
-    dayjs(entry.timestamp).isBefore(timestamp)
-  );
-  const activeEntriesBeforeTimestamp = entriesBeforeTimestamp.filter(
-    (entry) => entry.entryType === 'active'
-  );
-  return activeEntriesBeforeTimestamp.reduce(
-    (total, next) => total - next.number,
     0
   );
 }
@@ -73,8 +60,7 @@ function calculateDailyPassiveCalories(entries: entry[]) {
   sortedEntries
     .filter((entry) => entry.entryType !== 'weight')
     .forEach((entry) => {
-      if (entry.entryType === 'food') runningTotalCalories += entry.number;
-      else runningTotalCalories -= entry.number;
+      runningTotalCalories += entry.number;
       calorieSeries.push({
         x: dayjs(entry.timestamp).valueOf(),
         y: runningTotalCalories,
@@ -115,7 +101,6 @@ export {
   getLastDay,
   caloriesAtTimestamp,
   foodCaloriesAtTimestamp,
-  activeCaloriesAtTimestamp,
   calculateDailyPassiveCalories,
   dayDiff,
 };

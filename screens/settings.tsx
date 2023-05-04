@@ -5,12 +5,9 @@ import {
   addEntries,
   clearEntries,
   getEntries,
-  getSettings,
   resetSettings,
-  updateSetting,
   useDefaultEntries,
 } from '../store';
-import { entry, entryList } from '../types';
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -18,28 +15,18 @@ import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
 import { Text } from 'react-native';
+import { entry } from '../types';
 import styled from 'styled-components/native';
 
 export default function SettingsScreen({ navigation }: Props) {
   const dispatch = useDispatch();
-  const settings = useSelector(getSettings);
   const entries = useSelector(getEntries);
 
-  const { trackActiveCalories } = settings;
   return (
     <Page>
       <TitleSection>
         <Title>Preferences</Title>
       </TitleSection>
-      <OptionButton
-        onPress={() => {
-          dispatch(
-            updateSetting({ trackActiveCalories: !trackActiveCalories })
-          );
-        }}
-      >
-        <Text>Track Active Calories: {trackActiveCalories ? 'Yes' : 'No'}</Text>
-      </OptionButton>
       <OptionButton
         onPress={() => {
           dispatch(resetSettings());

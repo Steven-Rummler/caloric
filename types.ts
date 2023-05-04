@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs';
 
-export type entryType = 'food' | 'active' | 'weight';
+export type entryType = 'food' | 'weight';
 
 export type timeSeries = { x: Dayjs; y: number }[];
 export type daySeries = { x: string; y: number }[];
@@ -12,6 +12,4 @@ export interface entry {
   label?: string;
 }
 
-export interface settings {
-  trackActiveCalories: boolean;
-}
+export type settings = Record<string, boolean>;
