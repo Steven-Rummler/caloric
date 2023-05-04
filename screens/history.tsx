@@ -1,6 +1,5 @@
 import { FlatList, Modal, Text } from 'react-native';
 import { entry, entryType } from '../types';
-import { getEntries, getSettings } from '../store';
 import { useMemo, useState } from 'react';
 
 import EditEntry from '../components/EditEntry';
@@ -9,6 +8,7 @@ import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import _ from 'lodash';
 import dayjs from 'dayjs';
+import { getEntries } from '../store';
 import styled from 'styled-components/native';
 import { useSelector } from 'react-redux';
 
