@@ -5,6 +5,7 @@ import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
 import { Text } from 'react-native';
+import _ from 'lodash';
 import dayjs from 'dayjs';
 import { getLastDay } from '../pure/entries';
 import styled from 'styled-components/native';
@@ -48,20 +49,29 @@ export default function HomeScreen({ navigation }: Props) {
     return Math.round(totalFoodCalories / days.length);
   }, [entries]);
 
+  const weightChange = _.round(
+    (7 * (averageFoodCalories + passiveCalories)) / 3500,
+    1
+  );
+
   return (
     <Page>
       <TitleSection>
         <Title>Caloric</Title>
       </TitleSection>
       <InfoSection>
-        <Info>Food Calories Today: {recentFoodCalories}</Info>
+        <Info>{recentFoodCalories} Today</Info>
       </InfoSection>
       <InfoSection>
-        <Info>Average Food Calories: {averageFoodCalories}</Info>
+        <Info>{averageFoodCalories} Average</Info>
+      </InfoSection>
+      <InfoSection>
+        <Info>{Math.round(-1 * passiveCalories)} Equilibrium</Info>
       </InfoSection>
       <InfoSection>
         <Info>
-          Equilibrium Food Calories: {Math.round(-1 * passiveCalories)}
+          {weightChange > 0 ? 'Gaining' : 'Losing'} {Math.abs(weightChange)}lbs
+          per Week
         </Info>
       </InfoSection>
       <ActionSection>
@@ -89,7 +99,7 @@ const Title = styled.Text`
   font-size: 67.77px;
 `;
 const InfoSection = styled.View`
-  flex: 0.667 1 0;
+  flex: 0.5 1 0;
   align-items: center;
   justify-content: center;
 `;

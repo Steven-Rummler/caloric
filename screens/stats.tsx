@@ -16,11 +16,22 @@ const charts = new Map(
 );
 
 export default function StatsScreen() {
-  const [chart, setChart] = useState<string>('dailyCalories');
+  const [chart, setChart] = useState<string>('weight');
 
   return (
     <Page style={{ paddingTop: 90 }}>
       <OptionsSection>
+        <OptionButton onPress={() => setChart('weight')}>
+          <Text
+            style={{
+              padding: 5,
+              textAlign: 'center',
+              color: chart === 'weight' ? undefined : 'lightgrey',
+            }}
+          >
+            Weight
+          </Text>
+        </OptionButton>
         <OptionButton onPress={() => setChart('dailyCalories')}>
           <Text
             style={{
@@ -41,17 +52,6 @@ export default function StatsScreen() {
             }}
           >
             {'Running\nTotal\nCalories'}
-          </Text>
-        </OptionButton>
-        <OptionButton onPress={() => setChart('weight')}>
-          <Text
-            style={{
-              padding: 5,
-              textAlign: 'center',
-              color: chart === 'weight' ? undefined : 'lightgrey',
-            }}
-          >
-            Weight
           </Text>
         </OptionButton>
       </OptionsSection>

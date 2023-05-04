@@ -22,7 +22,7 @@ export default function WeightChart() {
     entries.length < 2 ||
     entries.filter((entry) => entry.entryType === 'weight').length < 2
   )
-    return;
+    return <></>;
 
   const weightEntries = useMemo(
     () => entries.filter((e) => e.entryType === 'weight'),
@@ -93,8 +93,8 @@ export default function WeightChart() {
           orientation="horizontal"
           gutter={20}
           data={[
-            { name: 'Recorded', symbol: { fill: 'red' } },
-            { name: 'Calculated', symbol: { fill: 'blue' } },
+            { name: 'Measured', symbol: { fill: 'red' } },
+            { name: 'Estimated', symbol: { fill: 'blue' } },
           ]}
         />
         <VictoryAxis

@@ -42,7 +42,7 @@ export default function DailyCaloriesChart() {
   if (foodSeries.length > 1)
     lines.push({ name: 'Food', data: foodSeries, color: 'purple' });
   if (passiveSeries.length > 1)
-    lines.push({ name: 'Passive', data: passiveSeries, color: 'blue' });
+    lines.push({ name: 'Burned', data: passiveSeries, color: 'blue' });
 
   if (lines.some((line) => !Array.isArray(line.data)))
     return <Text>Loading</Text>;
