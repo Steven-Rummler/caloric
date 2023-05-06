@@ -21,7 +21,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.stevenrummler.caloric",
-      "buildNumber": "2"
+      "buildNumber": "3"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +29,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.stevenrummler.caloric",
-      "versionCode": 4,
+      "versionCode": 6,
       "runtimeVersion": {
         "policy": "sdkVersion"
       }
