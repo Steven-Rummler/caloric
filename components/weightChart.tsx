@@ -9,6 +9,7 @@ import { getEntries, getPassiveCalories } from '../store';
 
 import { View } from 'react-native';
 import dayjs from 'dayjs';
+import { entry } from '../types';
 import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
 import { getFirstDay } from '../pure/entries';
 import { useMemo } from 'react';
@@ -38,33 +39,10 @@ export default function WeightChart() {
     [weightEntries]
   );
 
-  const actualWeight = useMemo(() => {
-    if (entries.length === 0) return [];
-
-    const firstDay = getFirstDay(entries);
-    const days = [firstDay];
-
-    while (days[days.length - 1] <= dayjs())
-      days.push(days[days.length - 1].add(1, 'hour'));
-
-    const caloriesSeries = generateRunningTotalCalorieSeries(
-      entries,
-      passiveCalories
-    );
-
-    const averageWeight =
-      weightData.reduce((total, next) => total + next.y, 0) / weightData.length;
-    const averageCalories =
-      caloriesSeries.reduce((total, next) => total + next.y, 0) /
-      caloriesSeries.length;
-    const gap = averageWeight - averageCalories / 3500;
-
-    caloriesSeries.forEach((point) => {
-      point.y = point.y / 3500 + gap;
-    });
-
-    return caloriesSeries;
-  }, [entries, weightData]);
+  const actualWeight = useMemo(
+    () => computeActualWeightSeries(entries, weightData, passiveCalories),
+    [entries, weightData]
+  );
 
   return (
     <View style={{ margin: 10 }}>
@@ -104,4 +82,36 @@ export default function WeightChart() {
       </VictoryChart>
     </View>
   );
+}
+
+export function computeActualWeightSeries(
+  entries: entry[],
+  weightData: { x: Date; y: number }[],
+  passiveCalories: number
+) {
+  if (entries.length === 0) return [];
+
+  const firstDay = getFirstDay(entries);
+  const days = [firstDay];
+
+  while (days[days.length - 1] <= dayjs())
+    days.push(days[days.length - 1].add(1, 'hour'));
+
+  const caloriesSeries = generateRunningTotalCalorieSeries(
+    entries,
+    passiveCalories
+  );
+
+  const averageWeight =
+    weightData.reduce((total, next) => total + next.y, 0) / weightData.length;
+  const averageCalories =
+    caloriesSeries.reduce((total, next) => total + next.y, 0) /
+    caloriesSeries.length;
+  const gap = averageWeight - averageCalories / 3500;
+
+  caloriesSeries.forEach((point) => {
+    point.y = point.y / 3500 + gap;
+  });
+
+  return caloriesSeries;
 }

@@ -38,7 +38,8 @@
     "redux-toolkit": "^1.1.2",
     "sentry-expo": "~6.1.0",
     "styled-components": "^5.3.6",
-    "victory-native": "^36.6.8"
+    "victory-native": "^36.6.8",
+    "expo-image": "~1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
