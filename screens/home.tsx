@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { getEntries, getPassiveCalories } from '../store';
 
 import ActionButton from '../components/ActionButton';
-import Icon from '../assets/header-icon.png';
+import Icon from '../assets/icon.png';
 import { Image } from 'expo-image';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
