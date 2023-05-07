@@ -31,7 +31,7 @@ export default function HistoryScreen() {
   }, [entries, selectedEntryType]);
 
   return (
-    <Page style={{ paddingTop: 90 }}>
+    <Page>
       <OptionsSection>
         <OptionButton onPress={() => setSelectedEntryType('food')}>
           <Text

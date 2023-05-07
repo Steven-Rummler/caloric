@@ -81,7 +81,7 @@ export default function LogEntryScreen({ navigation }: Props) {
 const Page = styled.KeyboardAvoidingView`
   flex: 1;
   background-color: white;
-  padding-top: 90px;
+  padding-top: 40px;
 `;
 const OptionsSection = styled.View`
   flex: 1 1 0;

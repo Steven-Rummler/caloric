@@ -61,7 +61,6 @@ function CustomHeader(props: Props) {
   return (
     <View
       style={{
-        paddingTop: 48,
         paddingHorizontal: 18,
         width: '100%',
         position: 'absolute',

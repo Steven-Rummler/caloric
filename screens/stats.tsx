@@ -19,7 +19,7 @@ export default function StatsScreen() {
   const [chart, setChart] = useState<string>('weight');
 
   return (
-    <Page style={{ paddingTop: 90 }}>
+    <Page>
       <OptionsSection>
         <OptionButton onPress={() => setChart('weight')}>
           <Text

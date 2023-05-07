@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { getEntries, getPassiveCalories } from '../store';
 
 import ActionButton from '../components/ActionButton';
-import Icon from '../assets/icon.png';
+import Icon from '../assets/thin-margin-icon.png';
 import { Image } from 'expo-image';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
@@ -48,8 +48,7 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <Page>
       <TitleSection>
-        {/* <Title>Caloric</Title> */}
-        <Image source={Icon} style={{ width: 96, height: 96 }} />
+        <Image source={Icon as string} style={{ width: 96, height: 96 }} />
       </TitleSection>
       <InfoSection>
         <InfoColumn>
