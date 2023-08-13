@@ -1,6 +1,7 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 
+import { OptionButton, OutlineOptionButton } from '../components/OptionButton';
 import {
   addEntries,
   clearEntries,
@@ -11,7 +12,6 @@ import {
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
 import { Text } from 'react-native';
@@ -62,24 +62,24 @@ export default function SettingsScreen({ navigation }: Props) {
       >
         <Text>Import Log from CSV</Text>
       </OptionButton>
-      <OptionButton
+      <OutlineOptionButton
         onPress={() => {
           dispatch(clearEntries());
           navigation.goBack();
         }}
-        style={{ borderColor: '#ab0000' }}
+        style={{ borderColor: '#ff4444' }}
       >
-        <Text style={{ color: '#ab0000' }}>Clear Log</Text>
-      </OptionButton>
-      <OptionButton
+        <Text style={{ color: '#ff4444' }}>Clear Log</Text>
+      </OutlineOptionButton>
+      <OutlineOptionButton
         onPress={() => {
           dispatch(useDefaultEntries());
           navigation.goBack();
         }}
-        style={{ borderColor: '#ab0000' }}
+        style={{ borderColor: '#ff4444' }}
       >
-        <Text style={{ color: '#ab0000' }}>Reset Log to Demo</Text>
-      </OptionButton>
+        <Text style={{ color: '#ff4444' }}>Reset Log to Demo</Text>
+      </OutlineOptionButton>
     </Page>
   );
 }

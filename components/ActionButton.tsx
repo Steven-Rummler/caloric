@@ -1,10 +1,13 @@
 import styled from 'styled-components/native';
 
-const ActionButton = styled.Pressable`
+export const ActionButton = styled.Pressable`
   flex: 1;
   align-items: center;
   justify-content: center;
-  border: 1px solid lightgrey;
+  background-color: #b9e2f5;
+  border-radius: 16px;
 `;
 
-export default ActionButton;
+export const DisabledActionButton = styled(ActionButton)`
+  background-color: #edf7fc;
+`;

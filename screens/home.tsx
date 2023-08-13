@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 import { getEntries, getPassiveCalories } from '../store';
 
-import ActionButton from '../components/ActionButton';
+import { ActionButton } from '../components/ActionButton';
 import Icon from '../assets/thin-margin-icon.png';
 import { Image } from 'expo-image';
 import { OptionButton } from '../components/OptionButton';
@@ -65,15 +65,11 @@ export default function HomeScreen({ navigation }: Props) {
             value={`${Math.abs(totalWeightChange)}lbs`}
           />
           <InfoCard
-            label={`Weight ${
-              weeklyWeightChange > 0 ? 'Gain' : 'Loss'
-            } per Week`}
+            label={`Weight ${weeklyWeightChange > 0 ? 'Gain' : 'Loss'} per Week`}
             value={`${Math.abs(weeklyWeightChange)}lbs`}
           />
           <InfoCard
-            label={`Weight ${
-              monthlyWeightChange > 0 ? 'Gain' : 'Loss'
-            } per Month`}
+            label={`Weight ${monthlyWeightChange > 0 ? 'Gain' : 'Loss'} per Month`}
             value={`${Math.abs(monthlyWeightChange)}lbs`}
           />
         </InfoColumn>

@@ -40,7 +40,8 @@ export default function EntryTypePicker({
 const ItemBox = styled.Pressable`
   align-items: center;
   justify-content: center;
-  border: 1px solid lightgrey;
+  background-color: #b9e2f5;
+  border-radius: 16px;
   margin: 5px 10px;
   flex-direction: row;
   justify-content: space-between;

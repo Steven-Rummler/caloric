@@ -1,8 +1,8 @@
 import { Alert, Dimensions, Text, View } from 'react-native';
+import { OptionButton, OutlineOptionButton } from './OptionButton';
 import { addEntry, removeEntry } from '../store';
 
 import { DatePicker } from './DatePicker';
-import { OptionButton } from './OptionButton';
 import { Trash2 } from 'react-native-feather';
 import _ from 'lodash';
 import { entry } from '../types';
@@ -71,6 +71,7 @@ export default function EditEntry({
           onChangeText={setNumber}
           multiline={true}
           numberOfLines={1}
+          selectionColor={'#b9e2f5'}
         />
       </OptionsSection>
       <OptionsSection>
@@ -81,13 +82,13 @@ export default function EditEntry({
           <Text>Save Changes</Text>
         </OptionButton>
       </OptionsSection>
-      <OptionButton
+      <OutlineOptionButton
         onPress={() => onDelete(selectedEntry)}
-        style={{ borderColor: '#ab0000', flexGrow: 0.5 }}
+        style={{ borderColor: '#ff4444', flexGrow: 0.5 }}
       >
-        <Trash2 color="#ab0000" />
-        <Text style={{ color: '#ab0000' }}>Delete Entry</Text>
-      </OptionButton>
+        <Trash2 color="#ff4444" />
+        <Text style={{ color: '#ff4444' }}>Delete Entry</Text>
+      </OutlineOptionButton>
     </ModalArea>
   );
 }
@@ -96,8 +97,9 @@ const ModalArea = styled.View`
   width: 90%;
   margin: 16% auto 5% auto;
   padding: 10px 10px 20px 10px;
+  border: 2px solid #b9e2f5;
   background-color: white;
-  border: 1px solid lightgrey;
+  border-radius: 16px;
 `;
 
 const OptionsSection = styled.View`
@@ -107,6 +109,7 @@ const OptionsSection = styled.View`
 const OptionTextInput = styled.TextInput`
   flex: 1;
   text-align: center;
-  border: 1px solid lightgrey;
+  border: 2px solid #b9e2f5;
+  border-radius: 16px;
   margin: 10px;
 `;

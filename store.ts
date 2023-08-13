@@ -58,13 +58,19 @@ const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
 const defaultSettings: settings = {};
 
+const initialState: {
+  passiveCalories: number;
+  entries: entry[];
+  settings: settings;
+} = {
+  passiveCalories: defaultPassive,
+  entries: [],
+  settings: defaultSettings,
+};
+
 const slice = createSlice({
   name: 'data',
-  initialState: {
-    passiveCalories: defaultPassive,
-    entries: defaultEntries,
-    settings: defaultSettings,
-  },
+  initialState,
   reducers: {
     addEntry: (state, action: { type: string; payload: entry }) => {
       state.entries.push(action.payload);

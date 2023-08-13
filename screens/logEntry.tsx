@@ -1,9 +1,9 @@
+import { ActionButton, DisabledActionButton } from '../components/ActionButton';
+import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
 import { Text, View } from 'react-native';
 import { entry, entryType } from '../types';
 
-import ActionButton from '../components/ActionButton';
 import { DatePicker } from '../components/DatePicker';
-import { OptionButton } from '../components/OptionButton';
 import { Props } from '../navigationTypes';
 import _ from 'lodash';
 import { addEntry } from '../store';
@@ -30,19 +30,19 @@ export default function LogEntryScreen({ navigation }: Props) {
     dispatch(addEntry(newEntry));
   };
 
+  const FoodButton = entryType === 'food' ? OptionButton : UnselectedOptionButton;
+  const WeightButton = entryType === 'weight' ? OptionButton : UnselectedOptionButton;
+  const LogButton = [undefined, '', '0'].includes(number) ? DisabledActionButton : ActionButton;
+
   return (
     <Page>
       <OptionsSection>
-        <OptionButton onPress={() => setEntryType('food')}>
-          <Text style={entryType === 'food' ? {} : { color: 'lightgrey' }}>
-            Food
-          </Text>
-        </OptionButton>
-        <OptionButton onPress={() => setEntryType('weight')}>
-          <Text style={entryType === 'weight' ? {} : { color: 'lightgrey' }}>
-            Weight
-          </Text>
-        </OptionButton>
+        <FoodButton onPress={() => setEntryType('food')}>
+          <Text>Food</Text>
+        </FoodButton>
+        <WeightButton onPress={() => setEntryType('weight')}>
+          <Text>Weight</Text>
+        </WeightButton>
       </OptionsSection>
       <OptionsSection>
         <DatePicker {...{ timestamp, setTimestamp }} />
@@ -55,24 +55,17 @@ export default function LogEntryScreen({ navigation }: Props) {
           onChangeText={setNumber}
           multiline={true}
           numberOfLines={1}
+          selectionColor={'#b9e2f5'}
         />
       </OptionsSection>
       <View style={{ padding: 20, flexGrow: 1 }}>
-        <ActionButton
-          disabled={[undefined, '', '0'].includes(number)}
+        <LogButton
           onPress={submit}
         >
-          <Text
-            style={{
-              textAlign: 'center',
-              color: [undefined, '', '0'].includes(number)
-                ? 'lightgrey'
-                : 'black',
-            }}
-          >
+          <Text style={{ textAlign: 'center' }}          >
             {`Log ${_.upperFirst(entryType)}`}
           </Text>
-        </ActionButton>
+        </LogButton>
       </View>
     </Page>
   );
@@ -92,6 +85,8 @@ const OptionsSection = styled.View`
 const OptionTextInput = styled.TextInput`
   flex: 1;
   text-align: center;
-  border: 1px solid lightgrey;
+  border: 2px solid #b9e2f5;
+  padding: -10px;
+  border-radius: 16px;
   margin: 10px;
 `;

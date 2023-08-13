@@ -1,5 +1,6 @@
+import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
+
 import DailyCaloriesChart from '../components/dailyCaloriesChart';
-import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import RunningCaloriesChart from '../components/runningCaloriesChart';
 import { Text } from 'react-native';
@@ -18,42 +19,43 @@ const charts = new Map(
 export default function StatsScreen() {
   const [chart, setChart] = useState<string>('weight');
 
+  const WeightButton = chart === 'weight' ? OptionButton : UnselectedOptionButton;
+  const DailyCaloriesButton = chart === 'dailyCalories' ? OptionButton : UnselectedOptionButton;
+  const RunningCaloriesButton = chart === 'runningCalories' ? OptionButton : UnselectedOptionButton;
+
   return (
     <Page>
       <OptionsSection>
-        <OptionButton onPress={() => setChart('weight')}>
+        <WeightButton onPress={() => setChart('weight')}>
           <Text
             style={{
               padding: 5,
               textAlign: 'center',
-              color: chart === 'weight' ? undefined : 'lightgrey',
             }}
           >
             Weight
           </Text>
-        </OptionButton>
-        <OptionButton onPress={() => setChart('dailyCalories')}>
+        </WeightButton>
+        <DailyCaloriesButton onPress={() => setChart('dailyCalories')}>
           <Text
             style={{
               padding: 5,
               textAlign: 'center',
-              color: chart === 'dailyCalories' ? undefined : 'lightgrey',
             }}
           >
             Daily Calories
           </Text>
-        </OptionButton>
-        <OptionButton onPress={() => setChart('runningCalories')}>
+        </DailyCaloriesButton>
+        <RunningCaloriesButton onPress={() => setChart('runningCalories')}>
           <Text
             style={{
               padding: 5,
               textAlign: 'center',
-              color: chart === 'runningCalories' ? undefined : 'lightgrey',
             }}
           >
             {'Running\nTotal\nCalories'}
           </Text>
-        </OptionButton>
+        </RunningCaloriesButton>
       </OptionsSection>
       {charts.get(chart)}
     </Page>

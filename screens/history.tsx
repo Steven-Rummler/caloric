@@ -1,10 +1,10 @@
 import { FlatList, Modal, Text } from 'react-native';
+import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
 import { entry, entryType } from '../types';
 import { useMemo, useState } from 'react';
 
 import EditEntry from '../components/EditEntry';
 import EntryListItem from '../components/entryListItem';
-import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import _ from 'lodash';
 import dayjs from 'dayjs';
@@ -30,23 +30,22 @@ export default function HistoryScreen() {
     return sortedEntries;
   }, [entries, selectedEntryType]);
 
+  const FoodButton = selectedEntryType === 'food' ? OptionButton : UnselectedOptionButton;
+  const WeightButton = selectedEntryType === 'weight' ? OptionButton : UnselectedOptionButton;
+
   return (
     <Page>
       <OptionsSection>
-        <OptionButton onPress={() => setSelectedEntryType('food')}>
-          <Text
-            style={selectedEntryType === 'food' ? {} : { color: 'lightgrey' }}
-          >
+        <FoodButton onPress={() => setSelectedEntryType('food')}>
+          <Text          >
             Food
           </Text>
-        </OptionButton>
-        <OptionButton onPress={() => setSelectedEntryType('weight')}>
-          <Text
-            style={selectedEntryType === 'weight' ? {} : { color: 'lightgrey' }}
-          >
+        </FoodButton>
+        <WeightButton onPress={() => setSelectedEntryType('weight')}>
+          <Text          >
             Weight
           </Text>
-        </OptionButton>
+        </WeightButton>
       </OptionsSection>
       <FlatList
         data={sortedEntries}
