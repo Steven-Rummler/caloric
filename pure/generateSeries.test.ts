@@ -7,7 +7,6 @@ import {
   generateRunningTotalCalorieSeries,
   passiveCaloriesAtTimestampFromEntries,
 } from './generateSeries';
-import { generateDailyCalorieSeriesFast } from './generateSeriesFast';
 import dayjs from 'dayjs';
 import { expect, it } from 'vitest';
 
@@ -43,7 +42,7 @@ it('should give empty series from no entries', () => {
   ).toEqual([]);
   const passiveCaloriesAtTimestamp = passiveCaloriesAtTimestampFromEntries(
     noEntries,
-    dayjs(),
+    dayjs().toJSON(),
     defaultPassiveCalories
   );
   expect(passiveCaloriesAtTimestamp).toBeGreaterThanOrEqual(0);
@@ -62,7 +61,8 @@ it('should give correct results for single entry list', () => {
 });
 
 it('should be performant', () => {
-  const days = 1000;
+  const now = dayjs().toJSON();
+  const days = 2000;
   const meals = 5;
 
   const largeHistory: entry[] = [];
@@ -89,70 +89,40 @@ it('should be performant', () => {
         number: 400,
       });
   }
+
   const startRunningFood = performance.now();
-  generateRunningCalorieSeries(largeHistory, 'food');
+  generateRunningCalorieSeries(largeHistory, 'food', now);
   const endRunningFood = performance.now();
-  console.log(
-    `generateRunningCalorieSeries(largeHistory, 'food') took ${
-      endRunningFood - startRunningFood
-    }ms`
-  );
+  const runningFoodTime = endRunningFood - startRunningFood;
+  expect(runningFoodTime).toBeLessThan(100);
 
   const startRunningWeight = performance.now();
-  generateRunningCalorieSeries(largeHistory, 'weight');
+  generateRunningCalorieSeries(largeHistory, 'weight', now);
   const endRunningWeight = performance.now();
-  console.log(
-    `generateRunningCalorieSeries(largeHistory, 'weight') took ${
-      endRunningWeight - startRunningWeight
-    }ms`
-  );
+  const runningWeightTime = endRunningWeight - startRunningWeight;
+  expect(runningWeightTime).toBeLessThan(100);
 
   const startDailyFood = performance.now();
-  const dailyFood = generateDailyCalorieSeries(largeHistory, 'food').sort(
-    (a, b) => a.x.localeCompare(b.x)
-  ); // sorting because the old code is wrong
+  generateDailyCalorieSeries(largeHistory, 'food');
   const endDailyFood = performance.now();
-  console.log(
-    `generateDailyCalorieSeries(largeHistory, 'food') took ${
-      endDailyFood - startDailyFood
-    }ms`
-  );
-
-  const startDailyFoodFast = performance.now();
-  const dailyFoodFast = generateDailyCalorieSeriesFast(largeHistory, 'food');
-  const endDailyFoodFast = performance.now();
-  console.log(
-    `generateDailyCalorieSeriesFast(largeHistory, 'food') took ${
-      endDailyFoodFast - startDailyFoodFast
-    }ms`
-  );
-
-  expect(dailyFood).toEqual(dailyFoodFast);
+  const dailyFoodTime = endDailyFood - startDailyFood;
+  expect(dailyFoodTime).toBeLessThan(100);
 
   const startDailyWeight = performance.now();
   generateDailyCalorieSeries(largeHistory, 'weight');
   const endDailyWeight = performance.now();
-  console.log(
-    `generateDailyCalorieSeries(largeHistory, 'weight') took ${
-      endDailyWeight - startDailyWeight
-    }ms`
-  );
+  const dailyWeightTime = endDailyWeight - startDailyWeight;
+  expect(dailyWeightTime).toBeLessThan(100);
 
   const startRunningTotal = performance.now();
-  generateRunningTotalCalorieSeries(largeHistory, defaultPassiveCalories);
+  generateRunningTotalCalorieSeries(largeHistory, defaultPassiveCalories, now);
   const endRunningTotal = performance.now();
-  console.log(
-    `generateRunningTotalCalorieSeries(largeHistory, defaultPassiveCalories) took ${
-      endRunningTotal - startRunningTotal
-    }ms`
-  );
+  const runningTotalTime = endRunningTotal - startRunningTotal;
+  expect(runningTotalTime).toBeLessThan(100);
 
   const startDailyTotal = performance.now();
   generateDailyTotalCalorieSeries(largeHistory, defaultPassiveCalories);
   const endDailyTotal = performance.now();
-  console.log(
-    `generateDailyTotalCalorieSeries(largeHistory, defaultPassiveCalories) took ${
-      endDailyTotal - startDailyTotal
-    }ms`
-  );
+  const dailyTotalTime = endDailyTotal - startDailyTotal;
+  expect(dailyTotalTime).toBeLessThan(100);
 });
