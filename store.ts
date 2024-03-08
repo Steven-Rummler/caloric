@@ -1,3 +1,14 @@
+import { calculateDailyPassiveCalories } from './pure/entries';
+import { entry, settings } from './types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  combineReducers,
+  configureStore,
+  createSlice,
+  getDefaultMiddleware,
+} from '@reduxjs/toolkit';
+import dayjs from 'dayjs';
+import _ from 'lodash';
 import {
   FLUSH,
   PAUSE,
@@ -8,18 +19,6 @@ import {
   persistReducer,
   persistStore,
 } from 'redux-persist';
-import {
-  combineReducers,
-  configureStore,
-  createSlice,
-  getDefaultMiddleware,
-} from '@reduxjs/toolkit';
-import { entry, settings } from './types';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import _ from 'lodash';
-import { calculateDailyPassiveCalories } from './pure/entries';
-import dayjs from 'dayjs';
 
 const persistConfig = {
   key: 'root',
@@ -27,32 +26,40 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
-function sizedArray(size: number) {
-  return Array(size)
-    .fill(0)
-    .map((e, i) => i);
-}
+const days = 365;
+const meals = 5;
+const dailyCalories = 2000;
+const calorieVariation = 500;
+const mealVariation = calorieVariation / meals;
 
-const startDay = dayjs().startOf('day').subtract(10, 'day');
-
-const defaultEntries: entry[] = [
-  ...sizedArray(80).map(
-    (): entry => ({
+const defaultEntries: entry[] = [];
+let weight = 150;
+for (let day = 0; day < days; day++) {
+  const calorieDiff = Math.random() * calorieVariation - calorieVariation / 2;
+  const mealSize = (dailyCalories + calorieDiff) / meals;
+  weight += calorieDiff / 3500;
+  defaultEntries.push({
+    entryType: 'weight',
+    timestamp: dayjs()
+      .subtract(days, 'days')
+      .add(day, 'days')
+      .startOf('day')
+      .add(8, 'hours')
+      .toJSON(),
+    number: weight + Math.random() - 0.5,
+  });
+  for (let meal = 0; meal < meals; meal++)
+    defaultEntries.push({
       entryType: 'food',
-      timestamp: startDay.add(10 * 24 * 60 * Math.random(), 'minute').toJSON(),
-      number: _.round(100 + 200 * Math.random()),
-    })
-  ),
-  ...sizedArray(10).map(
-    (day): entry => ({
-      entryType: 'weight',
-      timestamp: startDay
-        .add(24 * 60 * (day + Math.random()), 'minute')
+      timestamp: dayjs()
+        .subtract(days, 'days')
+        .add(day, 'days')
+        .startOf('day')
+        .add(8 + 2 * meal, 'hours')
         .toJSON(),
-      number: _.round(150 + 1 * Math.random() - 0.1 * day, 1),
-    })
-  ),
-];
+      number: mealSize + Math.random() * mealVariation - mealVariation / 2,
+    });
+}
 
 const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
@@ -160,16 +167,16 @@ const store = configureStore({
 const persistor = persistStore(store);
 
 export {
-  store,
-  persistor,
-  addEntry,
   addEntries,
-  removeEntry,
+  addEntry,
   clearEntries,
-  useDefaultEntries,
-  updateSetting,
-  resetSettings,
   getEntries,
   getPassiveCalories,
   getSettings,
+  persistor,
+  removeEntry,
+  resetSettings,
+  store,
+  updateSetting,
+  useDefaultEntries,
 };

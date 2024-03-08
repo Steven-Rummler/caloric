@@ -75,7 +75,8 @@ export default function DailyCaloriesChart() {
         />
         <VictoryAxis
           style={{ grid: { stroke: 'none' } }}
-          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM DD')}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM \'YY')}
+          fixLabelOverlap
         />
         <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
       </VictoryChart>

@@ -3,17 +3,17 @@ import {
   VictoryChart,
   VictoryLegend,
   VictoryLine,
+  VictoryScatter,
   VictoryTheme,
 } from 'victory-native';
 import { getEntries, getPassiveCalories } from '../store';
 
-import { View } from 'react-native';
 import dayjs from 'dayjs';
-import { entry } from '../types';
-import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
-import { getFirstDay } from '../pure/entries';
 import { useMemo } from 'react';
+import { View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
+import { entry } from '../types';
 
 export default function WeightChart() {
   const entries = useSelector(getEntries);
@@ -33,7 +33,7 @@ export default function WeightChart() {
   const weightData = useMemo(
     () =>
       weightEntries.map((e) => ({
-        x: dayjs(e.timestamp).toDate(),
+        x: e.timestamp,
         y: e.number,
       })),
     [weightEntries]
@@ -44,25 +44,26 @@ export default function WeightChart() {
     [entries, weightData]
   );
 
+  const weightDataDates = weightData.map(point => ({ x: new Date(point.x), y: point.y }));
+  const actualWeightDates = actualWeight.map(point => ({ x: new Date(point.x), y: point.y }));
+
   return (
     <View style={{ margin: 10 }}>
       <VictoryChart theme={VictoryTheme.material}>
-        {weightData.length > 1 && (
-          <VictoryLine
-            style={{
-              data: { stroke: 'red' },
-              parent: { border: '1px solid #ccc' },
-            }}
-            data={weightData}
+        {weightDataDates.length > 1 && (
+          <VictoryScatter
+            style={{ data: { fill: 'red' } }}
+            size={2}
+            data={weightDataDates}
           />
         )}
-        {actualWeight.length > 1 && (
+        {actualWeightDates.length > 1 && (
           <VictoryLine
             style={{
               data: { stroke: 'blue' },
               parent: { border: '1px solid #ccc' },
             }}
-            data={actualWeight}
+            data={actualWeightDates}
           />
         )}
         <VictoryLegend
@@ -76,7 +77,8 @@ export default function WeightChart() {
         />
         <VictoryAxis
           style={{ grid: { stroke: 'none' } }}
-          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM DD')}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM \'YY')}
+          fixLabelOverlap
         />
         <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
       </VictoryChart>
@@ -86,16 +88,10 @@ export default function WeightChart() {
 
 export function computeActualWeightSeries(
   entries: entry[],
-  weightData: { x: Date; y: number }[],
+  weightData: { x: string; y: number }[],
   passiveCalories: number
 ) {
   if (entries.length === 0) return [];
-
-  const firstDay = getFirstDay(entries);
-  const days = [firstDay];
-
-  while (days[days.length - 1] <= dayjs())
-    days.push(days[days.length - 1].add(1, 'hour'));
 
   const caloriesSeries = generateRunningTotalCalorieSeries(
     entries,
