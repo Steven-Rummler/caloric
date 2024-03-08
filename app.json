@@ -29,7 +29,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.stevenrummler.caloric",
-      "versionCode": 8,
+      "versionCode": 9,
       "runtimeVersion": {
         "policy": "sdkVersion"
       }
@@ -50,6 +50,9 @@
       "eas": {
         "projectId": "68603faa-f028-4a0e-9fd5-96b85f926366"
       }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
