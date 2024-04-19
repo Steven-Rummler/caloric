@@ -1,17 +1,16 @@
-import { ActionButton, DisabledActionButton } from '../components/ActionButton';
-import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
-import { Text, View } from 'react-native';
-import { entry, entryType } from '../types';
-
-import { DatePicker } from '../components/DatePicker';
-import { Props } from '../navigationTypes';
-import _ from 'lodash';
-import { addEntry } from '../store';
 import dayjs from 'dayjs';
-import { entryTypeUnit } from '../pure/entryTypes';
-import styled from 'styled-components/native';
-import { useDispatch } from 'react-redux';
+import upperFirst from 'lodash/upperFirst';
 import { useState } from 'react';
+import { Text, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components/native';
+import { ActionButton, DisabledActionButton } from '../components/ActionButton';
+import { DatePicker } from '../components/DatePicker';
+import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
+import { Props } from '../navigationTypes';
+import { entryTypeUnit } from '../pure/entryTypes';
+import { addEntry } from '../store';
+import { entry, entryType } from '../types';
 
 export default function LogEntryScreen({ navigation }: Props) {
   const dispatch = useDispatch();
@@ -63,7 +62,7 @@ export default function LogEntryScreen({ navigation }: Props) {
           onPress={submit}
         >
           <Text style={{ textAlign: 'center' }}          >
-            {`Log ${_.upperFirst(entryType)}`}
+            {`Log ${upperFirst(entryType)}`}
           </Text>
         </LogButton>
       </View>

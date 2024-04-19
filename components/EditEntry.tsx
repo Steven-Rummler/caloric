@@ -1,15 +1,14 @@
-import { Alert, Dimensions, Text, View } from 'react-native';
-import { OptionButton, OutlineOptionButton } from './OptionButton';
-import { addEntry, removeEntry } from '../store';
-
-import { DatePicker } from './DatePicker';
-import { Trash2 } from 'react-native-feather';
-import _ from 'lodash';
-import { entry } from '../types';
-import { entryTypeUnit } from '../pure/entryTypes';
-import styled from 'styled-components/native';
-import { useDispatch } from 'react-redux';
+import startCase from 'lodash/startCase';
 import { useState } from 'react';
+import { Alert, Dimensions, Text, View } from 'react-native';
+import { Trash2 } from 'react-native-feather';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components/native';
+import { entryTypeUnit } from '../pure/entryTypes';
+import { addEntry, removeEntry } from '../store';
+import { entry } from '../types';
+import { DatePicker } from './DatePicker';
+import { OptionButton, OutlineOptionButton } from './OptionButton';
 
 export default function EditEntry({
   selectedEntry,
@@ -57,7 +56,7 @@ export default function EditEntry({
         }}
       >
         <Text style={{ fontSize: 25.89 }}>
-          Edit {_.startCase(entryType)} Entry
+          Edit {startCase(entryType)} Entry
         </Text>
       </View>
       <OptionsSection>

@@ -1,3 +1,7 @@
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
+import { View } from 'react-native';
+import { useSelector } from 'react-redux';
 import {
   VictoryAxis,
   VictoryChart,
@@ -6,18 +10,14 @@ import {
   VictoryScatter,
   VictoryTheme,
 } from 'victory-native';
-import { getEntries, getPassiveCalories } from '../store';
-
-import dayjs from 'dayjs';
-import { useMemo } from 'react';
-import { View } from 'react-native';
-import { useSelector } from 'react-redux';
 import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
+import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 import { entry } from '../types';
 
 export default function WeightChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
+  const dateFormat = useSelector(getDateFormat);
 
   if (
     entries.length < 2 ||
@@ -77,7 +77,7 @@ export default function WeightChart() {
         />
         <VictoryAxis
           style={{ grid: { stroke: 'none' } }}
-          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM \'YY')}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format(dateFormat)}
           fixLabelOverlap
         />
         <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
@@ -96,7 +96,7 @@ export function computeActualWeightSeries(
   const caloriesSeries = generateRunningTotalCalorieSeries(
     entries,
     passiveCalories
-  );
+  ).sort((a, b) => a.x.localeCompare(b.x));
 
   const averageWeight =
     weightData.reduce((total, next) => total + next.y, 0) / weightData.length;

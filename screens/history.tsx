@@ -1,16 +1,15 @@
-import { FlatList, Modal, Text } from 'react-native';
-import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
-import { entry, entryType } from '../types';
-import { useMemo, useState } from 'react';
-
-import EditEntry from '../components/EditEntry';
-import EntryListItem from '../components/entryListItem';
-import Page from '../components/Page';
-import _ from 'lodash';
 import dayjs from 'dayjs';
-import { getEntries } from '../store';
-import styled from 'styled-components/native';
+import clone from 'lodash/clone';
+import { useMemo, useState } from 'react';
+import { FlatList, Modal, Text } from 'react-native';
 import { useSelector } from 'react-redux';
+import styled from 'styled-components/native';
+import EditEntry from '../components/EditEntry';
+import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
+import Page from '../components/Page';
+import EntryListItem from '../components/entryListItem';
+import { getEntries } from '../store';
+import { entry, entryType } from '../types';
 
 export default function HistoryScreen() {
   const entries = useSelector(getEntries);
@@ -21,7 +20,7 @@ export default function HistoryScreen() {
   const [editVisible, setEditVisible] = useState(false);
 
   const sortedEntries = useMemo(() => {
-    const sortedEntries = _.clone(
+    const sortedEntries = clone(
       entries.filter((entry) => entry.entryType === selectedEntryType)
     );
     sortedEntries.sort(

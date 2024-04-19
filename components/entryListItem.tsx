@@ -1,10 +1,9 @@
-import { Text, View } from 'react-native';
-import { displayDate, entryTypeUnit } from '../pure/entryTypes';
-
-import { Edit } from 'react-native-feather';
 import dayjs from 'dayjs';
-import { entry } from '../types';
+import { Text, View } from 'react-native';
+import { Edit } from 'react-native-feather';
 import styled from 'styled-components/native';
+import { displayDate, entryTypeUnit } from '../pure/entryTypes';
+import { entry } from '../types';
 
 export default function EntryTypePicker({
   entry,

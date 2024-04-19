@@ -1,7 +1,12 @@
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-
+import { Text } from 'react-native';
+import { jsonToCSV, readString } from 'react-native-csv';
+import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components/native';
 import { OptionButton, OutlineOptionButton } from '../components/OptionButton';
+import Page from '../components/Page';
+import { Props } from '../navigationTypes';
 import {
   addEntries,
   clearEntries,
@@ -9,14 +14,7 @@ import {
   resetSettings,
   useDefaultEntries,
 } from '../store';
-import { jsonToCSV, readString } from 'react-native-csv';
-import { useDispatch, useSelector } from 'react-redux';
-
-import Page from '../components/Page';
-import { Props } from '../navigationTypes';
-import { Text } from 'react-native';
 import { entry } from '../types';
-import styled from 'styled-components/native';
 
 export default function SettingsScreen({ navigation }: Props) {
   const dispatch = useDispatch();
@@ -127,8 +125,9 @@ async function importData() {
     copyToCacheDirectory: true,
     type: ['text/csv', 'text/comma-separated-values'],
   });
-  if (importFile.type !== 'success') return [];
-  const fileString = await FileSystem.readAsStringAsync(importFile.uri, {
+  if (importFile.canceled) return [];
+  const file = importFile.assets[0]?.uri;
+  const fileString = await FileSystem.readAsStringAsync(file, {
     encoding: FileSystem.EncodingType.UTF8,
   });
   const fileData = readString(fileString);

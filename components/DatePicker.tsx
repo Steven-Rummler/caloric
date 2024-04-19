@@ -1,10 +1,9 @@
-import { OptionButton, OptionText } from './OptionButton';
-import { useCallback, useState } from 'react';
-
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
-import { displayDate } from '../pure/entryTypes';
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { displayDate } from '../pure/entryTypes';
+import { OptionButton, OptionText } from './OptionButton';
 
 export function DatePicker(props: {
   timestamp: string;

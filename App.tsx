@@ -1,13 +1,11 @@
-import * as Sentry from 'sentry-expo';
-
-import { Platform, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
-import { persistor, store } from './store';
-import { setCustomText, setCustomTextInput } from 'react-native-global-props';
-
 import { NavigationContainer } from '@react-navigation/native';
-import Navigator from './Navigator';
-import { PersistGate } from 'redux-persist/integration/react';
+import { Platform, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { setCustomText, setCustomTextInput } from 'react-native-global-props';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import * as Sentry from 'sentry-expo';
+import Navigator from './Navigator';
+import { persistor, store } from './store';
 
 Sentry.init({
   dsn: 'https://7defc0a9e6a14cf98c568b8b9b8b451e@o4505059880468480.ingest.sentry.io/4505059883876352',

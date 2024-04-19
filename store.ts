@@ -1,5 +1,3 @@
-import { calculateDailyPassiveCalories } from './pure/entries';
-import { entry, settings } from './types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   combineReducers,
@@ -8,7 +6,8 @@ import {
   getDefaultMiddleware,
 } from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
+import round from 'lodash/round';
 import {
   FLUSH,
   PAUSE,
@@ -19,6 +18,8 @@ import {
   persistReducer,
   persistStore,
 } from 'redux-persist';
+import { calculateDailyPassiveCalories } from './pure/entries';
+import { entry, settings } from './types';
 
 const persistConfig = {
   key: 'root',
@@ -26,38 +27,43 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
-const days = 365;
-const meals = 5;
+const days = 30;
+const meals = 3;
 const dailyCalories = 2000;
-const calorieVariation = 500;
+const calorieVariation = 1000;
 const mealVariation = calorieVariation / meals;
+
+const sections = 4;
+const gapDays = 7;
+const totalDays = days * sections + gapDays * (sections - 1);
 
 const defaultEntries: entry[] = [];
 let weight = 150;
-for (let day = 0; day < days; day++) {
+for (let section = 0; section < sections; section++) for (let day = 0; day < days; day++) {
+  const daysFromStart = day + section * gapDays + section * days;
   const calorieDiff = Math.random() * calorieVariation - calorieVariation / 2;
   const mealSize = (dailyCalories + calorieDiff) / meals;
   weight += calorieDiff / 3500;
   defaultEntries.push({
     entryType: 'weight',
     timestamp: dayjs()
-      .subtract(days, 'days')
-      .add(day, 'days')
+      .subtract(totalDays, 'days')
+      .add(daysFromStart, 'days')
       .startOf('day')
       .add(8, 'hours')
       .toJSON(),
-    number: weight + Math.random() - 0.5,
+    number: round(weight + Math.random() - 0.51, 2),
   });
   for (let meal = 0; meal < meals; meal++)
     defaultEntries.push({
       entryType: 'food',
       timestamp: dayjs()
-        .subtract(days, 'days')
-        .add(day, 'days')
+        .subtract(totalDays, 'days')
+        .add(daysFromStart, 'days')
         .startOf('day')
-        .add(8 + 2 * meal, 'hours')
+        .add(8 + 4 * meal, 'hours')
         .toJSON(),
-      number: mealSize + Math.random() * mealVariation - mealVariation / 2,
+      number: round(mealSize + Math.random() * mealVariation - mealVariation / 2, -1),
     });
 }
 
@@ -65,11 +71,16 @@ const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
 const defaultSettings: settings = {};
 
-const initialState: {
+interface DataSlice {
   passiveCalories: number;
   entries: entry[];
   settings: settings;
-} = {
+}
+interface Store {
+  data: DataSlice;
+}
+
+const initialState: DataSlice = {
   passiveCalories: defaultPassive,
   entries: [],
   settings: defaultSettings,
@@ -89,7 +100,7 @@ const slice = createSlice({
     },
     removeEntry: (state, action: { type: string; payload: entry }) => {
       const filteredEntries = state.entries.filter(
-        (entry) => !_.isEqual(entry, action.payload)
+        (entry) => !isEqual(entry, action.payload)
       );
       state.entries = filteredEntries;
       state.passiveCalories = calculateDailyPassiveCalories(state.entries);
@@ -130,16 +141,19 @@ const {
   resetSettings,
 } = slice.actions;
 
-function getEntries(state: {
-  data: { entries: entry[]; settings: settings };
-}): entry[] {
+function getEntries(state: Store): entry[] {
   return state.data.entries;
 }
 
-function getPassiveCalories(state: {
-  data: { passiveCalories: number };
-}): number {
+function getPassiveCalories(state: Store): number {
   return state.data.passiveCalories;
+}
+
+function getDateFormat(state: Store) {
+  const minDate = state.data.entries.reduce((min, entry) => entry.timestamp < min ? entry.timestamp : min, state.data.entries[0].timestamp);
+  const maxDate = state.data.entries.reduce((max, entry) => entry.timestamp > max ? entry.timestamp : max, state.data.entries[0].timestamp);
+  const diff = dayjs(maxDate).diff(dayjs(minDate), 'day');
+  return diff > 3 * 365 ? 'YYYY' : diff > 2 * 30 ? 'MMM \'YY' : diff > 7 ? 'MMM D' : 'ddd';
 }
 
 function getSettings(state: { data: { settings: settings } }) {
@@ -169,14 +183,13 @@ const persistor = persistStore(store);
 export {
   addEntries,
   addEntry,
-  clearEntries,
-  getEntries,
-  getPassiveCalories,
-  getSettings,
+  clearEntries, getDateFormat, getEntries,
+  getPassiveCalories, getSettings,
   persistor,
   removeEntry,
   resetSettings,
   store,
   updateSetting,
-  useDefaultEntries,
+  useDefaultEntries
 };
+

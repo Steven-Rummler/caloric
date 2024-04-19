@@ -1,12 +1,11 @@
-import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
-
-import DailyCaloriesChart from '../components/dailyCaloriesChart';
-import Page from '../components/Page';
-import RunningCaloriesChart from '../components/runningCaloriesChart';
-import { Text } from 'react-native';
-import WeightChart from '../components/weightChart';
-import styled from 'styled-components/native';
 import { useState } from 'react';
+import { Text } from 'react-native';
+import styled from 'styled-components/native';
+import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
+import Page from '../components/Page';
+import DailyCaloriesChart from '../components/dailyCaloriesChart';
+import RunningCaloriesChart from '../components/runningCaloriesChart';
+import WeightChart from '../components/weightChart';
 
 const charts = new Map(
   Object.entries({

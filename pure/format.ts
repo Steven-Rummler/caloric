@@ -1,0 +1,1 @@
+export const sig3 = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format.bind(this);

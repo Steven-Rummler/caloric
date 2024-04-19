@@ -7,7 +7,6 @@ import {
   View,
 } from 'react-native';
 import { entryTypeLabel, entryTypes } from '../pure/entryTypes';
-
 import { entryType } from '../types';
 
 interface props {

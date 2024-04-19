@@ -1,7 +1,6 @@
-import { entry, entryType } from '../types';
-
-import _ from 'lodash';
 import dayjs from 'dayjs';
+import { entry, entryType } from '../types';
+import { fillInFoodGaps } from './generateSeries';
 
 function getEntriesForType(entries: entry[], entryType: entryType): entry[] {
   return entries.filter((entry) => entry.entryType === entryType);
@@ -55,17 +54,16 @@ function calculateDailyPassiveCalories(entries: entry[]) {
     }));
   let runningTotalCalories = 0;
   const calorieSeries: { x: number; y: number }[] = [];
-  const sortedEntries = _.cloneDeep(entries);
-  sortedEntries.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1));
-  sortedEntries
-    .filter((entry) => entry.entryType !== 'weight')
-    .forEach((entry) => {
-      runningTotalCalories += entry.number;
-      calorieSeries.push({
-        x: dayjs(entry.timestamp).valueOf(),
-        y: runningTotalCalories,
-      });
+  const foodEntries = entries.filter((entry) => entry.entryType === 'food');
+  fillInFoodGaps(foodEntries);
+  foodEntries.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1));
+  for (const entry of foodEntries) {
+    runningTotalCalories += entry.number;
+    calorieSeries.push({
+      x: dayjs(entry.timestamp).valueOf(),
+      y: runningTotalCalories,
     });
+  }
 
   const weightLine = slopeForLine(weightSeries);
   const calorieLine = slopeForLine(calorieSeries);
@@ -95,12 +93,7 @@ function dayDiff(start: dayjs.Dayjs, end: dayjs.Dayjs) {
   return (end.valueOf() - start.valueOf()) / 1000 / 60 / 60 / 24;
 }
 export {
-  getEntriesForType,
-  getEntriesForDay,
-  getFirstDay,
-  getLastDay,
-  caloriesAtTimestamp,
-  foodCaloriesAtTimestamp,
-  calculateDailyPassiveCalories,
-  dayDiff,
+  calculateDailyPassiveCalories, caloriesAtTimestamp, dayDiff, foodCaloriesAtTimestamp, getEntriesForDay, getEntriesForType, getFirstDay,
+  getLastDay
 };
+

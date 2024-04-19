@@ -1,20 +1,19 @@
-import { Text, View } from 'react-native';
-import { getEntries, getPassiveCalories } from '../store';
-
-import { ActionButton } from '../components/ActionButton';
-import Icon from '../assets/thin-margin-icon.png';
+import dayjs from 'dayjs';
 import { Image } from 'expo-image';
+import round from 'lodash/round';
+import { useMemo } from 'react';
+import { Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components/native';
+import Icon from '../assets/thin-margin-icon.png';
+import { ActionButton } from '../components/ActionButton';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
-import { Props } from '../navigationTypes';
-import _ from 'lodash';
 import { computeActualWeightSeries } from '../components/weightChart';
-import dayjs from 'dayjs';
-import { entry } from '../types';
+import { Props } from '../navigationTypes';
 import { getLastDay } from '../pure/entries';
-import styled from 'styled-components/native';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { getEntries, getPassiveCalories } from '../store';
+import { entry } from '../types';
 
 export default function HomeScreen({ navigation }: Props) {
   const entries = useSelector(getEntries);
@@ -132,7 +131,7 @@ function computeTotalWeightChange(entries: entry[], passiveCalories: number) {
   const weightData = entries
     .filter((entry) => entry.entryType === 'weight')
     .map((e) => ({
-      x: dayjs(e.timestamp).toDate(),
+      x: e.timestamp,
       y: e.number,
     }));
 
@@ -144,7 +143,7 @@ function computeTotalWeightChange(entries: entry[], passiveCalories: number) {
 
   if (weightSeries.length === 0) return 0;
 
-  return _.round(
+  return round(
     weightSeries[weightSeries.length - 1].y - weightSeries[0].y,
     1
   );
@@ -154,7 +153,7 @@ function computeCurrentWeight(entries: entry[], passiveCalories: number) {
   const weightData = entries
     .filter((entry) => entry.entryType === 'weight')
     .map((e) => ({
-      x: dayjs(e.timestamp).toDate(),
+      x: e.timestamp,
       y: e.number,
     }));
 
@@ -166,5 +165,5 @@ function computeCurrentWeight(entries: entry[], passiveCalories: number) {
 
   if (weightSeries.length === 0) return 0;
 
-  return _.round(weightSeries[weightSeries.length - 1].y, 1);
+  return round(weightSeries[weightSeries.length - 1].y, 1);
 }

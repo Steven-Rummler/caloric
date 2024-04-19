@@ -33,7 +33,7 @@
     "curly": ["error", "multi"],
     "dot-notation": "error",
     "eqeqeq": "error",
-    "max-depth": ["error", 2],
+    "max-depth": ["error", 3],
     "max-params": ["error", 3],
     "no-var": "error",
     "prefer-const": "error",

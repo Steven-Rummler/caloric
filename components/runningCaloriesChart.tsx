@@ -1,4 +1,7 @@
+import dayjs from 'dayjs';
+import { useMemo } from 'react';
 import { Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
 import {
   VictoryAxis,
   VictoryChart,
@@ -11,15 +14,12 @@ import {
   generateRunningTotalCalorieSeries,
   passiveCaloriesAtTimestampFromEntries,
 } from '../pure/generateSeries';
-import { getEntries, getPassiveCalories } from '../store';
-
-import dayjs from 'dayjs';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 
 export default function DailyCaloriesChart() {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
+  const dateFormat = useSelector(getDateFormat);
 
   const netSeries = useMemo(() => {
     return generateRunningTotalCalorieSeries(entries, passiveCalories);
@@ -75,7 +75,7 @@ export default function DailyCaloriesChart() {
         />
         <VictoryAxis
           style={{ grid: { stroke: 'none' } }}
-          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format('MMM \'YY')}
+          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format(dateFormat)}
           fixLabelOverlap
         />
         <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
