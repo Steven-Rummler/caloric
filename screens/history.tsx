@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 import clone from 'lodash/clone';
 import { useMemo, useState } from 'react';
-import { FlatList, Modal, Text } from 'react-native';
+import { FlatList, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import styled from 'styled-components/native';
 import EditEntry from '../components/EditEntry';
 import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
@@ -34,7 +33,7 @@ export default function HistoryScreen() {
 
   return (
     <Page>
-      <OptionsSection>
+      <View style={styles.optionsSection}>
         <FoodButton onPress={() => setSelectedEntryType('food')}>
           <Text          >
             Food
@@ -45,7 +44,7 @@ export default function HistoryScreen() {
             Weight
           </Text>
         </WeightButton>
-      </OptionsSection>
+      </View>
       <FlatList
         data={sortedEntries}
         renderItem={({ item }) => (
@@ -73,9 +72,11 @@ export default function HistoryScreen() {
   );
 }
 
-const OptionsSection = styled.View`
-  flex: 1 1 0;
-  min-height: 133px;
-  max-height: 133px;
-  flex-direction: row;
-`;
+const styles = StyleSheet.create({
+  optionsSection: {
+    flex: 1,
+    minHeight: 133,
+    maxHeight: 133,
+    flexDirection: 'row',
+  },
+});

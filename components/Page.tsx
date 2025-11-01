@@ -1,9 +1,17 @@
-import styled from 'styled-components/native';
+import { View, StyleSheet, ViewProps } from 'react-native';
 
-const Page = styled.View`
-  flex: 1;
-  background-color: white;
-  padding-top: 40px;
-`;
+export default function Page({ children, style, ...props }: ViewProps) {
+  return (
+    <View style={[styles.page, style]} {...props}>
+      {children}
+    </View>
+  );
+}
 
-export default Page;
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: 'white',
+    paddingTop: 40,
+  },
+});

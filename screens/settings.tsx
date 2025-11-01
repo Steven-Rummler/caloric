@@ -1,9 +1,8 @@
 import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system';
-import { Text } from 'react-native';
+import { Directory, File } from 'expo-file-system';
+import { StyleSheet, Text, View } from 'react-native';
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components/native';
 import { OptionButton, OutlineOptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
@@ -22,9 +21,9 @@ export default function SettingsScreen({ navigation }: Props) {
 
   return (
     <Page>
-      <TitleSection>
-        <Title>Preferences</Title>
-      </TitleSection>
+      <View style={styles.titleSection}>
+        <Text style={styles.title}>Preferences</Text>
+      </View>
       <OptionButton
         onPress={() => {
           dispatch(resetSettings());
@@ -32,9 +31,9 @@ export default function SettingsScreen({ navigation }: Props) {
       >
         <Text>Reset Preferences to Defaults</Text>
       </OptionButton>
-      <TitleSection>
-        <Title>Manage Log</Title>
-      </TitleSection>
+      <View style={styles.titleSection}>
+        <Text style={styles.title}>Manage Log</Text>
+      </View>
       <OptionButton
         onPress={() => {
           exportData(entries)
@@ -82,14 +81,16 @@ export default function SettingsScreen({ navigation }: Props) {
   );
 }
 
-const TitleSection = styled.View`
-  flex: 0.667;
-  align-items: center;
-  justify-content: center;
-`;
-const Title = styled.Text`
-  font-size: 25.89px;
-`;
+const styles = StyleSheet.create({
+  titleSection: {
+    flex: 0.667,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 25.89,
+  },
+});
 
 async function exportData(entries: entry[]) {
   try {
@@ -102,19 +103,11 @@ async function exportData(entries: entry[]) {
       )
     );
 
-    const permissions =
-      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-    if (!permissions.granted) return;
+    const selectedDirectory = await Directory.pickDirectoryAsync();
+    if (!selectedDirectory) return;
 
-    const filePath = await FileSystem.StorageAccessFramework.createFileAsync(
-      `${permissions.directoryUri}`,
-      'caloric',
-      'text/csv'
-    );
-
-    await FileSystem.writeAsStringAsync(filePath, csvString, {
-      encoding: FileSystem.EncodingType.UTF8,
-    });
+    const file = new File(selectedDirectory.uri, 'caloric.csv');
+    file.write(csvString);
   } catch (error) {
     console.error(error);
   }
@@ -126,10 +119,11 @@ async function importData() {
     type: ['text/csv', 'text/comma-separated-values'],
   });
   if (importFile.canceled) return [];
-  const file = importFile.assets[0]?.uri;
-  const fileString = await FileSystem.readAsStringAsync(file, {
-    encoding: FileSystem.EncodingType.UTF8,
-  });
+  const fileUri = importFile.assets[0]?.uri;
+  if (!fileUri) return [];
+  
+  const file = new File(fileUri);
+  const fileString = await file.text();
   const fileData = readString(fileString);
   if (Array.isArray(fileData.data)) {
     const dataRows = fileData.data.slice(1);

@@ -2,13 +2,7 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import {
-  VictoryAxis,
-  VictoryChart,
-  VictoryLegend,
-  VictoryLine,
-  VictoryTheme,
-} from 'victory-native';
+import { CartesianChart, Line } from 'victory-native';
 import {
   generateDailyCalorieSeries,
   generateDailyTotalCalorieSeries,
@@ -22,7 +16,7 @@ export default function DailyCaloriesChart() {
 
   const netSeries = useMemo(() => {
     return generateDailyTotalCalorieSeries(entries, passiveCalories);
-  }, [entries]);
+  }, [entries, passiveCalories]);
 
   const foodSeries = useMemo(() => {
     return generateDailyCalorieSeries(entries, 'food');
@@ -30,51 +24,47 @@ export default function DailyCaloriesChart() {
 
   const passiveSeries = useMemo(() => {
     return netSeries.map(({ x }) => ({ x, y: passiveCalories }));
-  }, [netSeries]);
+  }, [netSeries, passiveCalories]);
 
-  const lines = [];
-  if (netSeries.length > 1)
-    lines.push({ name: 'Net', data: netSeries, color: 'green' });
-  if (foodSeries.length > 1)
-    lines.push({ name: 'Food', data: foodSeries, color: 'purple' });
-  if (passiveSeries.length > 1)
-    lines.push({ name: 'Burned', data: passiveSeries, color: 'blue' });
+  // Transform data for CartesianChart
+  const chartData = useMemo(() => {
+    const allTimestamps = new Set([
+      ...netSeries.map(d => d.x),
+      ...foodSeries.map(d => d.x),
+      ...passiveSeries.map(d => d.x)
+    ]);
+    
+    return Array.from(allTimestamps).sort().map(timestamp => {
+      const net = netSeries.find(d => d.x === timestamp);
+      const food = foodSeries.find(d => d.x === timestamp);
+      const passive = passiveSeries.find(d => d.x === timestamp);
+      
+      return {
+        x: dayjs(timestamp).valueOf(),
+        net: net?.y,
+        food: food?.y,
+        burned: passive?.y,
+      };
+    });
+  }, [netSeries, foodSeries, passiveSeries]);
 
-  if (lines.some((line) => !Array.isArray(line.data)))
-    return <Text>Loading</Text>;
-
-  const linesWithData = lines.filter((line) => line.data.length > 0);
-
-  const blank = lines.every((line) => line.data.length === 0);
+  if (chartData.length < 2) return <Text>Not enough data</Text>;
 
   return (
-    <View style={{ margin: 10 }}>
-      <VictoryChart theme={VictoryTheme.material}>
-        {linesWithData.map((line, index) => (
-          <VictoryLine
-            key={index}
-            style={{
-              data: { stroke: line.color },
-              parent: { border: '1px solid #ccc' },
-            }}
-            data={line.data.map(({ x, y }) => ({ x: dayjs(x).valueOf(), y }))}
-          />
-        ))}
-        <VictoryLegend
-          x={70}
-          orientation="horizontal"
-          gutter={20}
-          data={(blank ? lines : linesWithData).map((line) => ({
-            name: line.name,
-            symbol: { fill: line.color },
-          }))}
-        />
-        <VictoryAxis
-          style={{ grid: { stroke: 'none' } }}
-          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format(dateFormat)}
-        />
-        <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
-      </VictoryChart>
+    <View style={{ height: 300, margin: 10 }}>
+      <CartesianChart
+        data={chartData}
+        xKey="x"
+        yKeys={['net', 'food', 'burned']}
+      >
+        {({ points }) => (
+          <>
+            {points.net && <Line points={points.net} color="green" strokeWidth={2} />}
+            {points.food && <Line points={points.food} color="purple" strokeWidth={2} />}
+            {points.burned && <Line points={points.burned} color="blue" strokeWidth={2} />}
+          </>
+        )}
+      </CartesianChart>
     </View>
   );
 }

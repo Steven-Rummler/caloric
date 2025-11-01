@@ -1,7 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
-import styled from 'styled-components';
 import { displayDate } from '../pure/entryTypes';
 import { OptionButton, OptionText } from './OptionButton';
 
@@ -39,11 +38,18 @@ export function DatePicker(props: {
 
   return (
     <>
-      <DatePickerButton onPress={() => setShowDatePicker(true)}>
+      <OptionButton 
+        onPress={() => setShowDatePicker(true)}
+        style={{ 
+          borderWidth: 2, 
+          borderColor: '#b9e2f5', 
+          backgroundColor: 'white' 
+        }}
+      >
         <OptionText style={{ textAlignVertical: 'center' }}>
           {displayDate(dayjs(timestamp), 'food').replace(/,\s/g, '\n')}
         </OptionText>
-      </DatePickerButton>
+      </OptionButton>
       {showDatePicker && (
         <DateTimePicker
           value={new Date(timestamp)}
@@ -69,8 +75,3 @@ export function DatePicker(props: {
 function dayAndTimeToTimestamp(day: string, time: string) {
   return `${day}T${time}${dayjs().format('Z')}`;
 }
-
-const DatePickerButton = styled(OptionButton)`
-border: 2px solid #b9e2f5;
-background-color: white;
-`;

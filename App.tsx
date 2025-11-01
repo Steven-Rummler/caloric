@@ -1,50 +1,24 @@
+import * as Sentry from '@sentry/react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { Platform, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
-import { setCustomText, setCustomTextInput } from 'react-native-global-props';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import * as Sentry from 'sentry-expo';
-import Navigator from './Navigator';
 import { persistor, store } from './store';
+import Navigator from './Navigator';
 
 Sentry.init({
   dsn: 'https://7defc0a9e6a14cf98c568b8b9b8b451e@o4505059880468480.ingest.sentry.io/4505059883876352',
-  enableInExpoDevelopment: true,
-  debug: true, // If `true`, Sentry will try to print out useful debugging information if something goes wrong with sending the event. Set it to `false` in production
+  debug: true,
+  tracesSampleRate: 1.0,
 });
 
 export default function App() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  setCustomText({
-    style: {
-      fontSize: 16,
-    },
-  });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  setCustomTextInput({
-    style: {
-      fontSize: 16,
-    },
-  });
-
   return (
     <Provider store={store}>
-      {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
-      <PersistGate loading={null} persistor={persistor}>
-        <NavigationContainer>
-          <SafeAreaView style={styles.AndroidSafeArea}>
-            <Navigator />
-          </SafeAreaView>
+       <PersistGate loading={null} persistor={persistor}> 
+         <NavigationContainer>
+          <Navigator />
         </NavigationContainer>
-      </PersistGate>
-    </Provider>
+       </PersistGate>
+     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  AndroidSafeArea: {
-    flex: 1,
-    backgroundColor: 'white',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-});

@@ -2,14 +2,7 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
-import {
-  VictoryAxis,
-  VictoryChart,
-  VictoryLegend,
-  VictoryLine,
-  VictoryScatter,
-  VictoryTheme,
-} from 'victory-native';
+import { CartesianChart, Line, Scatter } from 'victory-native';
 import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 import { entry } from '../types';
@@ -41,47 +34,44 @@ export default function WeightChart() {
 
   const actualWeight = useMemo(
     () => computeActualWeightSeries(entries, weightData, passiveCalories),
-    [entries, weightData]
+    [entries, weightData, passiveCalories]
   );
 
-  const weightDataDates = weightData.map(point => ({ x: new Date(point.x), y: point.y }));
-  const actualWeightDates = actualWeight.map(point => ({ x: new Date(point.x), y: point.y }));
+  // Transform data for CartesianChart
+  const chartData = useMemo(() => {
+    const allTimestamps = new Set([
+      ...weightData.map(d => d.x),
+      ...actualWeight.map(d => d.x)
+    ]);
+    
+    return Array.from(allTimestamps).sort().map(timestamp => {
+      const measured = weightData.find(d => d.x === timestamp);
+      const estimated = actualWeight.find(d => d.x === timestamp);
+      
+      return {
+        x: new Date(timestamp).getTime(),
+        measured: measured?.y,
+        estimated: estimated?.y,
+      };
+    });
+  }, [weightData, actualWeight]);
+
+  if (chartData.length < 2) return <></>;
 
   return (
-    <View style={{ margin: 10 }}>
-      <VictoryChart theme={VictoryTheme.material}>
-        {weightDataDates.length > 1 && (
-          <VictoryScatter
-            style={{ data: { fill: 'red' } }}
-            size={2}
-            data={weightDataDates}
-          />
+    <View style={{ height: 300, margin: 10 }}>
+      <CartesianChart
+        data={chartData}
+        xKey="x"
+        yKeys={['measured', 'estimated']}
+      >
+        {({ points }) => (
+          <>
+            {points.measured && <Scatter points={points.measured} color="red" radius={3} />}
+            {points.estimated && <Line points={points.estimated} color="blue" strokeWidth={2} />}
+          </>
         )}
-        {actualWeightDates.length > 1 && (
-          <VictoryLine
-            style={{
-              data: { stroke: 'blue' },
-              parent: { border: '1px solid #ccc' },
-            }}
-            data={actualWeightDates}
-          />
-        )}
-        <VictoryLegend
-          x={110}
-          orientation="horizontal"
-          gutter={20}
-          data={[
-            { name: 'Measured', symbol: { fill: 'red' } },
-            { name: 'Estimated', symbol: { fill: 'blue' } },
-          ]}
-        />
-        <VictoryAxis
-          style={{ grid: { stroke: 'none' } }}
-          tickFormat={(t: dayjs.Dayjs) => dayjs(t).format(dateFormat)}
-          fixLabelOverlap
-        />
-        <VictoryAxis style={{ grid: { stroke: 'none' } }} dependentAxis />
-      </VictoryChart>
+      </CartesianChart>
     </View>
   );
 }

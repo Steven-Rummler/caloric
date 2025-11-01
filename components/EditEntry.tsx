@@ -1,9 +1,8 @@
 import startCase from 'lodash/startCase';
 import { useState } from 'react';
-import { Alert, Dimensions, Text, View } from 'react-native';
+import { Alert, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Trash2 } from 'react-native-feather';
 import { useDispatch } from 'react-redux';
-import styled from 'styled-components/native';
 import { entryTypeUnit } from '../pure/entryTypes';
 import { addEntry, removeEntry } from '../store';
 import { entry } from '../types';
@@ -47,7 +46,7 @@ export default function EditEntry({
   };
 
   return (
-    <ModalArea style={{ height: Dimensions.get('window').height * 0.55 }}>
+    <View style={[styles.modalArea, { height: Dimensions.get('window').height * 0.55 }]}>
       <View
         style={{
           alignItems: 'center',
@@ -59,9 +58,10 @@ export default function EditEntry({
           Edit {startCase(entryType)} Entry
         </Text>
       </View>
-      <OptionsSection>
+      <View style={styles.optionsSection}>
         <DatePicker {...{ timestamp, setTimestamp }} />
-        <OptionTextInput
+        <TextInput
+          style={styles.optionTextInput}
           autoFocus
           keyboardType="numeric"
           value={number}
@@ -72,15 +72,15 @@ export default function EditEntry({
           numberOfLines={1}
           selectionColor={'#b9e2f5'}
         />
-      </OptionsSection>
-      <OptionsSection>
+      </View>
+      <View style={styles.optionsSection}>
         <OptionButton onPress={() => setVisible(false)}>
           <Text>Cancel</Text>
         </OptionButton>
         <OptionButton onPress={onSave}>
           <Text>Save Changes</Text>
         </OptionButton>
-      </OptionsSection>
+      </View>
       <OutlineOptionButton
         onPress={() => onDelete(selectedEntry)}
         style={{ borderColor: '#ff4444', flexGrow: 0.5 }}
@@ -88,27 +88,33 @@ export default function EditEntry({
         <Trash2 color="#ff4444" />
         <Text style={{ color: '#ff4444' }}>Delete Entry</Text>
       </OutlineOptionButton>
-    </ModalArea>
+    </View>
   );
 }
 
-const ModalArea = styled.View`
-  width: 90%;
-  margin: 16% auto 5% auto;
-  padding: 10px 10px 20px 10px;
-  border: 2px solid #b9e2f5;
-  background-color: white;
-  border-radius: 16px;
-`;
-
-const OptionsSection = styled.View`
-  flex: 1 1 0;
-  flex-direction: row;
-`;
-const OptionTextInput = styled.TextInput`
-  flex: 1;
-  text-align: center;
-  border: 2px solid #b9e2f5;
-  border-radius: 16px;
-  margin: 10px;
-`;
+const styles = StyleSheet.create({
+  modalArea: {
+    width: '90%',
+    marginVertical: '16%',
+    marginHorizontal: 'auto',
+    marginBottom: '5%',
+    padding: 10,
+    paddingBottom: 20,
+    borderWidth: 2,
+    borderColor: '#b9e2f5',
+    backgroundColor: 'white',
+    borderRadius: 16,
+  },
+  optionsSection: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  optionTextInput: {
+    flex: 1,
+    textAlign: 'center',
+    borderWidth: 2,
+    borderColor: '#b9e2f5',
+    borderRadius: 16,
+    margin: 10,
+  },
+});

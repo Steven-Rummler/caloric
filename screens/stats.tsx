@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Text } from 'react-native';
-import styled from 'styled-components/native';
+import { StyleSheet, Text, View } from 'react-native';
 import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import DailyCaloriesChart from '../components/dailyCaloriesChart';
@@ -24,7 +23,7 @@ export default function StatsScreen() {
 
   return (
     <Page>
-      <OptionsSection>
+      <View style={styles.optionsSection}>
         <WeightButton onPress={() => setChart('weight')}>
           <Text
             style={{
@@ -55,15 +54,17 @@ export default function StatsScreen() {
             {'Running\nTotal\nCalories'}
           </Text>
         </RunningCaloriesButton>
-      </OptionsSection>
+      </View>
       {charts.get(chart)}
     </Page>
   );
 }
 
-const OptionsSection = styled.View`
-  flex: 1 1 0;
-  max-height: 133px;
-  flex-direction: row;
-  padding: 0px 10px 0px 10px;
-`;
+const styles = StyleSheet.create({
+  optionsSection: {
+    flex: 1,
+    maxHeight: 133,
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+  },
+});

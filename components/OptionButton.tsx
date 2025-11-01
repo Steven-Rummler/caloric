@@ -1,25 +1,66 @@
-import { Dimensions } from 'react-native';
-import styled from 'styled-components/native';
+import { Dimensions, Pressable, Text, StyleSheet, PressableProps, TextProps } from 'react-native';
 
-export const OptionButton = styled.Pressable`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  background-color: #b9e2f5;
-  border-radius: 16px;
-  margin: 10px;
-`;
+export function OptionButton({ style, ...props }: PressableProps) {
+  return (
+    <Pressable 
+      style={(state) => [
+        styles.optionButton, 
+        typeof style === 'function' ? style(state) : style
+      ]} 
+      {...props} 
+    />
+  );
+}
 
-export const UnselectedOptionButton = styled(OptionButton)`
-background-color: #edf7fc;
-`;
+export function UnselectedOptionButton({ style, ...props }: PressableProps) {
+  return (
+    <Pressable 
+      style={(state) => [
+        styles.optionButton, 
+        styles.unselected,
+        typeof style === 'function' ? style(state) : style
+      ]} 
+      {...props} 
+    />
+  );
+}
 
-export const OutlineOptionButton = styled(OptionButton)`
-  border: 2px solid #b9e2f5;
-  background-color: white;
-`;
+export function OutlineOptionButton({ style, ...props }: PressableProps) {
+  return (
+    <Pressable 
+      style={(state) => [
+        styles.optionButton, 
+        styles.outline,
+        typeof style === 'function' ? style(state) : style
+      ]} 
+      {...props} 
+    />
+  );
+}
 
-export const OptionText = styled.Text`
-  height: ${Dimensions.get('window').height * 0.15}px;
-  text-align: center;
-`;
+export function OptionText({ style, ...props }: TextProps) {
+  return <Text style={[styles.optionText, style]} {...props} />;
+}
+
+const styles = StyleSheet.create({
+  optionButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#b9e2f5',
+    borderRadius: 16,
+    margin: 10,
+  },
+  unselected: {
+    backgroundColor: '#edf7fc',
+  },
+  outline: {
+    borderWidth: 2,
+    borderColor: '#b9e2f5',
+    backgroundColor: 'white',
+  },
+  optionText: {
+    height: Dimensions.get('window').height * 0.15,
+    textAlign: 'center',
+  },
+});

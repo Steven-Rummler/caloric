@@ -44,7 +44,13 @@
           "iCloudContainerEnvironment": "Production"
         }
       ],
-      "sentry-expo"
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "steven-rummler",
+          "project": "caloric"
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -16,8 +16,11 @@ export function generateDailyCalorieSeries(
     .sort((a, b) => a.x.localeCompare(b.x));
   if (dayValues.length === 0) return [];
 
+  const firstValue = dayValues[0];
+  if (!firstValue) return [];
+
   const series: daySeries = [];
-  let currentDay = dayValues[0].x;
+  let currentDay = firstValue.x;
   let currentTotal = 0;
 
   for (const entry of dayValues) {
@@ -31,7 +34,8 @@ export function generateDailyCalorieSeries(
   series.push({ x: currentDay, y: currentTotal });
 
   const today = dayjs().format('YYYY-MM-DD');
-  if (series.length === 0 || series[series.length - 1].x < today)
+  const lastSeries = series[series.length - 1];
+  if (series.length === 0 || (lastSeries && lastSeries.x < today))
     series.push({ x: today, y: 0 });
 
   fillInSeriesGapDays(series);
@@ -52,20 +56,28 @@ export function generateDailyTotalCalorieSeries(
 
 function fillInSeriesGapDays(series: daySeries) {
   if (series.length === 0) return;
-  const lastDay = series[series.length - 1].x;
-  let seriesIndex = 0; // Start at the first day
+  
+  const lastSeries = series[series.length - 1];
+  const firstSeries = series[0];
+  
+  if (!lastSeries || !firstSeries) return;
+  
+  const lastDay = lastSeries.x;
+  let seriesIndex = 0;
+  
   for (
-    let day = series[0].x;
+    let day = firstSeries.x;
     day < lastDay;
     day = dayjs(day).add(1, 'day').format('YYYY-MM-DD')
-  )
-    if (series[seriesIndex].x !== day)
-      // If the current day is not in the series, add it
+  ) {
+    const currentSeries = series[seriesIndex];
+    if (currentSeries && currentSeries.x !== day)
       series.push({
         x: day,
         y: 0,
       });
-    else seriesIndex++; // Otherwise, move to the next day in the series
+    else seriesIndex++;
+  }
 }
 
 export function generateRunningCalorieSeries(
@@ -74,10 +86,14 @@ export function generateRunningCalorieSeries(
   now?: string
 ): timeSeries {
   if (entries.length === 0) return [];
+  
+  const firstEntry = entries[0];
+  if (!firstEntry) return [];
+  
   const startDay = dayjs(
     entries.reduce(
       (start, entry) => (entry.timestamp < start ? entry.timestamp : start),
-      entries[0].timestamp
+      firstEntry.timestamp
     )
   )
     .startOf('day')
@@ -122,16 +138,11 @@ export function generateRunningTotalCalorieSeries(
     ...foodEntries.map((entry) => {
       const timestamp = entry.timestamp;
       const number = entry.number;
-      // const runningTotalBefore = runningTotal;
-      // const runningTotalAfter = runningTotal + number;
       const passiveCalories = passiveCaloriesAtTimestamp(startDay, timestamp, dailyPassiveCalories);
-      // console.log(`Added ${sig3(number)} calories on ${dayjs(timestamp).format('ddd, MMM D [at] h:mm a')} to running total ${sig3(runningTotalBefore)} -> ${sig3(runningTotalAfter)} with ${sig3(passiveCalories)} passive calories for a total of ${sig3(runningTotalAfter + passiveCalories)}`);
       runningTotal += number;
       return {
         x: timestamp,
-        y:
-          runningTotal +
-          passiveCalories // passiveCaloriesAtTimestamp(startDay, timestamp, dailyPassiveCalories),
+        y: runningTotal + passiveCalories,
       };
     }),
     {
@@ -199,7 +210,6 @@ export function fillInFoodGaps(
   const startDay = dayjs(startOfFirstDay(foodEntries)).format('YYYY-MM-DD');
   const endDay = foodEntries.reduce(
     (end, entry) => (entry.timestamp > end ? entry.timestamp : end),
-    // If it's after 6pm, fill in today, otherwise fill in to yesterday
     dayjs().hour() >= 18
       ? dayjs().format('YYYY-MM-DD')
       : dayjs().subtract(1, 'day').format('YYYY-MM-DD')

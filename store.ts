@@ -3,7 +3,6 @@ import {
   combineReducers,
   configureStore,
   createSlice,
-  getDefaultMiddleware,
 } from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
 import isEqual from 'lodash/isEqual';
@@ -150,8 +149,12 @@ function getPassiveCalories(state: Store): number {
 }
 
 function getDateFormat(state: Store) {
-  const minDate = state.data.entries.reduce((min, entry) => entry.timestamp < min ? entry.timestamp : min, state.data.entries[0].timestamp);
-  const maxDate = state.data.entries.reduce((max, entry) => entry.timestamp > max ? entry.timestamp : max, state.data.entries[0].timestamp);
+  if (state.data.entries.length === 0) {
+    return 'MMM D'; // Default format when no entries
+  }
+  const firstTimestamp = state.data.entries[0]!.timestamp;
+  const minDate = state.data.entries.reduce((min, entry) => entry.timestamp < min ? entry.timestamp : min, firstTimestamp);
+  const maxDate = state.data.entries.reduce((max, entry) => entry.timestamp > max ? entry.timestamp : max, firstTimestamp);
   const diff = dayjs(maxDate).diff(dayjs(minDate), 'day');
   return diff > 3 * 365 ? 'YYYY' : diff > 2 * 30 ? 'MMM \'YY' : diff > 7 ? 'MMM D' : 'ddd';
 }
@@ -170,11 +173,12 @@ const persistedReducer = persistReducer(persistConfig, reducer);
 const store = configureStore({
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   reducer: persistedReducer,
-  middleware: getDefaultMiddleware({
-    serializableCheck: {
-      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    },
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
