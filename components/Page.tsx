@@ -1,10 +1,11 @@
-import { View, StyleSheet, ViewProps } from 'react-native';
+import { StyleSheet, ViewProps } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Page({ children, style, ...props }: ViewProps) {
   return (
-    <View style={[styles.page, style]} {...props}>
+    <SafeAreaView style={[styles.page, style]} {...props}>
       {children}
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -12,6 +13,5 @@ const styles = StyleSheet.create({
   page: {
     flex: 1,
     backgroundColor: 'white',
-    paddingTop: 40,
   },
 });
