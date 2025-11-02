@@ -50,7 +50,8 @@
           "organization": "steven-rummler",
           "project": "caloric"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {
