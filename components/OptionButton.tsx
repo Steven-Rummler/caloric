@@ -62,5 +62,7 @@ const styles = StyleSheet.create({
   optionText: {
     height: Dimensions.get('window').height * 0.15,
     textAlign: 'center',
+    justifyContent: 'center',
+    textAlignVertical: 'center',
   },
 });

@@ -57,8 +57,6 @@ export default function LogEntryScreen({ navigation }: Props) {
             placeholder={entryTypeUnit(entryType)}
             textAlign="center"
             onChangeText={setNumber}
-            multiline={true}
-            numberOfLines={1}
             selectionColor={'#b9e2f5'}
           />
         </View>
