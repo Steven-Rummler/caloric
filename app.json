@@ -32,7 +32,6 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.stevenrummler.caloric",
-      "versionCode": 10,
       "runtimeVersion": {
         "policy": "sdkVersion"
       }
