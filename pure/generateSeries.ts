@@ -5,38 +5,43 @@ export function generateDailyCalorieSeries(
   entries: entry[],
   entryType: entryType
 ): daySeries {
-  const filteredEntries = entries
-    .filter((entry) => entry.entryType === entryType);
+  // Pre-filter entries to avoid multiple iterations
+  const filteredEntries = entries.filter(entry => entry.entryType === entryType);
+  if (filteredEntries.length === 0) return [];
+
+  // Fill in gaps for food entries if needed
   if (entryType === 'food') fillInFoodGaps(filteredEntries);
-  const dayValues = filteredEntries
-    .map(({ timestamp, number }) => ({
-      x: dayjs(timestamp).format('YYYY-MM-DD'),
-      y: number,
-    }))
-    .sort((a, b) => a.x.localeCompare(b.x));
-  if (dayValues.length === 0) return [];
 
-  const firstValue = dayValues[0];
-  if (!firstValue) return [];
+  // Sort entries by timestamp once
+  filteredEntries.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
-  const series: daySeries = [];
-  let currentDay = firstValue.x;
-  let currentTotal = 0;
+  // Group by day and accumulate totals in one pass
+  const dayMap = new Map<string, number>();
+  let minDay = '';
+  let maxDay = '';
 
-  for (const entry of dayValues) {
-    if (entry.x !== currentDay) {
-      series.push({ x: currentDay, y: currentTotal });
-      currentDay = entry.x;
-      currentTotal = 0;
-    }
-    currentTotal += entry.y;
+  for (const entry of filteredEntries) {
+    // Extract date directly from ISO timestamp (YYYY-MM-DDTHH:mm:ss.sssZ -> YYYY-MM-DD)
+    const day = entry.timestamp.substring(0, 10);
+    dayMap.set(day, (dayMap.get(day) || 0) + entry.number);
+
+    if (!minDay || day < minDay) minDay = day;
+    if (!maxDay || day > maxDay) maxDay = day;
   }
-  series.push({ x: currentDay, y: currentTotal });
 
+  // Convert map to sorted array
+  const series: daySeries = [];
+  for (const day of dayMap.keys()) {
+    series.push({ x: day, y: dayMap.get(day)! });
+  }
+  series.sort((a, b) => a.x.localeCompare(b.x));
+
+  // Add today if needed
   const today = dayjs().format('YYYY-MM-DD');
   const lastSeries = series[series.length - 1];
-  if (series.length === 0 || (lastSeries && lastSeries.x < today))
+  if (series.length === 0 || (lastSeries && lastSeries.x < today)) {
     series.push({ x: today, y: 0 });
+  }
 
   fillInSeriesGapDays(series);
 
@@ -86,34 +91,36 @@ export function generateRunningCalorieSeries(
   now?: string
 ): timeSeries {
   if (entries.length === 0) return [];
-  
-  const firstEntry = entries[0];
-  if (!firstEntry) return [];
-  
-  const startDay = dayjs(
-    entries.reduce(
-      (start, entry) => (entry.timestamp < start ? entry.timestamp : start),
-      firstEntry.timestamp
-    )
-  )
-    .startOf('day')
-    .toJSON();
-  const filteredEntries = entries.filter(
-    (entry) => entry.entryType === entryType
-  );
+
+  // Pre-filter entries by type to avoid multiple iterations
+  const filteredEntries = entries.filter(entry => entry.entryType === entryType);
   if (filteredEntries.length === 0) return [];
+
+  // Fill in gaps for food entries
   if (entryType === 'food') fillInFoodGaps(filteredEntries);
+
+  // Sort once
   filteredEntries.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
+  const firstEntry = filteredEntries[0];
+  if (!firstEntry) return [];
+
+  // Use direct timestamp math for start day calculation
+  const startTimestamp = dayjs(firstEntry.timestamp).valueOf();
+  const startOfDay = startTimestamp - (startTimestamp % (24 * 60 * 60 * 1000));
+  const startDay = new Date(startOfDay).toJSON();
+
+  // Build series with pre-calculated capacity
+  const series: timeSeries = [ { x: startDay, y: 0 } ];
+
   let runningTotal = 0;
-  const series = [
-    { x: startDay, y: 0 },
-    ...filteredEntries.map((entry) => {
-      runningTotal += entry.number;
-      return { x: entry.timestamp, y: runningTotal };
-    }),
-    { x: now ?? dayjs().toJSON(), y: runningTotal },
-  ];
+  for (const entry of filteredEntries) {
+    runningTotal += entry.number;
+    series.push({ x: entry.timestamp, y: runningTotal });
+  }
+
+  const endTime = now ?? dayjs().toJSON();
+  series.push({ x: endTime, y: runningTotal });
 
   return series;
 }
@@ -132,13 +139,19 @@ export function generateRunningTotalCalorieSeries(
   fillInFoodGaps(foodEntries);
   foodEntries.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
+  // Pre-calculate start timestamp for passive calories calculation
+  const startTimestamp = new Date(startDay).getTime();
+
   let runningTotal = 0;
   const series = [
     { x: startDay, y: 0 },
     ...foodEntries.map((entry) => {
       const timestamp = entry.timestamp;
       const number = entry.number;
-      const passiveCalories = passiveCaloriesAtTimestamp(startDay, timestamp, dailyPassiveCalories);
+      // Calculate passive calories using direct timestamp math
+      const entryTimestamp = new Date(timestamp).getTime();
+      const daysDiff = (entryTimestamp - startTimestamp) / (1000 * 60 * 60 * 24);
+      const passiveCalories = dailyPassiveCalories * daysDiff;
       runningTotal += number;
       return {
         x: timestamp,
@@ -147,13 +160,11 @@ export function generateRunningTotalCalorieSeries(
     }),
     {
       x: now ?? dayjs().toJSON(),
-      y:
-        runningTotal +
-        passiveCaloriesAtTimestamp(
-          startDay,
-          now ?? dayjs().toJSON(),
-          dailyPassiveCalories
-        ),
+      y: (() => {
+        const endTimestamp = new Date(now ?? dayjs().toJSON()).getTime();
+        const daysDiff = (endTimestamp - startTimestamp) / (1000 * 60 * 60 * 24);
+        return runningTotal + dailyPassiveCalories * daysDiff;
+      })(),
     },
   ];
 

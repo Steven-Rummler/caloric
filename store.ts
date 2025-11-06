@@ -6,7 +6,6 @@ import {
 } from '@reduxjs/toolkit';
 import dayjs from 'dayjs';
 import isEqual from 'lodash/isEqual';
-import round from 'lodash/round';
 import {
   FLUSH,
   PAUSE,
@@ -18,6 +17,7 @@ import {
   persistStore,
 } from 'redux-persist';
 import { calculateDailyPassiveCalories } from './pure/entries';
+import { generateDefaultEntries } from './pure/defaultEntries';
 import { entry, settings } from './types';
 
 const persistConfig = {
@@ -26,45 +26,15 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
-const days = 30;
-const meals = 3;
-const dailyCalories = 2000;
-const calorieVariation = 1000;
-const mealVariation = calorieVariation / meals;
-
-const sections = 4;
-const gapDays = 7;
-const totalDays = days * sections + gapDays * (sections - 1);
-
-const defaultEntries: entry[] = [];
-let weight = 150;
-for (let section = 0; section < sections; section++) for (let day = 0; day < days; day++) {
-  const daysFromStart = day + section * gapDays + section * days;
-  const calorieDiff = Math.random() * calorieVariation - calorieVariation / 2;
-  const mealSize = (dailyCalories + calorieDiff) / meals;
-  weight += calorieDiff / 3500;
-  defaultEntries.push({
-    entryType: 'weight',
-    timestamp: dayjs()
-      .subtract(totalDays, 'days')
-      .add(daysFromStart, 'days')
-      .startOf('day')
-      .add(8, 'hours')
-      .toJSON(),
-    number: round(weight + Math.random() - 0.51, 2),
-  });
-  for (let meal = 0; meal < meals; meal++)
-    defaultEntries.push({
-      entryType: 'food',
-      timestamp: dayjs()
-        .subtract(totalDays, 'days')
-        .add(daysFromStart, 'days')
-        .startOf('day')
-        .add(8 + 4 * meal, 'hours')
-        .toJSON(),
-      number: round(mealSize + Math.random() * mealVariation - mealVariation / 2, -1),
-    });
-}
+const defaultEntries = generateDefaultEntries({
+  days: 30,
+  meals: 3,
+  dailyCalories: 2000,
+  calorieVariation: 1000,
+  sections: 4,
+  gapDays: 7,
+  initialWeight: 150,
+});
 
 const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
