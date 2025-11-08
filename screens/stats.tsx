@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
+import { useTheme } from '../ThemeProvider';
 import DailyCaloriesChart from '../components/dailyCaloriesChart';
 import RunningCaloriesChart from '../components/runningCaloriesChart';
 import WeightChart from '../components/weightChart';
@@ -25,6 +26,7 @@ const dateRanges = [
 export default function StatsScreen() {
   const [chart, setChart] = useState<string>('weight');
   const [dateRange, setDateRange] = useState<number | null>(null);
+  const theme = useTheme();
 
   const WeightButton = chart === 'weight' ? OptionButton : UnselectedOptionButton;
   const DailyCaloriesButton = chart === 'dailyCalories' ? OptionButton : UnselectedOptionButton;
@@ -38,6 +40,7 @@ export default function StatsScreen() {
             style={{
               padding: 5,
               textAlign: 'center',
+              color: theme.primaryText,
             }}
           >
             Weight
@@ -48,6 +51,7 @@ export default function StatsScreen() {
             style={{
               padding: 5,
               textAlign: 'center',
+              color: theme.primaryText,
             }}
           >
             Daily Calories
@@ -58,6 +62,7 @@ export default function StatsScreen() {
             style={{
               padding: 5,
               textAlign: 'center',
+              color: theme.primaryText,
             }}
           >
             {'Running\nTotal\nCalories'}
@@ -69,7 +74,7 @@ export default function StatsScreen() {
           const Button = dateRange === days ? OptionButton : UnselectedOptionButton;
           return (
             <Button key={label} onPress={() => setDateRange(days)}>
-              <Text style={{ padding: 5, textAlign: 'center' }}>{label}</Text>
+              <Text style={{ padding: 5, textAlign: 'center', color: theme.primaryText }}>{label}</Text>
             </Button>
           );
         })}

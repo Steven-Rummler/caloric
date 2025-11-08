@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, store } from './store';
+import { ThemeProvider } from './ThemeProvider';
 import Navigator from './Navigator';
 
 // Sentry.init({
@@ -14,10 +15,12 @@ import Navigator from './Navigator';
 export default function App() {
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}> 
-        <NavigationContainer>
-          <Navigator />
-        </NavigationContainer>
+      <PersistGate loading={null} persistor={persistor}>
+        <ThemeProvider>
+          <NavigationContainer>
+            <Navigator />
+          </NavigationContainer>
+        </ThemeProvider>
       </PersistGate>
     </Provider>
   );

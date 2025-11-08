@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Alert, Dimensions, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Trash2 } from 'react-native-feather';
 import { useDispatch } from 'react-redux';
+import { useTheme } from '../ThemeProvider';
 import { entryTypeUnit } from '../pure/entryTypes';
 import { addEntry, removeEntry } from '../store';
 import { entry } from '../types';
@@ -17,6 +18,7 @@ export default function EditEntry({
   setVisible: (visible: boolean) => void;
 }) {
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const entryType = selectedEntry.entryType;
   const [number, setNumber] = useState<string>(`${selectedEntry.number}`);
@@ -49,7 +51,7 @@ export default function EditEntry({
   };
 
   return (
-    <View style={[styles.modalArea, { height: Dimensions.get('window').height * 0.55 }]}>
+    <View style={[styles.modalArea, { height: Dimensions.get('window').height * 0.55, borderColor: theme.inputBorder, backgroundColor: theme.modalSurface }]}>
       <View
         style={{
           alignItems: 'center',
@@ -64,14 +66,14 @@ export default function EditEntry({
       <View style={styles.optionsSection}>
         <DatePicker {...{ timestamp, setTimestamp }} />
         <TextInput
-          style={styles.optionTextInput}
+          style={[styles.optionTextInput, { borderColor: theme.inputBorder }]}
           autoFocus
           keyboardType='numeric'
           value={number}
           placeholder={entryTypeUnit(entryType)}
           textAlign='center'
           onChangeText={setNumber}
-          selectionColor={'#b9e2f5'}
+          selectionColor={theme.inputSelection}
         />
       </View>
       <View style={styles.optionsSection}>
@@ -84,10 +86,10 @@ export default function EditEntry({
       </View>
       <OutlineOptionButton
         onPress={() => onDelete(selectedEntry)}
-        style={{ borderColor: '#ff4444', flexGrow: 0.5 }}
+        style={{ borderColor: theme.error, flexGrow: 0.5 }}
       >
-        <Trash2 color='#ff4444' />
-        <Text style={{ color: '#ff4444' }}>Delete Entry</Text>
+        <Trash2 color={theme.error} />
+        <Text style={{ color: theme.error }}>Delete Entry</Text>
       </OutlineOptionButton>
     </View>
   );
@@ -102,8 +104,6 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBottom: 20,
     borderWidth: 2,
-    borderColor: '#b9e2f5',
-    backgroundColor: 'white',
     borderRadius: 16,
   },
   optionsSection: {
@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     borderWidth: 2,
-    borderColor: '#b9e2f5',
     borderRadius: 16,
     margin: 10,
   },

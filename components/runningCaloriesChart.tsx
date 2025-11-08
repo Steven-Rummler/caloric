@@ -5,13 +5,11 @@ import { useSelector } from 'react-redux';
 import { CartesianChart, Line } from 'victory-native';
 import { Skia } from '@shopify/react-native-skia';
 import { useAssets } from 'expo-asset';
+import { useTheme } from '../ThemeProvider';
 import {
-  generateRunningCalorieSeries,
   generateRunningTotalCalorieSeries,
-  passiveCaloriesAtTimestampFromEntries,
 } from '../pure/generateSeries';
-import { getFirstDay } from '../pure/entries';
-import { createRunningCaloriesChartData } from '../pure/chartData';
+import { createChartData } from '../pure/chartData';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
@@ -20,6 +18,7 @@ export default function RunningCaloriesChart({ dateRange }: { dateRange: number 
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
+  const theme = useTheme();
   
   const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
@@ -59,37 +58,15 @@ export default function RunningCaloriesChart({ dateRange }: { dateRange: number 
     return result;
   }, [filteredEntries, passiveCalories]);
 
-  const foodSeries = useMemo(() => {
-    const result = generateRunningCalorieSeries(filteredEntries, 'food');
-    return result;
-  }, [filteredEntries]);
-
-  const passiveSeries = useMemo(() => {
-    
-    // Calculate start day once instead of for each timestamp
-    const firstDayStart = getFirstDay(filteredEntries).startOf('day').toJSON();
-    
-    const result = netSeries.map(({ x }) => ({
-      x,
-      y: passiveCaloriesAtTimestampFromEntries({
-        entries: filteredEntries,
-        timestamp: x,
-        dailyPassiveCalories: passiveCalories,
-        startDay: firstDayStart
-      }),
-    }));
-    return result;
-  }, [filteredEntries, passiveCalories, netSeries]);
-
   const chartData = useMemo(() => {
-    const result = createRunningCaloriesChartData({
-      netSeries,
-      foodSeries,
-      passiveSeries
-    });
+    const result = createChartData(
+      [netSeries],
+      ['net'],
+      400
+    );
 
     return result;
-  }, [netSeries, foodSeries, passiveSeries]);
+  }, [netSeries]);
 
   if (chartData.length < 2) return <Text>Not enough data</Text>;
   if (!font) return null;
@@ -100,7 +77,7 @@ export default function RunningCaloriesChart({ dateRange }: { dateRange: number 
         <CartesianChart
           data={chartData}
           xKey='x'
-          yKeys={['net', 'food', 'burned']}
+          yKeys={['net']}
           frame={{ lineWidth: 0 }}
           axisOptions={{
             font,
@@ -128,29 +105,20 @@ export default function RunningCaloriesChart({ dateRange }: { dateRange: number 
               }
               return `${sign}${absValue.toFixed(0)}`;
             },
+            labelColor: theme.text,
           }}
         >
           {({ points, chartBounds }) => (
             <>
-              <Line points={points.net} color='green' strokeWidth={2} />
-              <Line points={points.food} color='purple' strokeWidth={2} />
-              <Line points={points.burned} color='blue' strokeWidth={2} />
+              <Line points={points.net} color={theme.chart.net} strokeWidth={2} />
             </>
           )}
         </CartesianChart>
       </View>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'green' }]} />
-          <Text style={styles.legendText}>Net</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'purple' }]} />
-          <Text style={styles.legendText}>Food</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'blue' }]} />
-          <Text style={styles.legendText}>Burned</Text>
+          <View style={[styles.legendLine, { backgroundColor: theme.chart.net }]} />
+          <Text style={[styles.legendText, { color: theme.text }]}>Net Calories</Text>
         </View>
       </View>
     </View>

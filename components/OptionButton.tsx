@@ -1,39 +1,46 @@
 import { Dimensions, Pressable, Text, StyleSheet, PressableProps, TextProps } from 'react-native';
+import { useTheme } from '../ThemeProvider';
 
 export function OptionButton({ style, ...props }: PressableProps) {
+  const theme = useTheme();
   return (
-    <Pressable 
+    <Pressable
       style={(state) => [
-        styles.optionButton, 
+        styles.optionButton,
+        { backgroundColor: theme.primary },
         typeof style === 'function' ? style(state) : style
-      ]} 
-      {...props} 
+      ]}
+      {...props}
     />
   );
 }
 
 export function UnselectedOptionButton({ style, ...props }: PressableProps) {
+  const theme = useTheme();
   return (
-    <Pressable 
+    <Pressable
       style={(state) => [
-        styles.optionButton, 
+        styles.optionButton,
         styles.unselected,
+        { backgroundColor: theme.primaryUnselected },
         typeof style === 'function' ? style(state) : style
-      ]} 
-      {...props} 
+      ]}
+      {...props}
     />
   );
 }
 
 export function OutlineOptionButton({ style, ...props }: PressableProps) {
+  const theme = useTheme();
   return (
-    <Pressable 
+    <Pressable
       style={(state) => [
-        styles.optionButton, 
+        styles.optionButton,
         styles.outline,
+        { borderColor: theme.primary, backgroundColor: theme.background },
         typeof style === 'function' ? style(state) : style
-      ]} 
-      {...props} 
+      ]}
+      {...props}
     />
   );
 }
@@ -47,18 +54,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#b9e2f5',
     borderRadius: 16,
     margin: 4,
     minHeight: 60,
   },
-  unselected: {
-    backgroundColor: '#edf7fc',
-  },
+  unselected: {},
   outline: {
     borderWidth: 2,
-    borderColor: '#b9e2f5',
-    backgroundColor: 'white',
   },
   optionText: {
     height: Dimensions.get('window').height * 0.15,

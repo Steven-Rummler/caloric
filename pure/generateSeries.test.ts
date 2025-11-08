@@ -3,9 +3,7 @@ import { entryTypes } from './entryTypes';
 import {
   generateDailyCalorieSeries,
   generateDailyTotalCalorieSeries,
-  generateRunningCalorieSeries,
   generateRunningTotalCalorieSeries,
-  passiveCaloriesAtTimestampFromEntries,
 } from './generateSeries';
 import { maxAcceptableProcessingTime, generateLargeHistory, generateLargeHistoryWithGaps } from './test';
 import dayjs from 'dayjs';
@@ -31,25 +29,9 @@ it('should give empty series from no entries', () => {
   expect(
     generateDailyTotalCalorieSeries(noEntries, defaultPassiveCalories)
   ).toEqual([]);
-  entryTypes.forEach((entryType) => {
-    const runningCalorieSeries = generateRunningCalorieSeries(
-      noEntries,
-      entryType
-    );
-    expect(runningCalorieSeries).toEqual([]);
-  });
   expect(
     generateRunningTotalCalorieSeries(noEntries, defaultPassiveCalories)
   ).toEqual([]);
-  const passiveCaloriesAtTimestamp = passiveCaloriesAtTimestampFromEntries({
-    entries: noEntries,
-    timestamp: dayjs().toJSON(),
-    dailyPassiveCalories: defaultPassiveCalories
-  });
-  expect(passiveCaloriesAtTimestamp).toBeGreaterThanOrEqual(0);
-  expect(passiveCaloriesAtTimestamp).toBeLessThanOrEqual(
-    defaultPassiveCalories
-  );
 });
 
 it('should give correct results for single entry list', () => {
@@ -66,18 +48,6 @@ it('should be performant', () => {
 
   // Generate 10 years of realistic dataset using the same logic as default entries
   const largeHistory = generateLargeHistory();
-
-  const startRunningFood = performance.now();
-  generateRunningCalorieSeries(largeHistory, 'food', now);
-  const endRunningFood = performance.now();
-  const runningFoodTime = endRunningFood - startRunningFood;
-  expect(runningFoodTime).toBeLessThan(maxAcceptableProcessingTime);
-
-  const startRunningWeight = performance.now();
-  generateRunningCalorieSeries(largeHistory, 'weight', now);
-  const endRunningWeight = performance.now();
-  const runningWeightTime = endRunningWeight - startRunningWeight;
-  expect(runningWeightTime).toBeLessThan(maxAcceptableProcessingTime);
 
   const startDailyFood = performance.now();
   generateDailyCalorieSeries(largeHistory, 'food');
@@ -105,15 +75,8 @@ it('should be performant', () => {
 });
 
 it('should be performant with sparse data (many gaps)', () => {
-  const now = dayjs().toJSON();
-
   // Generate 10 years of sparse data with many gaps
   const sparseHistory = generateLargeHistoryWithGaps();
-
-  const startRunningFood = performance.now();
-  generateRunningCalorieSeries(sparseHistory, 'food', now);
-  const endRunningFood = performance.now();
-  expect(endRunningFood - startRunningFood).toBeLessThan(maxAcceptableProcessingTime);
 
   const startDailyTotal = performance.now();
   generateDailyTotalCalorieSeries(sparseHistory, defaultPassiveCalories);

@@ -3,6 +3,7 @@ import clone from 'lodash/clone';
 import { useMemo, useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
+import { useTheme } from '../ThemeProvider';
 import EditEntry from '../components/EditEntry';
 import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
@@ -12,6 +13,7 @@ import { entry, entryType } from '../types';
 
 export default function HistoryScreen() {
   const entries = useSelector(getEntries);
+  const theme = useTheme();
   const [selectedEntryType, setSelectedEntryType] = useState<entryType>('food');
   const [selectedEntry, setSelectedEntry] = useState<entry | undefined>(
     undefined
@@ -35,12 +37,12 @@ export default function HistoryScreen() {
     <Page>
       <View style={styles.optionsSection}>
         <FoodButton onPress={() => setSelectedEntryType('food')}>
-          <Text          >
+          <Text style={{ color: theme.primaryText }}>
             Food
           </Text>
         </FoodButton>
         <WeightButton onPress={() => setSelectedEntryType('weight')}>
-          <Text          >
+          <Text style={{ color: theme.primaryText }}>
             Weight
           </Text>
         </WeightButton>

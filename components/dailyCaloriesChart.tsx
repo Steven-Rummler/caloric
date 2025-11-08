@@ -5,11 +5,11 @@ import { useSelector } from 'react-redux';
 import { CartesianChart, Line } from 'victory-native';
 import { Skia } from '@shopify/react-native-skia';
 import { useAssets } from 'expo-asset';
+import { useTheme } from '../ThemeProvider';
 import {
-  generateDailyCalorieSeries,
   generateDailyTotalCalorieSeries,
 } from '../pure/generateSeries';
-import { createDailyCaloriesChartData } from '../pure/chartData';
+import { createChartData } from '../pure/chartData';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
@@ -18,6 +18,7 @@ export default function DailyCaloriesChart({ dateRange }: { dateRange: number | 
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
+  const theme = useTheme();
   
   const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
@@ -62,25 +63,15 @@ export default function DailyCaloriesChart({ dateRange }: { dateRange: number | 
     return result;
   }, [filteredEntries, passiveCalories]);
 
-  const foodSeries = useMemo(() => {
-    const result = generateDailyCalorieSeries(filteredEntries, 'food');
-    return result;
-  }, [filteredEntries]);
-
-  const passiveSeries = useMemo(() => {
-    const result = netSeries.map(({ x }) => ({ x, y: passiveCalories }));
-    return result;
-  }, [netSeries, passiveCalories]);
-
   const chartData = useMemo(() => {
-    const result = createDailyCaloriesChartData({
-      netSeries,
-      foodSeries,
-      passiveSeries
-    });
+    const result = createChartData(
+      [netSeries],
+      ['net'],
+      400
+    );
 
     return result;
-  }, [netSeries, foodSeries, passiveSeries]);
+  }, [netSeries]);
 
   if (chartData.length < 2) return <Text>Not enough data</Text>;
   if (!font) return null;
@@ -91,7 +82,7 @@ export default function DailyCaloriesChart({ dateRange }: { dateRange: number | 
         <CartesianChart
           data={chartData}
           xKey='x'
-          yKeys={['net', 'food', 'burned']}
+          yKeys={['net']}
           frame={{ lineWidth: 0 }}
           axisOptions={{
             font,
@@ -100,29 +91,20 @@ export default function DailyCaloriesChart({ dateRange }: { dateRange: number | 
             lineWidth: { grid: { x: 0, y: 1 }, frame: 0 },
             formatXLabel: (value) => dayjs(value).format(dateFormat),
             formatYLabel: (value) => value != null ? value.toLocaleString() : '',
+            labelColor: theme.text,
           }}
         >
           {({ points, chartBounds }) => (
             <>
-              <Line points={points.net} color='green' strokeWidth={2} />
-              <Line points={points.food} color='purple' strokeWidth={2} />
-              <Line points={points.burned} color='blue' strokeWidth={2} />
+              <Line points={points.net} color={theme.chart.net} strokeWidth={2} />
             </>
           )}
         </CartesianChart>
       </View>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'green' }]} />
-          <Text style={styles.legendText}>Net</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'purple' }]} />
-          <Text style={styles.legendText}>Food</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'blue' }]} />
-          <Text style={styles.legendText}>Burned</Text>
+          <View style={[styles.legendLine, { backgroundColor: theme.chart.net }]} />
+          <Text style={[styles.legendText, { color: theme.text }]}>Net</Text>
         </View>
       </View>
     </View>

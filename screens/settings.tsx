@@ -4,6 +4,7 @@ import { Directory, File } from 'expo-file-system';
 import { Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTheme } from '../ThemeProvider';
 import { OptionButton, OutlineOptionButton } from '../components/OptionButton';
 import Page from '../components/Page';
 import { Props } from '../navigationTypes';
@@ -20,14 +21,12 @@ import { entry } from '../types';
 export default function SettingsScreen({ navigation }: Props) {
   const dispatch = useDispatch();
   const entries = useSelector(getEntries);
+  const theme = useTheme();
   const [showDemoModal, setShowDemoModal] = React.useState(false);
 
   return (
     <Page>
       <View style={styles.container}>
-        <View style={styles.titleSection}>
-          <Text style={styles.title}>Manage Log</Text>
-        </View>
         <OptionButton
           onPress={() => {
             exportData(entries)
@@ -36,7 +35,7 @@ export default function SettingsScreen({ navigation }: Props) {
           }}
           style={{}}
         >
-          <Text>Export Log to CSV</Text>
+          <Text style={{ color: theme.primaryText }}>Export Log to CSV</Text>
         </OptionButton>
         <OptionButton
           onPress={() => {
@@ -51,7 +50,7 @@ export default function SettingsScreen({ navigation }: Props) {
           }}
           style={{}}
         >
-          <Text>Import Log from CSV</Text>
+          <Text style={{ color: theme.primaryText }}>Import Log from CSV</Text>
         </OptionButton>
         <OutlineOptionButton
           onPress={() => {
@@ -70,15 +69,15 @@ export default function SettingsScreen({ navigation }: Props) {
               ]
             );
           }}
-          style={{ borderColor: '#ff4444' }}
+          style={{ borderColor: theme.error }}
         >
-          <Text style={{ color: '#ff4444' }}>Clear Log</Text>
+          <Text style={{ color: theme.error }}>Clear Log</Text>
         </OutlineOptionButton>
         <OutlineOptionButton
           onPress={() => setShowDemoModal(true)}
-          style={{ borderColor: '#ff4444' }}
+          style={{ borderColor: theme.error }}
         >
-          <Text style={{ color: '#ff4444' }}>Reset Log to Demo</Text>
+          <Text style={{ color: theme.error }}>Reset Log to Demo</Text>
         </OutlineOptionButton>
       </View>
       <Modal
@@ -87,47 +86,47 @@ export default function SettingsScreen({ navigation }: Props) {
         animationType='fade'
         onRequestClose={() => setShowDemoModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View style={[styles.modalOverlay, { backgroundColor: theme.modalBackground }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.modalSurface }]}>
             <Text style={styles.modalTitle}>Select Demo Data Size</Text>
-            <Text style={styles.modalSubtitle}>
+            <Text style={[styles.modalSubtitle, { color: theme.textSecondary }]}>
               All current entries will be replaced with demo data
             </Text>
             <TouchableOpacity
-              style={styles.modalOption}
+              style={[styles.modalOption, { backgroundColor: theme.primary }]}
               onPress={() => {
                 dispatch(demoEntriesMonth());
                 setShowDemoModal(false);
                 navigation.goBack();
               }}
             >
-              <Text style={styles.modalOptionText}>1 Month (30 days)</Text>
+              <Text style={[styles.modalOptionText, { color: theme.primaryText }]}>1 Month (30 days)</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.modalOption}
+              style={[styles.modalOption, { backgroundColor: theme.primary }]}
               onPress={() => {
                 dispatch(demoEntriesYear());
                 setShowDemoModal(false);
                 navigation.goBack();
               }}
             >
-              <Text style={styles.modalOptionText}>1 Year (365 days)</Text>
+              <Text style={[styles.modalOptionText, { color: theme.primaryText }]}>1 Year (365 days)</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.modalOption}
+              style={[styles.modalOption, { backgroundColor: theme.primary }]}
               onPress={() => {
                 dispatch(demoEntriesDecade());
                 setShowDemoModal(false);
                 navigation.goBack();
               }}
             >
-              <Text style={styles.modalOptionText}>10 Years (3,650 days)</Text>
+              <Text style={[styles.modalOptionText, { color: theme.primaryText }]}>10 Years (3,650 days)</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.modalCancel}
+              style={[styles.modalCancel, { backgroundColor: theme.secondary }]}
               onPress={() => setShowDemoModal(false)}
             >
-              <Text style={styles.modalCancelText}>Cancel</Text>
+              <Text style={[styles.modalCancelText, { color: theme.secondaryText }]}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -142,22 +141,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
   },
-  titleSection: {
-    flex: 0.667,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 25.89,
-  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
     width: '80%',
@@ -171,30 +160,25 @@ const styles = StyleSheet.create({
   },
   modalSubtitle: {
     fontSize: 14,
-    color: '#666',
     textAlign: 'center',
     marginBottom: 20,
   },
   modalOption: {
-    backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
   },
   modalOptionText: {
-    color: 'white',
     textAlign: 'center',
     fontSize: 16,
     fontWeight: '500',
   },
   modalCancel: {
-    backgroundColor: '#f0f0f0',
     padding: 15,
     borderRadius: 8,
     marginTop: 10,
   },
   modalCancelText: {
-    color: '#333',
     textAlign: 'center',
     fontSize: 16,
   },

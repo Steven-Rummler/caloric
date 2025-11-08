@@ -1,39 +1,40 @@
-import { Pressable, StyleSheet, PressableProps } from 'react-native';
+import { Pressable, PressableProps } from 'react-native';
+import { useTheme } from '../ThemeProvider';
 
 export function ActionButton({ style, ...props }: PressableProps) {
+  const theme = useTheme();
   return (
-    <Pressable 
+    <Pressable
       style={(state) => [
-        styles.actionButton, 
+        {
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.primary,
+          borderRadius: 16,
+        },
         typeof style === 'function' ? style(state) : style
-      ]} 
-      {...props} 
+      ]}
+      {...props}
     />
   );
 }
 
 export function DisabledActionButton({ style, ...props }: PressableProps) {
+  const theme = useTheme();
   return (
-    <Pressable 
+    <Pressable
       style={(state) => [
-        styles.actionButton, 
-        styles.disabled,
+        {
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: theme.primaryUnselected,
+          borderRadius: 16,
+        },
         typeof style === 'function' ? style(state) : style
-      ]} 
-      {...props} 
+      ]}
+      {...props}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  actionButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#b9e2f5',
-    borderRadius: 16,
-  },
-  disabled: {
-    backgroundColor: '#edf7fc',
-  },
-});

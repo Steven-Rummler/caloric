@@ -3,6 +3,7 @@ import upperFirst from 'lodash/upperFirst';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { useTheme } from '../ThemeProvider';
 import { ActionButton, DisabledActionButton } from '../components/ActionButton';
 import { DatePicker } from '../components/DatePicker';
 import { OptionButton, UnselectedOptionButton } from '../components/OptionButton';
@@ -14,6 +15,7 @@ import { entry, entryType } from '../types';
 
 export default function LogEntryScreen({ navigation }: Props) {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const [entryType, setEntryType] = useState<entryType>('food');
   const [timestamp, setTimestamp] = useState<string>(dayjs().toJSON());
   const [number, setNumber] = useState<string>();
@@ -36,7 +38,7 @@ export default function LogEntryScreen({ navigation }: Props) {
   return (
     <Page>
       <KeyboardAvoidingView 
-        style={styles.container}
+        style={[styles.container, { backgroundColor: theme.background }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.optionsSection}>
@@ -50,14 +52,14 @@ export default function LogEntryScreen({ navigation }: Props) {
         <View style={styles.optionsSection}>
           <DatePicker {...{ timestamp, setTimestamp }} />
           <TextInput
-            style={styles.optionTextInput}
+            style={[styles.optionTextInput, { borderColor: theme.inputBorder }]}
             autoFocus
             keyboardType='numeric'
             value={number}
             placeholder={entryTypeUnit(entryType)}
             textAlign='center'
             onChangeText={setNumber}
-            selectionColor={'#b9e2f5'}
+            selectionColor={theme.inputSelection}
           />
         </View>
         <View style={{ padding: 20, flexGrow: 1 }}>
@@ -77,7 +79,6 @@ export default function LogEntryScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
   },
   optionsSection: {
     flex: 1,
@@ -91,7 +92,6 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     borderWidth: 2,
-    borderColor: '#b9e2f5',
     borderRadius: 16,
     margin: 10,
   },

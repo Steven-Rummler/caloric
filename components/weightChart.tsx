@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { CartesianChart, Line, Scatter } from 'victory-native';
 import { Skia } from '@shopify/react-native-skia';
 import { useAssets } from 'expo-asset';
+import { useTheme } from '../ThemeProvider';
 import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
 import { createWeightChartData } from '../pure/chartData';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
@@ -16,6 +17,7 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
+  const theme = useTheme();
   
   const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
@@ -89,7 +91,6 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
   )
     return <></>;
 
-  if (chartData.length < 2) return <></>;
   if (!font) return null;
 
   return (
@@ -107,24 +108,25 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
             lineWidth: { grid: { x: 0, y: 1 }, frame: 0 },
             formatXLabel: (value) => dayjs(value).format(dateFormat),
             formatYLabel: (value) => value != null ? `${value.toFixed(1)}` : '',
+            labelColor: theme.text,
           }}
         >
           {({ points, chartBounds }) => (
             <>
-              <Scatter points={points.measured} color='red' radius={4} />
-              <Line points={points.estimated} color='blue' strokeWidth={2} />
+              <Scatter points={points.measured} color={theme.chart.measured} radius={2} />
+              <Line points={points.estimated} color={theme.chart.estimated} strokeWidth={2} />
             </>
           )}
         </CartesianChart>
       </View>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: 'red' }]} />
-          <Text style={styles.legendText}>Measured</Text>
+          <View style={[styles.legendDot, { backgroundColor: theme.chart.measured }]} />
+          <Text style={[styles.legendText, { color: theme.text }]}>Measured</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendLine, { backgroundColor: 'blue' }]} />
-          <Text style={styles.legendText}>Estimated</Text>
+          <View style={[styles.legendLine, { backgroundColor: theme.chart.estimated }]} />
+          <Text style={[styles.legendText, { color: theme.text }]}>Estimated</Text>
         </View>
       </View>
     </View>

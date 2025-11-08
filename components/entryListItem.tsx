@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Edit } from 'react-native-feather';
+import { useTheme } from '../ThemeProvider';
 import { displayDate, entryTypeUnit } from '../pure/entryTypes';
 import { entry } from '../types';
 
@@ -13,6 +14,7 @@ export default function EntryTypePicker({
   setSelectedEntry: (entry: entry) => void;
   setEditVisible: (visible: boolean) => void;
 }) {
+  const theme = useTheme();
   const { entryType, number, timestamp } = entry;
 
   const openEditEntry = () => {
@@ -21,15 +23,15 @@ export default function EntryTypePicker({
   };
 
   return (
-    <Pressable style={styles.itemBox} onPress={openEditEntry}>
+    <Pressable style={[styles.itemBox, { backgroundColor: theme.primary }]} onPress={openEditEntry}>
       <View>
-        <Text>
+        <Text style={{ color: theme.primaryText }}>
           {number} {entryTypeUnit(entryType).replace('\n', ' ')}
         </Text>
-        <Text>{displayDate(dayjs(timestamp), entryType)}</Text>
+        <Text style={{ color: theme.primaryText }}>{displayDate(dayjs(timestamp), entryType)}</Text>
       </View>
       <View>
-        <Edit color='black' />
+        <Edit color={theme.text} />
       </View>
     </Pressable>
   );
@@ -39,7 +41,6 @@ const styles = StyleSheet.create({
   itemBox: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#b9e2f5',
     borderRadius: 16,
     margin: 4,
     flexDirection: 'row',

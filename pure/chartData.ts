@@ -96,35 +96,31 @@ export function createWeightChartData(options: {
 }
 
 /**
- * Creates chart data for running calories charts (net, food, burned)
+ * Creates chart data for running calories charts (net only)
  */
 export function createRunningCaloriesChartData(options: {
   netSeries: TimeSeriesPoint[],
-  foodSeries: TimeSeriesPoint[],
-  passiveSeries: TimeSeriesPoint[],
   maxPoints?: number
 }): ChartDataPoint[] {
-  const { netSeries, foodSeries, passiveSeries, maxPoints = 400 } = options;
+  const { netSeries, maxPoints = 400 } = options;
   return createChartData(
-    [netSeries, foodSeries, passiveSeries],
-    ['net', 'food', 'burned'],
+    [netSeries],
+    ['net'],
     maxPoints
   );
 }
 
 /**
- * Creates chart data for daily calories charts (net, food, burned)
+ * Creates chart data for daily calories charts (net only)
  */
 export function createDailyCaloriesChartData(options: {
   netSeries: TimeSeriesPoint[],
-  foodSeries: TimeSeriesPoint[],
-  passiveSeries: TimeSeriesPoint[],
   maxPoints?: number
 }): ChartDataPoint[] {
-  const { netSeries, foodSeries, passiveSeries, maxPoints = 400 } = options;
+  const { netSeries, maxPoints = 400 } = options;
   return createChartData(
-    [netSeries, foodSeries, passiveSeries],
-    ['net', 'food', 'burned'],
+    [netSeries],
+    ['net'],
     maxPoints
   );
 }

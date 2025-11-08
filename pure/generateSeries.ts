@@ -83,46 +83,6 @@ function fillInSeriesGapDays(series: daySeries) {
   }
 }
 
-export function generateRunningCalorieSeries(
-  entries: entry[],
-  entryType: entryType,
-  now?: string
-): timeSeries {
-  if (entries.length === 0) return [];
-
-  // Pre-filter entries by type to avoid multiple iterations
-  const filteredEntries = entries.filter(entry => entry.entryType === entryType);
-  if (filteredEntries.length === 0) return [];
-
-  // Fill in gaps for food entries
-  if (entryType === 'food') fillInFoodGaps(filteredEntries);
-
-  // Sort once
-  filteredEntries.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-
-  const firstEntry = filteredEntries[0];
-  if (!firstEntry) return [];
-
-  // Use direct timestamp math for start day calculation
-  const startTimestamp = dayjs(firstEntry.timestamp).valueOf();
-  const startOfDay = startTimestamp - (startTimestamp % (24 * 60 * 60 * 1000));
-  const startDay = new Date(startOfDay).toJSON();
-
-  // Build series with pre-calculated capacity
-  const series: timeSeries = [ { x: startDay, y: 0 } ];
-
-  let runningTotal = 0;
-  for (const entry of filteredEntries) {
-    runningTotal += entry.number;
-    series.push({ x: entry.timestamp, y: runningTotal });
-  }
-
-  const endTime = now ?? dayjs().toJSON();
-  series.push({ x: endTime, y: runningTotal });
-
-  return series;
-}
-
 export function generateRunningTotalCalorieSeries(
   entries: entry[],
   dailyPassiveCalories: number,
@@ -167,24 +127,6 @@ export function generateRunningTotalCalorieSeries(
   ];
 
   return series;
-}
-
-export function passiveCaloriesAtTimestampFromEntries(options: {
-  entries: entry[],
-  timestamp: string,
-  dailyPassiveCalories: number,
-  startDay?: string
-}) {
-  const { entries, timestamp, dailyPassiveCalories, startDay } = options;
-  const firstDay = startDay ?? startOfFirstDay(entries);
-  return (
-    (dailyPassiveCalories *
-      (dayjs(timestamp).valueOf() - dayjs(firstDay).valueOf())) /
-    1000 /
-    60 /
-    60 /
-    24
-  );
 }
 
 function startOfFirstDay(entries: entry[]) {

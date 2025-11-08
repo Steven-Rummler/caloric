@@ -110,42 +110,28 @@ describe('chartData', () => {
   describe('createRunningCaloriesChartData', () => {
     it('should create running calories chart data correctly', () => {
       const netSeries: TimeSeriesPoint[] = [{ x: '2023-01-01', y: 2000 }];
-      const foodSeries: TimeSeriesPoint[] = [{ x: '2023-01-01', y: 1800 }];
-      const passiveSeries: TimeSeriesPoint[] = [{ x: '2023-01-01', y: 200 }];
 
       const result = createRunningCaloriesChartData({
-        netSeries,
-        foodSeries,
-        passiveSeries
+        netSeries
       });
 
       expect(result).toHaveLength(1);
-      if (result[0]) {
+      if (result[0])
         expect(result[0].net).toBe(2000);
-        expect(result[0].food).toBe(1800);
-        expect(result[0].burned).toBe(200);
-      }
     });
   });
 
   describe('createDailyCaloriesChartData', () => {
     it('should create daily calories chart data correctly', () => {
       const netSeries: TimeSeriesPoint[] = [{ x: '2023-01-01', y: 2200 }];
-      const foodSeries: TimeSeriesPoint[] = [{ x: '2023-01-01', y: 2000 }];
-      const passiveSeries: TimeSeriesPoint[] = [{ x: '2023-01-01', y: 200 }];
 
       const result = createDailyCaloriesChartData({
-        netSeries,
-        foodSeries,
-        passiveSeries
+        netSeries
       });
 
       expect(result).toHaveLength(1);
-      if (result[0]) {
+      if (result[0])
         expect(result[0].net).toBe(2200);
-        expect(result[0].food).toBe(2000);
-        expect(result[0].burned).toBe(200);
-      }
     });
   });
 
@@ -212,8 +198,6 @@ describe('chartData', () => {
       const start = performance.now();
       const result = createRunningCaloriesChartData({
         netSeries,
-        foodSeries,
-        passiveSeries,
         maxPoints: 400
       });
       const end = performance.now();
