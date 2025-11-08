@@ -28,6 +28,7 @@ export default function EditEntry({
         text: 'Delete',
         onPress: () => {
           dispatch(removeEntry(entry));
+          setVisible(false);
         },
       },
       { text: 'Cancel' },
@@ -68,8 +69,6 @@ export default function EditEntry({
           placeholder={entryTypeUnit(entryType)}
           textAlign="center"
           onChangeText={setNumber}
-          multiline={true}
-          numberOfLines={1}
           selectionColor={'#b9e2f5'}
         />
       </View>
