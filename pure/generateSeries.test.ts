@@ -7,7 +7,6 @@ import {
   generateRunningTotalCalorieSeries,
   passiveCaloriesAtTimestampFromEntries,
 } from './generateSeries';
-import { generateDefaultEntries } from './defaultEntries';
 import { maxAcceptableProcessingTime, generateLargeHistory, generateLargeHistoryWithGaps } from './test';
 import dayjs from 'dayjs';
 import { expect, it } from 'vitest';

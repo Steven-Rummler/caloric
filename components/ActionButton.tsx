@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, PressableProps, StyleProp, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, PressableProps } from 'react-native';
 
 export function ActionButton({ style, ...props }: PressableProps) {
   return (

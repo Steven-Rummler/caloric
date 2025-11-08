@@ -66,9 +66,8 @@ it('generateDefaultEntries should handle sections and gaps', () => {
   for (let i = 1; i < timestamps.length; i++) {
     const prev = timestamps[i - 1];
     const curr = timestamps[i];
-    if (prev !== undefined && curr !== undefined) {
+    if (prev !== undefined && curr !== undefined) 
       dayDiffs.push((curr - prev) / (1000 * 60 * 60 * 24));
-    }
   }
 
   expect(dayDiffs.some(diff => diff > 1)).toBe(true); // Should have gaps larger than 1 day between sections
@@ -118,7 +117,8 @@ it('generateDefaultEntries should generate weight progression', () => {
 
   expect(firstWeight).toBeDefined();
   expect(lastWeight).toBeDefined();
-  expect(lastWeight!).toBeGreaterThan(firstWeight!);
+  expect(typeof firstWeight).toBe('number');
+  if (typeof firstWeight === 'number') expect(lastWeight).toBeGreaterThan(firstWeight);
 });
 
 it('generateDefaultEntries should be performant', () => {

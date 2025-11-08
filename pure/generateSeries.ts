@@ -23,7 +23,7 @@ export function generateDailyCalorieSeries(
   for (const entry of filteredEntries) {
     // Extract date directly from ISO timestamp (YYYY-MM-DDTHH:mm:ss.sssZ -> YYYY-MM-DD)
     const day = entry.timestamp.substring(0, 10);
-    dayMap.set(day, (dayMap.get(day) || 0) + entry.number);
+    dayMap.set(day, (dayMap.get(day) ?? 0) + entry.number);
 
     if (!minDay || day < minDay) minDay = day;
     if (!maxDay || day > maxDay) maxDay = day;
@@ -31,17 +31,15 @@ export function generateDailyCalorieSeries(
 
   // Convert map to sorted array
   const series: daySeries = [];
-  for (const day of dayMap.keys()) {
-    series.push({ x: day, y: dayMap.get(day)! });
-  }
+  for (const day of dayMap.keys()) 
+    series.push({ x: day, y: dayMap.get(day) ?? 0 });
   series.sort((a, b) => a.x.localeCompare(b.x));
 
   // Add today if needed
   const today = dayjs().format('YYYY-MM-DD');
   const lastSeries = series[series.length - 1];
-  if (series.length === 0 || (lastSeries && lastSeries.x < today)) {
+  if (series.length === 0 || (lastSeries && lastSeries.x < today)) 
     series.push({ x: today, y: 0 });
-  }
 
   fillInSeriesGapDays(series);
 
@@ -196,21 +194,6 @@ function startOfFirstDay(entries: entry[]) {
   )
     .startOf('day')
     .toJSON();
-}
-
-function passiveCaloriesAtTimestamp(
-  startDay: string,
-  timestamp: string,
-  dailyPassiveCalories: number
-) {
-  return (
-    (dailyPassiveCalories *
-      (dayjs(timestamp).valueOf() - dayjs(startDay).valueOf())) /
-    1000 /
-    60 /
-    60 /
-    24
-  );
 }
 
 export function fillInFoodGaps(

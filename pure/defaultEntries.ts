@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import round from 'lodash/round';
 import { entry } from '../types';
 
 export interface GenerateEntriesParams {
@@ -37,7 +36,7 @@ export function generateDefaultEntries(params: GenerateEntriesParams): entry[] {
 
   let entryIndex = 0;
 
-  for (let section = 0; section < sections; section++) {
+  for (let section = 0; section < sections; section++) 
     for (let day = 0; day < days; day++) {
       const daysFromStart = day + section * gapDays + section * days;
       const calorieDiff = Math.random() * calorieVariation - calorieVariation / 2;
@@ -55,7 +54,7 @@ export function generateDefaultEntries(params: GenerateEntriesParams): entry[] {
       };
 
       // Food entries
-      for (let meal = 0; meal < meals; meal++) {
+      for (let meal = 0; meal < meals; meal++) 
         entries[entryIndex++] = {
           entryType: 'food',
           timestamp: new Date(dayTimestamp + (8 + 4 * meal) * 60 * 60 * 1000).toJSON(),
@@ -63,9 +62,7 @@ export function generateDefaultEntries(params: GenerateEntriesParams): entry[] {
             (mealSize + Math.random() * mealVariation - mealVariation / 2) * 10
           ) / 10,
         };
-      }
     }
-  }
 
   // Trim array to actual size in case we over-allocated
   entries.length = entryIndex;

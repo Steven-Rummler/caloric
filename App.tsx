@@ -14,11 +14,11 @@ import Navigator from './Navigator';
 export default function App() {
   return (
     <Provider store={store}>
-       <PersistGate loading={null} persistor={persistor}> 
-         <NavigationContainer>
+      <PersistGate loading={null} persistor={persistor}> 
+        <NavigationContainer>
           <Navigator />
         </NavigationContainer>
-       </PersistGate>
-     </Provider>
+      </PersistGate>
+    </Provider>
   );
 }
