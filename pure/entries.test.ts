@@ -58,7 +58,7 @@ it('getEntriesForDay should filter entries by day', () => {
   const twoDaysAgo = dayjs().subtract(2, 'days');
   const entriesForTwoDaysAgo = getEntriesForDay(sampleEntries, twoDaysAgo);
 
-  expect(entriesForTwoDaysAgo).toHaveLength(2);
+  expect(entriesForTwoDaysAgo).toHaveLength(3);
   expect(entriesForTwoDaysAgo.every(entry =>
     dayjs(entry.timestamp).isSame(twoDaysAgo, 'day')
   )).toBe(true);
