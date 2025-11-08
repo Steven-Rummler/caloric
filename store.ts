@@ -22,7 +22,6 @@ import { entry } from './types';
 
 const persistConfig = {
   key: 'root',
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   storage: AsyncStorage,
 };
 
@@ -78,6 +77,42 @@ const slice = createSlice({
       state.entries = defaultEntries;
       state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
+    demoEntriesMonth: (state) => {
+      state.entries = generateDefaultEntries({
+        days: 30,
+        meals: 3,
+        dailyCalories: 2000,
+        calorieVariation: 1000,
+        sections: 1,
+        gapDays: 0,
+        initialWeight: 150,
+      });
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+    },
+    demoEntriesYear: (state) => {
+      state.entries = generateDefaultEntries({
+        days: 365,
+        meals: 3,
+        dailyCalories: 2000,
+        calorieVariation: 1000,
+        sections: 1,
+        gapDays: 0,
+        initialWeight: 150,
+      });
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+    },
+    demoEntriesDecade: (state) => {
+      state.entries = generateDefaultEntries({
+        days: 3650,
+        meals: 3,
+        dailyCalories: 2000,
+        calorieVariation: 1000,
+        sections: 1,
+        gapDays: 0,
+        initialWeight: 150,
+      });
+      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
+    },
   },
 });
 
@@ -87,6 +122,9 @@ const {
   removeEntry,
   clearEntries,
   useDefaultEntries,
+  demoEntriesMonth,
+  demoEntriesYear,
+  demoEntriesDecade,
 } = slice.actions;
 
 function getEntries(state: Store): entry[] {
@@ -98,12 +136,11 @@ function getPassiveCalories(state: Store): number {
 }
 
 function getDateFormat(state: Store) {
-  if (state.data.entries.length === 0) {
+  if (state.data.entries.length === 0)
     return 'MMM D'; // Default format when no entries
-  }
-  const firstTimestamp = state.data.entries[0]!.timestamp;
-  const minDate = state.data.entries.reduce((min, entry) => entry.timestamp < min ? entry.timestamp : min, firstTimestamp);
-  const maxDate = state.data.entries.reduce((max, entry) => entry.timestamp > max ? entry.timestamp : max, firstTimestamp);
+  const timestamps = state.data.entries.map(entry => dayjs(entry.timestamp).valueOf());
+  const minDate = Math.min(...timestamps);
+  const maxDate = Math.max(...timestamps);
   const diff = dayjs(maxDate).diff(dayjs(minDate), 'day');
   return diff > 3 * 365 ? 'YYYY' : diff > 2 * 30 ? 'MMM \'YY' : diff > 7 ? 'MMM D' : 'ddd';
 }
@@ -112,11 +149,9 @@ const reducer = combineReducers({
   data: slice.reducer,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const persistedReducer = persistReducer(persistConfig, reducer);
 
 const store = configureStore({
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -126,17 +161,21 @@ const store = configureStore({
     }),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const persistor = persistStore(store);
 
 export {
   addEntries,
   addEntry,
-  clearEntries, getDateFormat, getEntries,
+  clearEntries,
+  getDateFormat,
+  getEntries,
   getPassiveCalories,
   persistor,
   removeEntry,
   store,
-  useDefaultEntries
+  useDefaultEntries,
+  demoEntriesMonth,
+  demoEntriesYear,
+  demoEntriesDecade,
 };
 

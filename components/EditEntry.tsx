@@ -64,10 +64,10 @@ export default function EditEntry({
         <TextInput
           style={styles.optionTextInput}
           autoFocus
-          keyboardType="numeric"
+          keyboardType='numeric'
           value={number}
           placeholder={entryTypeUnit(entryType)}
-          textAlign="center"
+          textAlign='center'
           onChangeText={setNumber}
           selectionColor={'#b9e2f5'}
         />
@@ -84,7 +84,7 @@ export default function EditEntry({
         onPress={() => onDelete(selectedEntry)}
         style={{ borderColor: '#ff4444', flexGrow: 0.5 }}
       >
-        <Trash2 color="#ff4444" />
+        <Trash2 color='#ff4444' />
         <Text style={{ color: '#ff4444' }}>Delete Entry</Text>
       </OutlineOptionButton>
     </View>

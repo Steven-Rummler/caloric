@@ -43,14 +43,14 @@ export default function HomeScreen({ navigation }: Props) {
       </View>
       <View style={styles.infoSection}>
         <View style={styles.infoColumn}>
-          <InfoCard label="Calories Today" value={`${recentFoodCalories}`} />
+          <InfoCard label='Calories Today' value={`${recentFoodCalories}`} />
           <InfoCard
-            label="Average Calories Burned"
+            label='Average Calories Burned'
             value={`${Math.round(-1 * passiveCalories)}`}
           />
         </View>
         <View style={styles.infoColumn}>
-          <InfoCard label="Current Weight" value={`${currentWeight.toFixed(1)}`} />
+          <InfoCard label='Current Weight' value={`${currentWeight.toFixed(1)}`} />
           <InfoCard
             label={`Weight ${totalWeightChange > 0 ? 'Gained' : 'Lost'}`}
             value={`${Math.abs(totalWeightChange).toFixed(1)}`}

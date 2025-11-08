@@ -29,7 +29,7 @@ export default function EntryTypePicker({
         <Text>{displayDate(dayjs(timestamp), entryType)}</Text>
       </View>
       <View>
-        <Edit color="black" />
+        <Edit color='black' />
       </View>
     </Pressable>
   );

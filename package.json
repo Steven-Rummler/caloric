@@ -46,6 +46,7 @@
   "devDependencies": {
     "@types/lodash": "^4.17.20",
     "@types/react": "~19.1.10",
+    "eslint-config-expo": "^10.0.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.6"
   }

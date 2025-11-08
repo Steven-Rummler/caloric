@@ -52,10 +52,10 @@ export default function LogEntryScreen({ navigation }: Props) {
           <TextInput
             style={styles.optionTextInput}
             autoFocus
-            keyboardType="numeric"
+            keyboardType='numeric'
             value={number}
             placeholder={entryTypeUnit(entryType)}
-            textAlign="center"
+            textAlign='center'
             onChangeText={setNumber}
             selectionColor={'#b9e2f5'}
           />

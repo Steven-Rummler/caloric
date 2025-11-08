@@ -1,6 +1,7 @@
+import React from 'react';
 import * as DocumentPicker from 'expo-document-picker';
 import { Directory, File } from 'expo-file-system';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 import { OptionButton, OutlineOptionButton } from '../components/OptionButton';
@@ -10,13 +11,16 @@ import {
   addEntries,
   clearEntries,
   getEntries,
-  useDefaultEntries,
+  demoEntriesMonth,
+  demoEntriesYear,
+  demoEntriesDecade,
 } from '../store';
 import { entry } from '../types';
 
 export default function SettingsScreen({ navigation }: Props) {
   const dispatch = useDispatch();
   const entries = useSelector(getEntries);
+  const [showDemoModal, setShowDemoModal] = React.useState(false);
 
   return (
     <Page>
@@ -70,26 +74,62 @@ export default function SettingsScreen({ navigation }: Props) {
         <Text style={{ color: '#ff4444' }}>Clear Log</Text>
       </OutlineOptionButton>
       <OutlineOptionButton
-        onPress={() => {
-          Alert.alert(
-            'Reset to Demo?',
-            'All current entries will be replaced with demo data',
-            [
-              {
-                text: 'Reset',
-                onPress: () => {
-                  dispatch(useDefaultEntries());
-                  navigation.goBack();
-                },
-              },
-              { text: 'Cancel' },
-            ]
-          );
-        }}
+        onPress={() => setShowDemoModal(true)}
         style={{ borderColor: '#ff4444' }}
       >
         <Text style={{ color: '#ff4444' }}>Reset Log to Demo</Text>
       </OutlineOptionButton>
+      <Modal
+        visible={showDemoModal}
+        transparent={true}
+        animationType='fade'
+        onRequestClose={() => setShowDemoModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Demo Data Size</Text>
+            <Text style={styles.modalSubtitle}>
+              All current entries will be replaced with demo data
+            </Text>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                dispatch(demoEntriesMonth());
+                setShowDemoModal(false);
+                navigation.goBack();
+              }}
+            >
+              <Text style={styles.modalOptionText}>1 Month (30 days)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                dispatch(demoEntriesYear());
+                setShowDemoModal(false);
+                navigation.goBack();
+              }}
+            >
+              <Text style={styles.modalOptionText}>1 Year (365 days)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                dispatch(demoEntriesDecade());
+                setShowDemoModal(false);
+                navigation.goBack();
+              }}
+            >
+              <Text style={styles.modalOptionText}>10 Years (3,650 days)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalCancel}
+              onPress={() => setShowDemoModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </Page>
   );
 }
@@ -102,6 +142,54 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25.89,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalOption: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  modalOptionText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  modalCancel: {
+    backgroundColor: '#f0f0f0',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  modalCancelText: {
+    color: '#333',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
 
@@ -117,7 +205,7 @@ async function exportData(entries: entry[]) {
     );
 
     const selectedDirectory = await Directory.pickDirectoryAsync();
-    if (!selectedDirectory) return;
+    if (selectedDirectory == null) return;
 
     const file = new File(selectedDirectory.uri, 'caloric.csv');
     file.write(csvString);
@@ -133,7 +221,7 @@ async function importData() {
   });
   if (importFile.canceled) return [];
   const fileUri = importFile.assets[0]?.uri;
-  if (!fileUri) return [];
+  if (fileUri == null) return [];
   
   const file = new File(fileUri);
   const fileString = await file.text();

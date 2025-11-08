@@ -1,4 +1,4 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import dayjs from 'dayjs';
 import { useCallback, useState } from 'react';
 import { Modal, View, StyleSheet, Text, Pressable, Platform } from 'react-native';
@@ -19,7 +19,7 @@ export function DatePicker(props: {
     dayjs(timestamp).format('YYYY-MM-DD')
   );
 
-  const onDateChange = useCallback((event: any, newDate: Date | undefined) => {
+  const onDateChange = useCallback((event: DateTimePickerEvent, newDate: Date | undefined) => {
     if (Platform.OS === 'android') {
       setShowDatePicker(false);
       if (event.type === 'set' && newDate !== undefined) {
@@ -27,9 +27,8 @@ export function DatePicker(props: {
         setTempDate(newDate);
         setShowTimePicker(true);
       }
-    } else if (newDate !== undefined) {
+    } else if (newDate !== undefined)
       setTempDate(newDate);
-    }
   }, []);
 
   const onDateConfirm = useCallback(() => {
@@ -43,17 +42,15 @@ export function DatePicker(props: {
     setTempDate(new Date(timestamp));
   }, [timestamp]);
 
-  const onTimeChange = useCallback((event: any, newTime: Date | undefined) => {
+  const onTimeChange = useCallback((event: DateTimePickerEvent, newTime: Date | undefined) => {
     if (Platform.OS === 'android') {
       setShowTimePicker(false);
-      if (event.type === 'set' && newTime !== undefined) {
+      if (event.type === 'set' && newTime !== undefined)
         setTimestamp(
           dayAndTimeToTimestamp(date, dayjs(newTime).format('HH:mm:ss'))
         );
-      }
-    } else if (newTime !== undefined) {
+    } else if (newTime !== undefined)
       setTempDate(newTime);
-    }
   }, [date, setTimestamp]);
 
   const onTimeConfirm = useCallback(() => {
@@ -84,13 +81,13 @@ export function DatePicker(props: {
         </OptionText>
       </OptionButton>
       {showDatePicker && Platform.OS === 'ios' && (
-        <Modal transparent animationType="slide">
+        <Modal transparent animationType='slide'>
           <View style={styles.modalOverlay}>
             <View style={styles.pickerContainer}>
               <DateTimePicker
                 value={tempDate}
-                mode="date"
-                display="spinner"
+                mode='date'
+                display='spinner'
                 onChange={onDateChange}
               />
               <View style={styles.buttonRow}>
@@ -108,18 +105,18 @@ export function DatePicker(props: {
       {showDatePicker && Platform.OS === 'android' && (
         <DateTimePicker
           value={tempDate}
-          mode="date"
+          mode='date'
           onChange={onDateChange}
         />
       )}
       {showTimePicker && Platform.OS === 'ios' && (
-        <Modal transparent animationType="slide">
+        <Modal transparent animationType='slide'>
           <View style={styles.modalOverlay}>
             <View style={styles.pickerContainer}>
               <DateTimePicker
                 value={tempDate}
-                mode="time"
-                display="spinner"
+                mode='time'
+                display='spinner'
                 onChange={onTimeChange}
               />
               <View style={styles.buttonRow}>
@@ -137,7 +134,7 @@ export function DatePicker(props: {
       {showTimePicker && Platform.OS === 'android' && (
         <DateTimePicker
           value={tempDate}
-          mode="time"
+          mode='time'
           onChange={onTimeChange}
         />
       )}
