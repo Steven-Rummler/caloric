@@ -1,6 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { Directory, File } from 'expo-file-system';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { jsonToCSV, readString } from 'react-native-csv';
 import { useDispatch, useSelector } from 'react-redux';
 import { OptionButton, OutlineOptionButton } from '../components/OptionButton';
@@ -50,8 +50,20 @@ export default function SettingsScreen({ navigation }: Props) {
       </OptionButton>
       <OutlineOptionButton
         onPress={() => {
-          dispatch(clearEntries());
-          navigation.goBack();
+          Alert.alert(
+            'Clear Log?',
+            'All entries will be gone forever (a long time)',
+            [
+              {
+                text: 'Clear',
+                onPress: () => {
+                  dispatch(clearEntries());
+                  navigation.goBack();
+                },
+              },
+              { text: 'Cancel' },
+            ]
+          );
         }}
         style={{ borderColor: '#ff4444' }}
       >
@@ -59,8 +71,20 @@ export default function SettingsScreen({ navigation }: Props) {
       </OutlineOptionButton>
       <OutlineOptionButton
         onPress={() => {
-          dispatch(useDefaultEntries());
-          navigation.goBack();
+          Alert.alert(
+            'Reset to Demo?',
+            'All current entries will be replaced with demo data',
+            [
+              {
+                text: 'Reset',
+                onPress: () => {
+                  dispatch(useDefaultEntries());
+                  navigation.goBack();
+                },
+              },
+              { text: 'Cancel' },
+            ]
+          );
         }}
         style={{ borderColor: '#ff4444' }}
       >
