@@ -84,7 +84,8 @@ const styles = StyleSheet.create({
     maxHeight: 133,
     flexDirection: 'row',
     padding: 0,
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   optionTextInput: {
     flex: 1,

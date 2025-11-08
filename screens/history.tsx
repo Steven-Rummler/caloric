@@ -55,6 +55,7 @@ export default function HistoryScreen() {
           />
         )}
         keyExtractor={(item) => item.timestamp}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8 }}
       />
       <Modal
         transparent={true}
@@ -78,5 +79,7 @@ const styles = StyleSheet.create({
     minHeight: 133,
     maxHeight: 133,
     flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
 });

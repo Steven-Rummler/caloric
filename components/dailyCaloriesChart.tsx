@@ -14,10 +14,12 @@ import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
 
-export default function DailyCaloriesChart() {
+export default function DailyCaloriesChart({ dateRange }: { dateRange: number | null }) {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
+  
+  const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
   const [font, setFont] = useState<SkiaFont | null>(null);
@@ -56,14 +58,14 @@ export default function DailyCaloriesChart() {
   }, [assets]);
 
   const netSeries = useMemo(() => {
-    const result = generateDailyTotalCalorieSeries(entries, passiveCalories);
+    const result = generateDailyTotalCalorieSeries(filteredEntries, passiveCalories);
     return result;
-  }, [entries, passiveCalories]);
+  }, [filteredEntries, passiveCalories]);
 
   const foodSeries = useMemo(() => {
-    const result = generateDailyCalorieSeries(entries, 'food');
+    const result = generateDailyCalorieSeries(filteredEntries, 'food');
     return result;
-  }, [entries]);
+  }, [filteredEntries]);
 
   const passiveSeries = useMemo(() => {
     const result = netSeries.map(({ x }) => ({ x, y: passiveCalories }));

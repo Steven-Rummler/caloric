@@ -16,10 +16,12 @@ import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
 
-export default function RunningCaloriesChart() {
+export default function RunningCaloriesChart({ dateRange }: { dateRange: number | null }) {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
+  
+  const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
   const [font, setFont] = useState<SkiaFont | null>(null);
@@ -53,31 +55,31 @@ export default function RunningCaloriesChart() {
   }, [assets]);
 
   const netSeries = useMemo(() => {
-    const result = generateRunningTotalCalorieSeries(entries, passiveCalories);
+    const result = generateRunningTotalCalorieSeries(filteredEntries, passiveCalories);
     return result;
-  }, [entries, passiveCalories]);
+  }, [filteredEntries, passiveCalories]);
 
   const foodSeries = useMemo(() => {
-    const result = generateRunningCalorieSeries(entries, 'food');
+    const result = generateRunningCalorieSeries(filteredEntries, 'food');
     return result;
-  }, [entries]);
+  }, [filteredEntries]);
 
   const passiveSeries = useMemo(() => {
     
     // Calculate start day once instead of for each timestamp
-    const firstDayStart = getFirstDay(entries).startOf('day').toJSON();
+    const firstDayStart = getFirstDay(filteredEntries).startOf('day').toJSON();
     
     const result = netSeries.map(({ x }) => ({
       x,
       y: passiveCaloriesAtTimestampFromEntries({
-        entries,
+        entries: filteredEntries,
         timestamp: x,
         dailyPassiveCalories: passiveCalories,
         startDay: firstDayStart
       }),
     }));
     return result;
-  }, [entries, passiveCalories, netSeries]);
+  }, [filteredEntries, passiveCalories, netSeries]);
 
   const chartData = useMemo(() => {
     const result = createRunningCaloriesChartData({

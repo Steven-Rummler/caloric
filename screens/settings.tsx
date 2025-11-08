@@ -24,61 +24,63 @@ export default function SettingsScreen({ navigation }: Props) {
 
   return (
     <Page>
-      <View style={styles.titleSection}>
-        <Text style={styles.title}>Manage Log</Text>
-      </View>
-      <OptionButton
-        onPress={() => {
-          exportData(entries)
-            .then(() => navigation.goBack())
-            .catch((error) => console.log(error));
-        }}
-        style={{}}
-      >
-        <Text>Export Log to CSV</Text>
-      </OptionButton>
-      <OptionButton
-        onPress={() => {
-          importData()
-            .then((newEntries) => {
-              if (newEntries.length === 0) return;
-              dispatch(clearEntries());
-              dispatch(addEntries(newEntries));
-              navigation.goBack();
-            })
-            .catch((error) => console.log(error));
-        }}
-        style={{}}
-      >
-        <Text>Import Log from CSV</Text>
-      </OptionButton>
-      <OutlineOptionButton
-        onPress={() => {
-          Alert.alert(
-            'Clear Log?',
-            'All entries will be gone forever (a long time)',
-            [
-              {
-                text: 'Clear',
-                onPress: () => {
-                  dispatch(clearEntries());
-                  navigation.goBack();
+      <View style={styles.container}>
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>Manage Log</Text>
+        </View>
+        <OptionButton
+          onPress={() => {
+            exportData(entries)
+              .then(() => navigation.goBack())
+              .catch((error) => console.log(error));
+          }}
+          style={{}}
+        >
+          <Text>Export Log to CSV</Text>
+        </OptionButton>
+        <OptionButton
+          onPress={() => {
+            importData()
+              .then((newEntries) => {
+                if (newEntries.length === 0) return;
+                dispatch(clearEntries());
+                dispatch(addEntries(newEntries));
+                navigation.goBack();
+              })
+              .catch((error) => console.log(error));
+          }}
+          style={{}}
+        >
+          <Text>Import Log from CSV</Text>
+        </OptionButton>
+        <OutlineOptionButton
+          onPress={() => {
+            Alert.alert(
+              'Clear Log?',
+              'All entries will be gone forever (a long time)',
+              [
+                {
+                  text: 'Clear',
+                  onPress: () => {
+                    dispatch(clearEntries());
+                    navigation.goBack();
+                  },
                 },
-              },
-              { text: 'Cancel' },
-            ]
-          );
-        }}
-        style={{ borderColor: '#ff4444' }}
-      >
-        <Text style={{ color: '#ff4444' }}>Clear Log</Text>
-      </OutlineOptionButton>
-      <OutlineOptionButton
-        onPress={() => setShowDemoModal(true)}
-        style={{ borderColor: '#ff4444' }}
-      >
-        <Text style={{ color: '#ff4444' }}>Reset Log to Demo</Text>
-      </OutlineOptionButton>
+                { text: 'Cancel' },
+              ]
+            );
+          }}
+          style={{ borderColor: '#ff4444' }}
+        >
+          <Text style={{ color: '#ff4444' }}>Clear Log</Text>
+        </OutlineOptionButton>
+        <OutlineOptionButton
+          onPress={() => setShowDemoModal(true)}
+          style={{ borderColor: '#ff4444' }}
+        >
+          <Text style={{ color: '#ff4444' }}>Reset Log to Demo</Text>
+        </OutlineOptionButton>
+      </View>
       <Modal
         visible={showDemoModal}
         transparent={true}
@@ -135,6 +137,11 @@ export default function SettingsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
   titleSection: {
     flex: 0.667,
     alignItems: 'center',

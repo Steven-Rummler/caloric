@@ -1,6 +1,6 @@
 import startCase from 'lodash/startCase';
 import { useState } from 'react';
-import { Alert, Dimensions, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Dimensions, Keyboard, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Trash2 } from 'react-native-feather';
 import { useDispatch } from 'react-redux';
 import { entryTypeUnit } from '../pure/entryTypes';
@@ -22,7 +22,8 @@ export default function EditEntry({
   const [number, setNumber] = useState<string>(`${selectedEntry.number}`);
   const [timestamp, setTimestamp] = useState<string>(selectedEntry.timestamp);
 
-  const onDelete = (entry: entry) =>
+  const onDelete = (entry: entry) => {
+    Keyboard.dismiss();
     Alert.alert('Delete Entry?', 'Entry will be gone forever (a long time)', [
       {
         text: 'Delete',
@@ -33,6 +34,7 @@ export default function EditEntry({
       },
       { text: 'Cancel' },
     ]);
+  };
 
   const onSave = () => {
     dispatch(

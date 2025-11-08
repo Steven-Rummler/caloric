@@ -49,7 +49,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#b9e2f5',
     borderRadius: 16,
-    margin: 10,
+    margin: 4,
+    minHeight: 60,
   },
   unselected: {
     backgroundColor: '#edf7fc',

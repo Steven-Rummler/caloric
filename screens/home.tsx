@@ -2,10 +2,10 @@ import { Text, View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import dayjs from 'dayjs';
 import round from 'lodash/round';
-import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Props } from '../navigationTypes';
-import { getEntries, getPassiveCalories } from '../store';
+import { addEntry, getEntries, getPassiveCalories } from '../store';
 import { entry } from '../types';
 import { getLastDay } from '../pure/entries';
 import { computeActualWeightSeries } from '../components/weightChart';
@@ -15,13 +15,26 @@ import Page from '../components/Page';
 import Icon from '../assets/thin-margin-icon.png';
 
 export default function HomeScreen({ navigation }: Props) {
+  const dispatch = useDispatch();
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
+  const [loading, setLoading] = useState([false, false, false, false]);
 
   const logEntry = () => navigation.navigate('LogEntry');
   const history = () => navigation.navigate('History');
   const stats = () => navigation.navigate('Stats');
   const settings = () => navigation.navigate('Settings');
+
+  const quickLog = (calories: number, index: number) => {
+    setLoading(prev => prev.map((l, i) => i === index ? true : l));
+    const newEntry: entry = {
+      entryType: 'food',
+      timestamp: dayjs().toJSON(),
+      number: calories,
+    };
+    dispatch(addEntry(newEntry));
+    setTimeout(() => setLoading(prev => prev.map((l, i) => i === index ? false : l)), 1000);
+  };
 
   const recentFoodCalories = useMemo(
     () => computeRecentFoodCalories(entries),
@@ -61,6 +74,13 @@ export default function HomeScreen({ navigation }: Props) {
         <ActionButton onPress={logEntry}>
           <Text>Log</Text>
         </ActionButton>
+      </View>
+      <View style={styles.quickButtonsSection}>
+        {[200, 400, 600, 800].map((cal, index) => (
+          <OptionButton key={cal} onPress={() => quickLog(cal, index)}>
+            {loading[index] === true ? <Text>Adding...</Text> : <Text>{cal}</Text>}
+          </OptionButton>
+        ))}
       </View>
       <View style={styles.optionsSection}>
         <OptionButton onPress={history}>
@@ -171,14 +191,20 @@ const styles = StyleSheet.create({
   },
   actionSection: {
     flex: 5,
-    padding: 20,
-    paddingBottom: 10,
+    padding: 16,
+    paddingBottom: 8,
+  },
+  quickButtonsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   optionsSection: {
     flex: 1.667,
     flexDirection: 'row',
     padding: 0,
-    paddingHorizontal: 10,
-    paddingBottom: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
 });

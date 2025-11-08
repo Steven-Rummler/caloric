@@ -35,10 +35,7 @@ const defaultEntries = generateDefaultEntries({
   initialWeight: 150,
 });
 
-const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
-
 interface DataSlice {
-  passiveCalories: number;
   entries: entry[];
 }
 interface Store {
@@ -46,7 +43,6 @@ interface Store {
 }
 
 const initialState: DataSlice = {
-  passiveCalories: defaultPassive,
   entries: [],
 };
 
@@ -56,26 +52,21 @@ const slice = createSlice({
   reducers: {
     addEntry: (state, action: { type: string; payload: entry }) => {
       state.entries.push(action.payload);
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     addEntries: (state, action: { type: string; payload: entry[] }) => {
       state.entries.push(...action.payload);
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     removeEntry: (state, action: { type: string; payload: entry }) => {
       const filteredEntries = state.entries.filter(
         (entry) => !isEqual(entry, action.payload)
       );
       state.entries = filteredEntries;
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     clearEntries: (state) => {
       state.entries = [];
-      state.passiveCalories = 1500;
     },
     useDefaultEntries: (state) => {
       state.entries = defaultEntries;
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     demoEntriesMonth: (state) => {
       state.entries = generateDefaultEntries({
@@ -87,7 +78,6 @@ const slice = createSlice({
         gapDays: 0,
         initialWeight: 150,
       });
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     demoEntriesYear: (state) => {
       state.entries = generateDefaultEntries({
@@ -99,7 +89,6 @@ const slice = createSlice({
         gapDays: 0,
         initialWeight: 150,
       });
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
     demoEntriesDecade: (state) => {
       state.entries = generateDefaultEntries({
@@ -111,7 +100,6 @@ const slice = createSlice({
         gapDays: 0,
         initialWeight: 150,
       });
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
   },
 });
@@ -132,7 +120,7 @@ function getEntries(state: Store): entry[] {
 }
 
 function getPassiveCalories(state: Store): number {
-  return state.data.passiveCalories;
+  return calculateDailyPassiveCalories(state.data.entries);
 }
 
 function getDateFormat(state: Store) {

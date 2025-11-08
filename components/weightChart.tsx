@@ -12,10 +12,12 @@ import { entry } from '../types';
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
 
-export default function WeightChart() {
+export default function WeightChart({ dateRange }: { dateRange: number | null }) {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
+  
+  const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
   const [font, setFont] = useState<SkiaFont | null>(null);
@@ -49,8 +51,8 @@ export default function WeightChart() {
   }, [assets]);
 
   const weightEntries = useMemo(
-    () => entries.filter((e) => e.entryType === 'weight'),
-    [entries]
+    () => filteredEntries.filter((e) => e.entryType === 'weight'),
+    [filteredEntries]
   );
 
   const weightData = useMemo(
@@ -66,10 +68,10 @@ export default function WeightChart() {
 
   const actualWeight = useMemo(
     () => {
-      const result = computeActualWeightSeries(entries, weightData, passiveCalories);
+      const result = computeActualWeightSeries(filteredEntries, weightData, passiveCalories);
       return result;
     },
-    [entries, weightData, passiveCalories]
+    [filteredEntries, weightData, passiveCalories]
   );
 
   const chartData = useMemo(() => {

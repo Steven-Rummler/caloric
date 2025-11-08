@@ -8,14 +8,23 @@ import WeightChart from '../components/weightChart';
 
 const charts = new Map(
   Object.entries({
-    dailyCalories: <DailyCaloriesChart />,
-    runningCalories: <RunningCaloriesChart />,
-    weight: <WeightChart />,
+    dailyCalories: (dateRange: number | null) => <DailyCaloriesChart dateRange={dateRange} />,
+    runningCalories: (dateRange: number | null) => <RunningCaloriesChart dateRange={dateRange} />,
+    weight: (dateRange: number | null) => <WeightChart dateRange={dateRange} />,
   })
 );
 
+const dateRanges = [
+  { label: '1D', days: 1 },
+  { label: '1W', days: 7 },
+  { label: '1M', days: 30 },
+  { label: '1Y', days: 365 },
+  { label: 'All', days: null },
+];
+
 export default function StatsScreen() {
   const [chart, setChart] = useState<string>('weight');
+  const [dateRange, setDateRange] = useState<number | null>(null);
 
   const WeightButton = chart === 'weight' ? OptionButton : UnselectedOptionButton;
   const DailyCaloriesButton = chart === 'dailyCalories' ? OptionButton : UnselectedOptionButton;
@@ -55,7 +64,17 @@ export default function StatsScreen() {
           </Text>
         </RunningCaloriesButton>
       </View>
-      {charts.get(chart)}
+      <View style={styles.dateRangeSection}>
+        {dateRanges.map(({ label, days }) => {
+          const Button = dateRange === days ? OptionButton : UnselectedOptionButton;
+          return (
+            <Button key={label} onPress={() => setDateRange(days)}>
+              <Text style={{ padding: 5, textAlign: 'center' }}>{label}</Text>
+            </Button>
+          );
+        })}
+      </View>
+      {charts.get(chart)?.(dateRange)}
     </Page>
   );
 }
@@ -65,6 +84,13 @@ const styles = StyleSheet.create({
     flex: 1,
     maxHeight: 133,
     flexDirection: 'row',
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  dateRangeSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 });
