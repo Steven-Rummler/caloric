@@ -6,8 +6,11 @@ import { CartesianChart, Line, Scatter } from 'victory-native';
 import { Skia } from '@shopify/react-native-skia';
 import { useAssets } from 'expo-asset';
 import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
+import { createWeightChartData } from '../pure/chartData';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
 import { entry } from '../types';
+
+type SkiaFont = ReturnType<typeof Skia.Font>;
 
 export default function WeightChart() {
   const entries = useSelector(getEntries);
@@ -15,7 +18,7 @@ export default function WeightChart() {
   const dateFormat = useSelector(getDateFormat);
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
-  const [font, setFont] = useState<any>(null);
+  const [font, setFont] = useState<SkiaFont | null>(null);
 
   useEffect(() => {
     if (!assets || !assets[0]) return;
@@ -25,7 +28,7 @@ export default function WeightChart() {
         const asset = assets[0];
         if (!asset) return;
         
-        const fontUri = asset.localUri || asset.uri;
+        const fontUri = asset.localUri ?? asset.uri ?? '';
         if (!fontUri) return;
         
         const response = await fetch(fontUri);
@@ -42,7 +45,7 @@ export default function WeightChart() {
       }
     };
     
-    loadFont();
+    void loadFont();
   }, [assets]);
 
   const weightEntries = useMemo(
@@ -51,35 +54,31 @@ export default function WeightChart() {
   );
 
   const weightData = useMemo(
-    () =>
-      weightEntries.map((e) => ({
+    () => {
+      const result = weightEntries.map((e) => ({
         x: e.timestamp,
         y: e.number,
-      })),
+      }));
+      return result;
+    },
     [weightEntries]
   );
 
   const actualWeight = useMemo(
-    () => computeActualWeightSeries(entries, weightData, passiveCalories),
+    () => {
+      const result = computeActualWeightSeries(entries, weightData, passiveCalories);
+      return result;
+    },
     [entries, weightData, passiveCalories]
   );
 
   const chartData = useMemo(() => {
-    const allTimestamps = new Set([
-      ...weightData.map(d => d.x),
-      ...actualWeight.map(d => d.x)
-    ]);
-    
-    return Array.from(allTimestamps).sort().map(timestamp => {
-      const measured = weightData.find(d => d.x === timestamp);
-      const estimated = actualWeight.find(d => d.x === timestamp);
-      
-      return {
-        x: new Date(timestamp).getTime(),
-        measured: measured?.y,
-        estimated: estimated?.y,
-      };
+    const result = createWeightChartData({
+      weightData,
+      actualWeight
     });
+
+    return result;
   }, [weightData, actualWeight]);
 
   if (
@@ -96,7 +95,7 @@ export default function WeightChart() {
       <View style={{ height: 300 }}>
         <CartesianChart
           data={chartData}
-          xKey="x"
+          xKey='x'
           yKeys={['measured', 'estimated']}
           frame={{ lineWidth: 0 }}
           axisOptions={{
@@ -105,13 +104,13 @@ export default function WeightChart() {
             labelOffset: { x: 0, y: 8 },
             lineWidth: { grid: { x: 0, y: 1 }, frame: 0 },
             formatXLabel: (value) => dayjs(value).format(dateFormat),
-            formatYLabel: (value) => value ? `${value.toFixed(1)}` : '',
+            formatYLabel: (value) => value != null ? `${value.toFixed(1)}` : '',
           }}
         >
           {({ points, chartBounds }) => (
             <>
-              {points.measured && <Scatter points={points.measured} color="red" radius={4} />}
-              {points.estimated && <Line points={points.estimated} color="blue" strokeWidth={2} />}
+              <Scatter points={points.measured} color='red' radius={4} />
+              <Line points={points.estimated} color='blue' strokeWidth={2} />
             </>
           )}
         </CartesianChart>

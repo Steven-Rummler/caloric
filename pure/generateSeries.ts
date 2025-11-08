@@ -169,15 +169,17 @@ export function generateRunningTotalCalorieSeries(
   return series;
 }
 
-export function passiveCaloriesAtTimestampFromEntries(
+export function passiveCaloriesAtTimestampFromEntries(options: {
   entries: entry[],
   timestamp: string,
-  dailyPassiveCalories: number
-) {
-  const startDay = startOfFirstDay(entries);
+  dailyPassiveCalories: number,
+  startDay?: string
+}) {
+  const { entries, timestamp, dailyPassiveCalories, startDay } = options;
+  const firstDay = startDay ?? startOfFirstDay(entries);
   return (
     (dailyPassiveCalories *
-      (dayjs(timestamp).valueOf() - dayjs(startDay).valueOf())) /
+      (dayjs(timestamp).valueOf() - dayjs(firstDay).valueOf())) /
     1000 /
     60 /
     60 /

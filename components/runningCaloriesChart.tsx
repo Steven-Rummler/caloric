@@ -10,7 +10,11 @@ import {
   generateRunningTotalCalorieSeries,
   passiveCaloriesAtTimestampFromEntries,
 } from '../pure/generateSeries';
+import { getFirstDay } from '../pure/entries';
+import { createRunningCaloriesChartData } from '../pure/chartData';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
+
+type SkiaFont = ReturnType<typeof Skia.Font>;
 
 export default function RunningCaloriesChart() {
   const entries = useSelector(getEntries);
@@ -18,7 +22,7 @@ export default function RunningCaloriesChart() {
   const dateFormat = useSelector(getDateFormat);
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
-  const [font, setFont] = useState<any>(null);
+  const [font, setFont] = useState<SkiaFont | null>(null);
 
   useEffect(() => {
     if (!assets || !assets[0]) return;
@@ -28,7 +32,7 @@ export default function RunningCaloriesChart() {
         const asset = assets[0];
         if (!asset) return;
         
-        const fontUri = asset.localUri || asset.uri;
+        const fontUri = asset.localUri ?? asset.uri ?? '';
         if (!fontUri) return;
         
         const response = await fetch(fontUri);
@@ -45,43 +49,44 @@ export default function RunningCaloriesChart() {
       }
     };
     
-    loadFont();
+    void loadFont();
   }, [assets]);
 
   const netSeries = useMemo(() => {
-    return generateRunningTotalCalorieSeries(entries, passiveCalories);
+    const result = generateRunningTotalCalorieSeries(entries, passiveCalories);
+    return result;
   }, [entries, passiveCalories]);
 
   const foodSeries = useMemo(() => {
-    return generateRunningCalorieSeries(entries, 'food');
+    const result = generateRunningCalorieSeries(entries, 'food');
+    return result;
   }, [entries]);
 
   const passiveSeries = useMemo(() => {
-    return netSeries.map(({ x }) => ({
+    
+    // Calculate start day once instead of for each timestamp
+    const firstDayStart = getFirstDay(entries).startOf('day').toJSON();
+    
+    const result = netSeries.map(({ x }) => ({
       x,
-      y: passiveCaloriesAtTimestampFromEntries(entries, x, passiveCalories),
+      y: passiveCaloriesAtTimestampFromEntries({
+        entries,
+        timestamp: x,
+        dailyPassiveCalories: passiveCalories,
+        startDay: firstDayStart
+      }),
     }));
+    return result;
   }, [entries, passiveCalories, netSeries]);
 
   const chartData = useMemo(() => {
-    const allTimestamps = new Set([
-      ...netSeries.map(d => d.x),
-      ...foodSeries.map(d => d.x),
-      ...passiveSeries.map(d => d.x)
-    ]);
-    
-    return Array.from(allTimestamps).sort().map(timestamp => {
-      const net = netSeries.find(d => d.x === timestamp);
-      const food = foodSeries.find(d => d.x === timestamp);
-      const passive = passiveSeries.find(d => d.x === timestamp);
-      
-      return {
-        x: dayjs(timestamp).valueOf(),
-        net: net?.y,
-        food: food?.y,
-        burned: passive?.y,
-      };
+    const result = createRunningCaloriesChartData({
+      netSeries,
+      foodSeries,
+      passiveSeries
     });
+
+    return result;
   }, [netSeries, foodSeries, passiveSeries]);
 
   if (chartData.length < 2) return <Text>Not enough data</Text>;
@@ -92,7 +97,7 @@ export default function RunningCaloriesChart() {
       <View style={{ height: 300 }}>
         <CartesianChart
           data={chartData}
-          xKey="x"
+          xKey='x'
           yKeys={['net', 'food', 'burned']}
           frame={{ lineWidth: 0 }}
           axisOptions={{
@@ -102,7 +107,7 @@ export default function RunningCaloriesChart() {
             lineWidth: { grid: { x: 0, y: 1 }, frame: 0 },
             formatXLabel: (value) => dayjs(value).format(dateFormat),
             formatYLabel: (value) => {
-              if (!value) return '';
+              if (value == null) return '';
               const absValue = Math.abs(value);
               const sign = value < 0 ? '-' : '';
               
@@ -125,9 +130,9 @@ export default function RunningCaloriesChart() {
         >
           {({ points, chartBounds }) => (
             <>
-              {points.net && <Line points={points.net} color="green" strokeWidth={2} />}
-              {points.food && <Line points={points.food} color="purple" strokeWidth={2} />}
-              {points.burned && <Line points={points.burned} color="blue" strokeWidth={2} />}
+              <Line points={points.net} color='green' strokeWidth={2} />
+              <Line points={points.food} color='purple' strokeWidth={2} />
+              <Line points={points.burned} color='blue' strokeWidth={2} />
             </>
           )}
         </CartesianChart>

@@ -41,11 +41,11 @@ it('should give empty series from no entries', () => {
   expect(
     generateRunningTotalCalorieSeries(noEntries, defaultPassiveCalories)
   ).toEqual([]);
-  const passiveCaloriesAtTimestamp = passiveCaloriesAtTimestampFromEntries(
-    noEntries,
-    dayjs().toJSON(),
-    defaultPassiveCalories
-  );
+  const passiveCaloriesAtTimestamp = passiveCaloriesAtTimestampFromEntries({
+    entries: noEntries,
+    timestamp: dayjs().toJSON(),
+    dailyPassiveCalories: defaultPassiveCalories
+  });
   expect(passiveCaloriesAtTimestamp).toBeGreaterThanOrEqual(0);
   expect(passiveCaloriesAtTimestamp).toBeLessThanOrEqual(
     defaultPassiveCalories
