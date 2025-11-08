@@ -10,7 +10,6 @@ import {
   addEntries,
   clearEntries,
   getEntries,
-  resetSettings,
   useDefaultEntries,
 } from '../store';
 import { entry } from '../types';
@@ -21,16 +20,6 @@ export default function SettingsScreen({ navigation }: Props) {
 
   return (
     <Page>
-      <View style={styles.titleSection}>
-        <Text style={styles.title}>Preferences</Text>
-      </View>
-      <OptionButton
-        onPress={() => {
-          dispatch(resetSettings());
-        }}
-      >
-        <Text>Reset Preferences to Defaults</Text>
-      </OptionButton>
       <View style={styles.titleSection}>
         <Text style={styles.title}>Manage Log</Text>
       </View>

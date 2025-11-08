@@ -9,5 +9,3 @@ export interface entry {
   number: number;
   label?: string;
 }
-
-export type settings = Record<string, boolean>;

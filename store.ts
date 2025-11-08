@@ -18,7 +18,7 @@ import {
 } from 'redux-persist';
 import { calculateDailyPassiveCalories } from './pure/entries';
 import { generateDefaultEntries } from './pure/defaultEntries';
-import { entry, settings } from './types';
+import { entry } from './types';
 
 const persistConfig = {
   key: 'root',
@@ -38,12 +38,9 @@ const defaultEntries = generateDefaultEntries({
 
 const defaultPassive = calculateDailyPassiveCalories(defaultEntries);
 
-const defaultSettings: settings = {};
-
 interface DataSlice {
   passiveCalories: number;
   entries: entry[];
-  settings: settings;
 }
 interface Store {
   data: DataSlice;
@@ -52,7 +49,6 @@ interface Store {
 const initialState: DataSlice = {
   passiveCalories: defaultPassive,
   entries: [],
-  settings: defaultSettings,
 };
 
 const slice = createSlice({
@@ -82,21 +78,6 @@ const slice = createSlice({
       state.entries = defaultEntries;
       state.passiveCalories = calculateDailyPassiveCalories(state.entries);
     },
-    updateSetting: (
-      state,
-      action: {
-        type: string;
-        payload: settings;
-      }
-    ) => {
-      for (const [key, value] of Object.entries(action.payload))
-        state.settings[key] = value;
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
-    },
-    resetSettings: (state) => {
-      state.settings = defaultSettings;
-      state.passiveCalories = calculateDailyPassiveCalories(state.entries);
-    },
   },
 });
 
@@ -106,8 +87,6 @@ const {
   removeEntry,
   clearEntries,
   useDefaultEntries,
-  updateSetting,
-  resetSettings,
 } = slice.actions;
 
 function getEntries(state: Store): entry[] {
@@ -127,10 +106,6 @@ function getDateFormat(state: Store) {
   const maxDate = state.data.entries.reduce((max, entry) => entry.timestamp > max ? entry.timestamp : max, firstTimestamp);
   const diff = dayjs(maxDate).diff(dayjs(minDate), 'day');
   return diff > 3 * 365 ? 'YYYY' : diff > 2 * 30 ? 'MMM \'YY' : diff > 7 ? 'MMM D' : 'ddd';
-}
-
-function getSettings(state: { data: { settings: settings } }) {
-  return state.data.settings;
 }
 
 const reducer = combineReducers({
@@ -158,12 +133,10 @@ export {
   addEntries,
   addEntry,
   clearEntries, getDateFormat, getEntries,
-  getPassiveCalories, getSettings,
+  getPassiveCalories,
   persistor,
   removeEntry,
-  resetSettings,
   store,
-  updateSetting,
   useDefaultEntries
 };
 
