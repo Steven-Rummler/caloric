@@ -95,22 +95,44 @@ export function downsampleMultipleSeries(
     for (const point of s)
       allXValues.add(point.x);
 
-  if (allXValues.size <= threshold)
-    return series;
-
   const sortedXValues = Array.from(allXValues).sort((a, b) => a - b);
 
-  // Create a combined dataset for LTTB
-  const combinedData: DataPoint[] = sortedXValues.map(x => ({ x }));
+  let targetXValues: number[];
 
-  // Apply LTTB to the x values
-  const downsampledX = downsampleLTTB(
-    combinedData.map(p => ({ x: p.x, y: p.x })), // Use x as y for downsampling
-    threshold
-  ).map(p => p.x);
+  if (sortedXValues.length <= threshold)
+    targetXValues = sortedXValues;
+  else {
+    // Create a combined dataset for LTTB
+    const combinedData: DataPoint[] = sortedXValues.map(x => ({ x }));
 
-  // Filter each series to only include downsampled x values
-  return series.map(s =>
-    s.filter(point => downsampledX.includes(point.x))
-  );
+    // Apply LTTB to the x values
+    targetXValues = downsampleLTTB(
+      combinedData.map(p => ({ x: p.x, y: p.x })), // Use x as y for downsampling
+      threshold
+    ).map(p => p.x);
+  }
+
+  // For each series, interpolate y values at the target x points
+  return series.map(s => {
+    const sortedSeries = s.slice().sort((a, b) => a.x - b.x);
+    return targetXValues.map(x => {
+      // Find exact match
+      const exactPoint = sortedSeries.find(p => p.x === x);
+      if (exactPoint) return exactPoint;
+
+      // Interpolate between nearest points
+      const before = sortedSeries.filter(p => p.x < x).pop();
+      const after = sortedSeries.find(p => p.x > x);
+
+      if (!before && !after) return { x, y: undefined }; // No data
+      if (!before && after) return { x, y: after.y }; // Extrapolate from first point
+      if (!after && before) return { x, y: before.y }; // Extrapolate from last point
+
+      // Linear interpolation
+      if (before?.y == null || after?.y == null) return { x, y: undefined };
+      const ratio = (x - before.x) / (after.x - before.x);
+      const y = before.y + ratio * (after.y - before.y);
+      return { x, y };
+    });
+  });
 }

@@ -187,3 +187,49 @@ it('downsampleLTTB should handle two point datasets', () => {
   const result = downsampleLTTB(twoPoints, 5);
   expect(result).toEqual(twoPoints);
 });
+
+it('downsampleMultipleSeries should interpolate y values at downsampled x points', () => {
+  const series: DataPoint[][] = [
+    [{ x: 1, y: 10 }, { x: 3, y: 30 }, { x: 5, y: 50 }],
+    [{ x: 1, y: 20 }, { x: 3, y: 40 }, { x: 5, y: 60 }],
+  ];
+
+  const result = downsampleMultipleSeries(series, 3);
+  expect(result).toHaveLength(2);
+  expect(result[0]).toHaveLength(3);
+  expect(result[1]).toHaveLength(3);
+
+  // Should include all downsampled x points
+  const xValues = result[0]?.map(p => p.x);
+  expect(xValues).toEqual([1, 3, 5]);
+
+  // Y values should be exact matches in this case
+  expect(result[0]?.[0]?.y).toBe(10);
+  expect(result[0]?.[1]?.y).toBe(30);
+  expect(result[0]?.[2]?.y).toBe(50);
+  expect(result[1]?.[0]?.y).toBe(20);
+  expect(result[1]?.[1]?.y).toBe(40);
+  expect(result[1]?.[2]?.y).toBe(60);
+});
+
+it('downsampleMultipleSeries should interpolate missing y values', () => {
+  const series: DataPoint[][] = [
+    [{ x: 1, y: 10 }, { x: 5, y: 50 }], // Missing x=3
+    [{ x: 1, y: 20 }, { x: 3, y: 40 }, { x: 5, y: 60 }],
+  ];
+
+  const result = downsampleMultipleSeries(series, 3);
+  expect(result).toHaveLength(2);
+  expect(result[0]).toHaveLength(3);
+  expect(result[1]).toHaveLength(3);
+
+  // First series should have interpolated y at x=3
+  expect(result[0]?.[0]?.y).toBe(10);
+  expect(result[0]?.[1]?.y).toBe(30); // Interpolated: (50-10)*(3-1)/(5-1) + 10 = 30
+  expect(result[0]?.[2]?.y).toBe(50);
+
+  // Second series has exact matches
+  expect(result[1]?.[0]?.y).toBe(20);
+  expect(result[1]?.[1]?.y).toBe(40);
+  expect(result[1]?.[2]?.y).toBe(60);
+});
