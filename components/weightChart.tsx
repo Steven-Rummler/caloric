@@ -8,15 +8,23 @@ import { useAssets } from 'expo-asset';
 import { useTheme } from '../ThemeProvider';
 import { computeActualWeightSeries } from '../pure/generateSeries';
 import { createWeightChartData } from '../pure/chartData';
-import { getDateFormat, getEntries, getPassiveCalories } from '../store';
+import { getDateFormatForRange } from '../pure/format';
+import { getEntries, getPassiveCalories } from '../store';
 
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
 
+const getStartDate = (dateRange: number): dayjs.Dayjs => {
+  const now = dayjs();
+  if (dateRange === 1) return now.startOf('day');
+  if (dateRange === 7) return now.startOf('week');
+  if (dateRange === 30) return now.startOf('month');
+  return now.subtract(dateRange, 'day');
+};
+
 export default function WeightChart({ dateRange }: { dateRange: number | null }) {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
-  const dateFormat = useSelector(getDateFormat);
   const theme = useTheme();
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
@@ -75,14 +83,31 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
   );
 
   const filteredWeightData = useMemo(
-    () => dateRange !== null ? weightData.filter(d => dayjs(d.x).isAfter(dayjs().subtract(dateRange, 'day'))) : weightData,
+    () => dateRange !== null ? weightData.filter(d => !dayjs(d.x).isBefore(getStartDate(dateRange))) : weightData,
     [weightData, dateRange]
   );
 
-  const filteredActualWeight = useMemo(
-    () => dateRange !== null ? actualWeight.filter(d => dayjs(d.x).isAfter(dayjs().subtract(dateRange, 'day'))) : actualWeight,
-    [actualWeight, dateRange]
-  );
+  const filteredActualWeight = useMemo(() => {
+    if (dateRange === null) return actualWeight;
+    const start = getStartDate(dateRange);
+    const filtered = actualWeight.filter(d => !dayjs(d.x).isBefore(start));
+    // Find last point before start
+    const beforePoints = actualWeight.filter(d => dayjs(d.x).isBefore(start));
+    if (beforePoints.length > 0) {
+      const lastBefore = beforePoints[beforePoints.length - 1];
+      const firstAfter = filtered[0];
+      if (firstAfter && lastBefore) {
+        const t1 = dayjs(lastBefore.x).valueOf();
+        const t2 = dayjs(firstAfter.x).valueOf();
+        const t = start.valueOf();
+        const y1 = lastBefore.y;
+        const y2 = firstAfter.y;
+        const y = y1 + (y2 - y1) * (t - t1) / (t2 - t1);
+        filtered.unshift({ x: start.toISOString(), y });
+      }
+    }
+    return filtered;
+  }, [actualWeight, dateRange]);
 
   const chartData = useMemo(() => {
     const result = createWeightChartData({
@@ -114,7 +139,7 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
             tickCount: 5,
             labelOffset: { x: 0, y: 8 },
             lineWidth: { grid: { x: 0, y: 1 }, frame: 0 },
-            formatXLabel: (value) => dayjs(value).format(dateFormat),
+            formatXLabel: (value) => dayjs(value).format(getDateFormatForRange(dateRange)),
             formatYLabel: (value) => value != null ? `${value.toFixed(1)}` : '',
             labelColor: theme.text,
           }}

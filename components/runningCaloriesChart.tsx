@@ -10,14 +10,14 @@ import {
   generateRunningTotalCalorieSeries,
 } from '../pure/generateSeries';
 import { createChartData } from '../pure/chartData';
-import { getDateFormat, getEntries, getPassiveCalories } from '../store';
+import { getDateFormatForRange } from '../pure/format';
+import { getEntries, getPassiveCalories } from '../store';
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
 
 export default function RunningCaloriesChart({ dateRange }: { dateRange: number | null }) {
   const entries = useSelector(getEntries);
   const passiveCalories = useSelector(getPassiveCalories);
-  const dateFormat = useSelector(getDateFormat);
   const theme = useTheme();
   
   const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
@@ -84,7 +84,7 @@ export default function RunningCaloriesChart({ dateRange }: { dateRange: number 
             tickCount: 5,
             labelOffset: { x: 0, y: 8 },
             lineWidth: { grid: { x: 0, y: 1 }, frame: 0 },
-            formatXLabel: (value) => dayjs(value).format(dateFormat),
+            formatXLabel: (value) => dayjs(value).format(getDateFormatForRange(dateRange)),
             formatYLabel: (value) => {
               if (value == null) return '';
               const absValue = Math.abs(value);

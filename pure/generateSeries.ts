@@ -65,7 +65,7 @@ function fillInSeriesGapDays(series: daySeries) {
   
   if (!lastSeries || !firstSeries) return;
   
-  const lastDay = lastSeries.x;
+  const lastDay = dayjs(lastSeries.x).format('YYYY-MM-DD');
   let seriesIndex = 0;
   
   for (
@@ -147,7 +147,10 @@ export function fillInFoodGaps(
   if (foodEntries.length === 0) return [];
   const startDay = dayjs(startOfFirstDay(foodEntries)).format('YYYY-MM-DD');
   const endDay = foodEntries.reduce(
-    (end, entry) => (entry.timestamp > end ? entry.timestamp : end),
+    (end, entry) => {
+      const entryDay = dayjs(entry.timestamp).format('YYYY-MM-DD');
+      return entryDay > end ? entryDay : end;
+    },
     dayjs().hour() >= 18
       ? dayjs().format('YYYY-MM-DD')
       : dayjs().subtract(1, 'day').format('YYYY-MM-DD')

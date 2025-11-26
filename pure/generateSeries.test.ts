@@ -13,12 +13,12 @@ const defaultPassiveCalories = 1500;
 const noEntries: entry[] = [];
 const foodEntry: entry = {
   entryType: 'food',
-  timestamp: dayjs().toJSON(),
+  timestamp: '2025-11-25T12:00:00.000Z',
   number: 100,
 };
 const weightEntry: entry = {
   entryType: 'weight',
-  timestamp: dayjs().toJSON(),
+  timestamp: '2025-11-25T12:00:00.000Z',
   number: 100,
 };
 
