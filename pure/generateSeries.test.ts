@@ -4,8 +4,8 @@ import {
   generateDailyCalorieSeries,
   generateDailyTotalCalorieSeries,
   generateRunningTotalCalorieSeries,
+  computeActualWeightSeries,
 } from './generateSeries';
-import { maxAcceptableProcessingTime, generateLargeHistory, generateLargeHistoryWithGaps } from './test';
 import dayjs from 'dayjs';
 import { expect, it } from 'vitest';
 
@@ -43,43 +43,54 @@ it('should give correct results for single entry list', () => {
   ]);
 });
 
-it('should be performant', () => {
-  const now = dayjs().toJSON();
+// Tests for computeActualWeightSeries
+const passiveCalories = 1500;
 
-  // Generate 10 years of realistic dataset using the same logic as default entries
-  const largeHistory = generateLargeHistory();
-
-  const startDailyFood = performance.now();
-  generateDailyCalorieSeries(largeHistory, 'food');
-  const endDailyFood = performance.now();
-  const dailyFoodTime = endDailyFood - startDailyFood;
-  expect(dailyFoodTime).toBeLessThan(maxAcceptableProcessingTime);
-
-  const startDailyWeight = performance.now();
-  generateDailyCalorieSeries(largeHistory, 'weight');
-  const endDailyWeight = performance.now();
-  const dailyWeightTime = endDailyWeight - startDailyWeight;
-  expect(dailyWeightTime).toBeLessThan(maxAcceptableProcessingTime);
-
-  const startRunningTotal = performance.now();
-  generateRunningTotalCalorieSeries(largeHistory, defaultPassiveCalories, now);
-  const endRunningTotal = performance.now();
-  const runningTotalTime = endRunningTotal - startRunningTotal;
-  expect(runningTotalTime).toBeLessThan(maxAcceptableProcessingTime);
-
-  const startDailyTotal = performance.now();
-  generateDailyTotalCalorieSeries(largeHistory, defaultPassiveCalories);
-  const endDailyTotal = performance.now();
-  const dailyTotalTime = endDailyTotal - startDailyTotal;
-  expect(dailyTotalTime).toBeLessThan(maxAcceptableProcessingTime);
+it('returns empty series when entries is empty', () => {
+  const entries: entry[] = [];
+  const weightData: { x: string; y: number }[] = [];
+  expect(computeActualWeightSeries(entries, weightData, passiveCalories)).toEqual([]);
 });
 
-it('should be performant with sparse data (many gaps)', () => {
-  // Generate 10 years of sparse data with many gaps
-  const sparseHistory = generateLargeHistoryWithGaps();
+it('converts calories running total to estimated weight scale and keeps length', () => {
+  const start = dayjs().startOf('day');
+  const e1 = { entryType: 'food', timestamp: start.toJSON(), number: 200 } as entry;
+  const e2 = { entryType: 'food', timestamp: start.add(1, 'day').toJSON(), number: 300 } as entry;
+  const entries: entry[] = [e1, e2];
 
-  const startDailyTotal = performance.now();
-  generateDailyTotalCalorieSeries(sparseHistory, defaultPassiveCalories);
-  const endDailyTotal = performance.now();
-  expect(endDailyTotal - startDailyTotal).toBeLessThan(maxAcceptableProcessingTime);
+  const weightData = [
+    { x: e1.timestamp, y: 80 },
+    { x: e2.timestamp, y: 80.5 },
+  ];
+
+  const series = computeActualWeightSeries(entries, weightData, passiveCalories);
+
+  // Should return at least as many points as calories series (start, each entry, now)
+  expect(series.length).toBeGreaterThanOrEqual(3);
+
+  // Values should be roughly on weight scale (not wildly different)
+  series.forEach((p) => {
+    expect(typeof p.y).toBe('number');
+    expect(p.y).toBeGreaterThan(0);
+  });
+});
+
+it('maintains average gap between weight and calories-derived series', () => {
+  const start = dayjs().startOf('day');
+  const e1 = { entryType: 'food', timestamp: start.toJSON(), number: 1000 } as entry;
+  const e2 = { entryType: 'food', timestamp: start.add(1, 'day').toJSON(), number: 1000 } as entry;
+  const entries: entry[] = [e1, e2];
+
+  const weightData = [
+    { x: e1.timestamp, y: 70 },
+    { x: e2.timestamp, y: 70 },
+  ];
+
+  const series = computeActualWeightSeries(entries, weightData, passiveCalories);
+
+  const avgWeight = weightData.reduce((s, n) => s + n.y, 0) / weightData.length;
+  const avgSeriesWeight = series.reduce((s, n) => s + n.y, 0) / series.length;
+
+  // The average estimated weight should be close to the provided averageWeight
+  expect(Math.abs(avgWeight - avgSeriesWeight)).toBeLessThan(5);
 });

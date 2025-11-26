@@ -179,3 +179,29 @@ export function fillInFoodGaps(
     number: averageDailyCalories / 2,
   }]);
 }
+
+export function computeActualWeightSeries(
+  entries: entry[],
+  weightData: { x: string; y: number }[],
+  passiveCalories: number
+) {
+  if (entries.length === 0) return [];
+
+  const caloriesSeries = generateRunningTotalCalorieSeries(
+    entries,
+    passiveCalories
+  ).sort((a, b) => a.x.localeCompare(b.x));
+
+  const averageWeight =
+    weightData.reduce((total, next) => total + next.y, 0) / weightData.length;
+  const averageCalories =
+    caloriesSeries.reduce((total, next) => total + next.y, 0) /
+    caloriesSeries.length;
+  const gap = averageWeight - averageCalories / 3500;
+
+  caloriesSeries.forEach((point) => {
+    point.y = point.y / 3500 + gap;
+  });
+
+  return caloriesSeries;
+}

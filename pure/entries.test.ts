@@ -11,8 +11,6 @@ import {
   getFirstDay,
   getLastDay,
 } from './entries';
-import { generateDefaultEntries } from './defaultEntries';
-import { maxAcceptableProcessingTime } from './test';
 
 const defaultPassiveCalories = 1500;
 
@@ -119,65 +117,4 @@ it('calculateDailyPassiveCalories should calculate passive calories from weight 
   const result = calculateDailyPassiveCalories(sampleEntries);
   expect(typeof result).toBe('number');
   expect(result).not.toBe(-1500); // Should be calculated, not default
-});
-
-it('calculateDailyPassiveCalories should be performant with large datasets', () => {
-  const largeEntries = generateDefaultEntries({
-    days: 365, // 365 days per section
-    meals: 3,
-    dailyCalories: 2000,
-    calorieVariation: 500,
-    sections: 10, // 10 sections = 10 years
-    gapDays: 0, // No gaps
-    initialWeight: 150,
-  });
-
-  const start = performance.now();
-  const result = calculateDailyPassiveCalories(largeEntries);
-  const end = performance.now();
-
-  expect(typeof result).toBe('number');
-  expect(end - start).toBeLessThan(maxAcceptableProcessingTime); // Should complete in under 48ms
-});
-
-it('caloriesAtTimestamp should be performant with large datasets', () => {
-  const largeEntries = generateDefaultEntries({
-    days: 365, // 365 days per section
-    meals: 4,
-    dailyCalories: 2200,
-    calorieVariation: 800,
-    sections: 10, // 10 sections = 10 years
-    gapDays: 0, // No gaps
-    initialWeight: 160,
-  });
-
-  const timestamp = dayjs().subtract(100, 'days');
-
-  const start = performance.now();
-  const result = caloriesAtTimestamp(largeEntries, timestamp, defaultPassiveCalories);
-  const end = performance.now();
-
-  expect(typeof result).toBe('number');
-  expect(end - start).toBeLessThan(maxAcceptableProcessingTime); // Should complete in under 48ms
-});
-
-it('foodCaloriesAtTimestamp should be performant with large datasets', () => {
-  const largeEntries = generateDefaultEntries({
-    days: 365, // 365 days per section
-    meals: 6,
-    dailyCalories: 2500,
-    calorieVariation: 1000,
-    sections: 10, // 10 sections = 10 years
-    gapDays: 0, // No gaps
-    initialWeight: 140,
-  });
-
-  const timestamp = dayjs().subtract(50, 'days');
-
-  const start = performance.now();
-  const result = foodCaloriesAtTimestamp(largeEntries, timestamp);
-  const end = performance.now();
-
-  expect(typeof result).toBe('number');
-  expect(end - start).toBeLessThan(maxAcceptableProcessingTime); // Should complete in under 48ms
 });

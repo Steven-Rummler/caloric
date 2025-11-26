@@ -8,7 +8,7 @@ import { Props } from '../navigationTypes';
 import { addEntry, getEntries, getPassiveCalories } from '../store';
 import { entry } from '../types';
 import { getLastDay } from '../pure/entries';
-import { computeActualWeightSeries } from '../components/weightChart';
+import { computeActualWeightSeries } from '../pure/generateSeries';
 import { ActionButton } from '../components/ActionButton';
 import { OptionButton } from '../components/OptionButton';
 import Page from '../components/Page';

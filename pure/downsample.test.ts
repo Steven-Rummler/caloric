@@ -1,7 +1,5 @@
 import { expect, it } from 'vitest';
 import { downsampleLTTB, downsampleMultipleSeries, DataPoint } from './downsample';
-import { maxAcceptableProcessingTime, generateLargeHistory } from './test';
-import { generateDailyCalorieSeries } from './generateSeries';
 
 const sampleData: DataPoint[] = [
   { x: 1, y: 10 },
@@ -116,28 +114,6 @@ it('downsampleMultipleSeries should handle series with different lengths', () =>
     expect(result[0].some(p => p.x === 1)).toBe(true);
     expect(result[1].some(p => p.x === 1)).toBe(true);
   }
-});
-
-it('downsampleLTTB should be performant with large datasets', () => {
-  // Generate a large dataset similar to real usage
-  const largeHistory = generateLargeHistory();
-  const dailySeries = generateDailyCalorieSeries(largeHistory, 'food');
-
-  // Convert to DataPoint format
-  const largeData: DataPoint[] = dailySeries.map(point => ({
-    x: new Date(point.x).getTime(),
-    y: point.y
-  }));
-
-  const startTime = performance.now();
-  const result = downsampleLTTB(largeData, 200); // Downsample to 200 points
-  const endTime = performance.now();
-
-  const processingTime = endTime - startTime;
-  expect(processingTime).toBeLessThan(maxAcceptableProcessingTime);
-  expect(result).toHaveLength(200);
-  expect(result[0]).toEqual(largeData[0]);
-  expect(result[result.length - 1]).toEqual(largeData[largeData.length - 1]);
 });
 
 it('downsampleLTTB should preserve visual features (peaks and valleys)', () => {

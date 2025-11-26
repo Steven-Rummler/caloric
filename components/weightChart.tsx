@@ -6,10 +6,10 @@ import { CartesianChart, Line, Scatter } from 'victory-native';
 import { Skia } from '@shopify/react-native-skia';
 import { useAssets } from 'expo-asset';
 import { useTheme } from '../ThemeProvider';
-import { generateRunningTotalCalorieSeries } from '../pure/generateSeries';
+import { computeActualWeightSeries } from '../pure/generateSeries';
 import { createWeightChartData } from '../pure/chartData';
 import { getDateFormat, getEntries, getPassiveCalories } from '../store';
-import { entry } from '../types';
+
 
 type SkiaFont = ReturnType<typeof Skia.Font>;
 
@@ -18,8 +18,6 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
   const passiveCalories = useSelector(getPassiveCalories);
   const dateFormat = useSelector(getDateFormat);
   const theme = useTheme();
-  
-  const filteredEntries = dateRange !== null ? entries.filter(e => dayjs(e.timestamp).isAfter(dayjs().subtract(dateRange, 'day'))) : entries;
   
   const [assets] = useAssets([require('../assets/fonts/Roboto-Regular.ttf')]);
   const [font, setFont] = useState<SkiaFont | null>(null);
@@ -53,8 +51,8 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
   }, [assets]);
 
   const weightEntries = useMemo(
-    () => filteredEntries.filter((e) => e.entryType === 'weight'),
-    [filteredEntries]
+    () => entries.filter((e) => e.entryType === 'weight'),
+    [entries]
   );
 
   const weightData = useMemo(
@@ -70,20 +68,30 @@ export default function WeightChart({ dateRange }: { dateRange: number | null })
 
   const actualWeight = useMemo(
     () => {
-      const result = computeActualWeightSeries(filteredEntries, weightData, passiveCalories);
+      const result = computeActualWeightSeries(entries, weightData, passiveCalories);
       return result;
     },
-    [filteredEntries, weightData, passiveCalories]
+    [entries, weightData, passiveCalories]
+  );
+
+  const filteredWeightData = useMemo(
+    () => dateRange !== null ? weightData.filter(d => dayjs(d.x).isAfter(dayjs().subtract(dateRange, 'day'))) : weightData,
+    [weightData, dateRange]
+  );
+
+  const filteredActualWeight = useMemo(
+    () => dateRange !== null ? actualWeight.filter(d => dayjs(d.x).isAfter(dayjs().subtract(dateRange, 'day'))) : actualWeight,
+    [actualWeight, dateRange]
   );
 
   const chartData = useMemo(() => {
     const result = createWeightChartData({
-      weightData,
-      actualWeight
+      weightData: filteredWeightData,
+      actualWeight: filteredActualWeight
     });
 
     return result;
-  }, [weightData, actualWeight]);
+  }, [filteredWeightData, filteredActualWeight]);
 
   if (
     entries.length < 2 ||
@@ -159,28 +167,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export function computeActualWeightSeries(
-  entries: entry[],
-  weightData: { x: string; y: number }[],
-  passiveCalories: number
-) {
-  if (entries.length === 0) return [];
 
-  const caloriesSeries = generateRunningTotalCalorieSeries(
-    entries,
-    passiveCalories
-  ).sort((a, b) => a.x.localeCompare(b.x));
-
-  const averageWeight =
-    weightData.reduce((total, next) => total + next.y, 0) / weightData.length;
-  const averageCalories =
-    caloriesSeries.reduce((total, next) => total + next.y, 0) /
-    caloriesSeries.length;
-  const gap = averageWeight - averageCalories / 3500;
-
-  caloriesSeries.forEach((point) => {
-    point.y = point.y / 3500 + gap;
-  });
-
-  return caloriesSeries;
-}

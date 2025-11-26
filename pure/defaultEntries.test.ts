@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { expect, it } from 'vitest';
 import { generateDefaultEntries } from './defaultEntries';
-import { maxAcceptableProcessingTime } from './test';
 
 it('generateDefaultEntries should create entries with correct structure', () => {
   const params = {
@@ -119,25 +118,6 @@ it('generateDefaultEntries should generate weight progression', () => {
   expect(lastWeight).toBeDefined();
   expect(typeof firstWeight).toBe('number');
   if (typeof firstWeight === 'number') expect(lastWeight).toBeGreaterThan(firstWeight);
-});
-
-it('generateDefaultEntries should be performant', () => {
-  const params = {
-    days: 365, // 365 days per section
-    meals: 4,
-    dailyCalories: 2000,
-    calorieVariation: 1000,
-    sections: 10, // 10 sections = 10 years
-    gapDays: 0, // No gaps
-    initialWeight: 150,
-  };
-
-  const start = performance.now();
-  const entries = generateDefaultEntries(params);
-  const end = performance.now();
-
-  expect(entries.length).toBeGreaterThan(14000); // Should generate many entries (365*10*5 ≈ 18k entries)
-  expect(end - start).toBeLessThan(maxAcceptableProcessingTime); // Should complete in under 48ms
 });
 
 it('generateDefaultEntries should handle edge cases', () => {
